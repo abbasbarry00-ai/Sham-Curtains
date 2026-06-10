@@ -218,6 +218,9 @@ export default function AppPage() {
 
     try {
       const getCohesivePrompt = () => {
+        const colorObj = colors.find(c => c.id === selectedColor);
+        const colorName = colorObj ? colorObj.name : 'أبيض';
+        const colorHex = colorObj ? colorObj.hex : '#ffffff';
         const colorDesc = colorPrompts[selectedColor];
         
         let lightingInstruction = '';
@@ -230,42 +233,44 @@ export default function AppPage() {
           lightingInstruction = "The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
         }
 
+        const qualityDirectives = "This is a professional architectural photograph. Avoid any cartoonish, 3D render, digital illustration, flat vector, or artificial look. The materials must have realistic photographic textures, natural fabric folds, physical shadows, and ambient reflections matching a high-end interior design catalog photo.";
+
         if (isBlindStyle(style)) {
           let blindStyleDesc = '';
           if (style === 'sunscreen') {
             if (opacity === 'blackout') {
-              blindStyleDesc = "modern solid blackout roller blinds, flat opaque fabric roller shades, completely blocking all light, fitted neatly inside the window frame, minimal tech look";
+              blindStyleDesc = `modern solid blackout roller blinds, flat opaque fabric roller shades, completely blocking all light, fitted neatly inside the window frame, minimal tech look, with premium realistic fabric texture`;
             } else if (opacity === 'sheer') {
-              blindStyleDesc = "modern sheer sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look";
+              blindStyleDesc = `modern sheer sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look, with visible fine mesh fabric texture`;
             } else { // semi
-              blindStyleDesc = "modern semi-opaque sunscreen roller blinds, flat light-filtering mesh roller shades, fitted neatly inside the window frame, minimal tech look";
+              blindStyleDesc = `modern semi-opaque sunscreen roller blinds, flat light-filtering mesh roller shades, fitted neatly inside the window frame, minimal tech look, with premium fabric texture`;
             }
           } else if (style === 'blackout') {
-            blindStyleDesc = "premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism";
+            blindStyleDesc = `premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism, with rich matte fabric texture`;
           } else if (style === 'zebra') {
             if (opacity === 'blackout') {
-              blindStyleDesc = "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and thick solid blackout fabric, zebra pattern window blinds";
+              blindStyleDesc = `zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and thick solid blackout fabric, zebra pattern window blinds, with photographic fabric textures`;
             } else {
-              blindStyleDesc = "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid light-filtering fabric, zebra pattern window blinds";
+              blindStyleDesc = `zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid light-filtering fabric, zebra pattern window blinds, with photographic fabric textures`;
             }
           } else if (style === 'wood_venetian' || style === 'metal_venetian') {
             const material = style === 'wood_venetian' ? 'wooden timber' : 'aluminum metal';
             if (opacity === 'blackout') {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully closed and tilted shut to block out all incoming daylight, fitted inside the window casing`;
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully closed and tilted shut to block out all incoming daylight, fitted inside the window casing, with realistic physical texture`;
             } else if (opacity === 'sheer') {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully open and tilted horizontally to let maximum sunlight stream in, fitted inside the window casing`;
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully open and tilted horizontally to let maximum sunlight stream in, fitted inside the window casing, with realistic physical texture`;
             } else {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are tilted partially open to filter the light, fitted inside the window casing`;
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are tilted partially open to filter the light, fitted inside the window casing, with realistic physical texture`;
             }
           } else if (style === 'dk') {
             if (opacity === 'blackout') {
-              blindStyleDesc = "modern vertical day and night blinds, DK vertical sheer and thick blackout fabric slats, slats are turned to the closed blackout position to block all light";
+              blindStyleDesc = `modern vertical day and night blinds, DK vertical sheer and thick blackout fabric slats, slats are turned to the closed blackout position to block all light, with realistic vertical slat textures`;
             } else {
-              blindStyleDesc = "modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels";
+              blindStyleDesc = `modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels, with realistic vertical slat textures`;
             }
           }
 
-          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[opacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
+          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[opacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives}`;
         }
 
         // Curtains
@@ -275,13 +280,13 @@ export default function AppPage() {
 
         let positionInstruction = '';
         if (curtainPosition === 'closed') {
-          positionInstruction = `In this photo, REPLACE the window view by completely covering the entire window with a CLOSED, SHUT, solid ${colorDesc.toUpperCase()} curtain. The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
+          positionInstruction = `In this photo, REPLACE the window view by completely covering the entire window with a CLOSED, SHUT, solid ${colorDesc.toUpperCase()} (${colorHex}) curtain. The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
         } else {
           // half_open
           if (addTulle) {
-            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} curtain on the sides of the window, and REPLACE the center window glass with a sheer white tulle layer. The main curtain panels are drawn open, gathered and bunched at the left and right edges of the window. In the center, fully covering the window glass, there is a sheer white tulle layer with fine mesh netting (sheer lace layer) that filters the daylight. The sheer tulle curtain covers the middle of the window glass, while the main curtains are on the sides.`;
+            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window, and REPLACE the center window glass with a sheer white tulle layer. The main curtain panels are drawn open, gathered and bunched at the left and right edges of the window. In the center, fully covering the window glass, there is a sheer white tulle layer with fine mesh netting (sheer lace layer) that filters the daylight. The sheer tulle curtain covers the middle of the window glass, while the main curtains are on the sides.`;
           } else {
-            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} curtain on the sides of the window. The curtain panels are drawn open, gathered and bunched at the left and right edges of the window. The center of the window is fully open and exposed, showing the clear window glass with daylight streaming through, and no tulle or sheer layer.`;
+            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window. The curtain panels are drawn open, gathered and bunched at the left and right edges of the window. The center of the window is fully open and exposed, showing the clear window glass with daylight streaming through, and no tulle or sheer layer.`;
           }
         }
 
