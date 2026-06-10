@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ستارة AI | صمم ستائرك بالذكاء الاصطناعي",
+  title: "معرض ستائر شام | تصميم ستائرك بالذكاء الاصطناعي",
   description: "ارفع صورة نافذتك وحدد نوع ولون القماش وسيتولى الذكاء الاصطناعي تصميم ستارة واقعية متناسقة مع غرفتك خلال ثوانٍ معدودة.",
 };
 

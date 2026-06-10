@@ -1,32 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --accents-1: #111111;
-  --accents-2: #222222;
-  --accents-3: #333333;
-  --accents-4: #444444;
-  --accents-5: #666666;
-  --accents-6: #888888;
-  --accents-7: #eaeaea;
-  --accents-8: #fafafa;
+  --background: #ffffff;
+  --foreground: #0c0c0e;
+  --accents-1: #f8f9fa;
+  --accents-2: #f1f3f5;
+  --accents-3: #e9ecef;
+  --accents-4: #dee2e6;
+  --accents-5: #868e96;
+  --accents-6: #495057;
+  --accents-7: #343a40;
+  --accents-8: #212529;
   
-  --primary: #ffffff;
-  --primary-invert: #000000;
+  --primary: #0c0c0e;
+  --primary-invert: #ffffff;
   
   --success: #0070f3;
   --success-dark: #0051b3;
   
-  --border: #333333;
-  --border-hover: #444444;
+  --border: #e9ecef;
+  --border-hover: #dee2e6;
   
   --font-sans: 'Tajawal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --radius: 8px;
   --radius-lg: 12px;
   
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  --transition: all 0.2s ease;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reset & Base Styles */
@@ -87,7 +87,7 @@ a {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
   z-index: 100;
 }
@@ -145,11 +145,11 @@ a {
 
 .footer {
   border-top: 1px solid var(--border);
-  padding: 48px 0;
+  padding: 64px 0 32px 0;
   margin-top: auto;
   font-size: 14px;
-  color: var(--accents-5);
-  text-align: center;
+  color: var(--accents-6);
+  background: var(--accents-1);
 }
 
 /* Typography & Hero Section */
@@ -164,7 +164,7 @@ a {
   letter-spacing: -1.5px;
   line-height: 1.15;
   margin-bottom: 24px;
-  background: linear-gradient(180deg, #fff 0%, #a1a1a1 100%);
+  background: linear-gradient(180deg, #0c0c0e 0%, #495057 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -232,7 +232,7 @@ a {
 }
 
 .btn-secondary {
-  background: var(--background);
+  background: #ffffff;
   color: var(--foreground);
   border: 1px solid var(--border);
 }
@@ -445,7 +445,7 @@ a {
   justify-content: center;
   padding: 16px;
   position: relative;
-  background: #050505;
+  background: #f8f9fa;
 }
 
 .dropzone {
@@ -564,7 +564,7 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -617,7 +617,7 @@ a {
 .gallery-image-box {
   width: 100%;
   aspect-ratio: 1.25;
-  background: #080808;
+  background: #f8f9fa;
   position: relative;
   overflow: hidden;
 }
@@ -684,4 +684,187 @@ a {
   content: '•';
   color: var(--primary);
   font-weight: bold;
+}
+
+/* Footer layout expansion */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 48px;
+  text-align: right;
+  margin-bottom: 48px;
+}
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+.footer-col h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 20px;
+}
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.footer-col ul a {
+  color: var(--accents-6);
+  transition: var(--transition);
+}
+.footer-col ul a:hover {
+  color: var(--foreground);
+}
+.footer-col p {
+  line-height: 1.6;
+  font-size: 13px;
+}
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--accents-5);
+}
+@media (max-width: 600px) {
+  .footer-bottom {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+
+/* Store Showcase & Portfolio styles */
+.store-filter-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+.store-filter-btn {
+  background: var(--background);
+  border: 1px solid var(--border);
+  color: var(--accents-7);
+  padding: 8px 20px;
+  font-family: var(--font-sans);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+.store-filter-btn:hover, .store-filter-btn.active {
+  background: var(--primary);
+  color: var(--primary-invert);
+  border-color: var(--primary);
+}
+.store-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--background);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+.store-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-hover);
+}
+.store-image-box {
+  width: 100%;
+  aspect-ratio: 1.25;
+  background: var(--accents-1);
+  position: relative;
+  overflow: hidden;
+}
+.store-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+.store-card:hover .store-img {
+  transform: scale(1.03);
+}
+.store-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #10b981;
+  color: white;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+.store-card-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 12px;
+  text-align: right;
+}
+.store-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.store-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.store-card-tag {
+  background: var(--accents-1);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--accents-6);
+  font-weight: 500;
+}
+.store-card-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.store-card-price {
+  font-size: 14px;
+  color: var(--accents-6);
+  font-weight: 600;
+}
+.store-card-price span {
+  color: var(--foreground);
+  font-size: 18px;
+  font-weight: 800;
+}
+.store-order-btn {
+  background: #25d366;
+  color: white !important;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.store-order-btn:hover {
+  background: #128c7e;
+  transform: scale(1.02);
 }

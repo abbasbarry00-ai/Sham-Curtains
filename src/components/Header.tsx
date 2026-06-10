@@ -10,7 +10,7 @@ export default function Header({ activePage }: HeaderProps) {
       <div className="container header-container">
         <Link href="/" className="logo">
           <span className="logo-icon"></span>
-          <span>ستارة AI</span>
+          <span>معرض ستائر شام</span>
         </Link>
         <nav className="nav">
           <Link href="/" className={`nav-link ${activePage === 'home' ? 'active' : ''}`}>
@@ -20,7 +20,7 @@ export default function Header({ activePage }: HeaderProps) {
             المصمم التفاعلي
           </Link>
           <Link href="/gallery" className={`nav-link ${activePage === 'gallery' ? 'active' : ''}`}>
-            معرض الإلهام
+            معرض أعمالنا
           </Link>
         </nav>
         <div>
