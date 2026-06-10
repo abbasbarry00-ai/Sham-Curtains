@@ -39,8 +39,7 @@ const fabricPrompts: Record<string, string> = {
   linen: "textured natural organic linen fabric with a visible weave and rustic elegance",
   silk: "shiny smooth premium mulberry silk fabric with elegant flowing draping and soft highlights",
   cotton: "soft high-quality organic cotton fabric with a clean smooth matte finish",
-  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture",
-  tulle: "light delicate sheer tulle fabric with a fine mesh netting and soft elegant draping"
+  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture"
 };
 
 const colorPrompts: Record<string, string> = {
@@ -52,9 +51,16 @@ const colorPrompts: Record<string, string> = {
   rose: "dusty rose pink tone"
 };
 
-const mountingPrompts: Record<string, string> = {
-  wall: "mounted on the wall with a prominent visible decorative curtain rod sliding above the window frame",
-  frame: "neatly installed inside the window frame with a hidden track, clean integrated flush mount"
+const barPrompts: Record<string, string> = {
+  wood_bar: "hanging from a luxurious decorative wooden curtain rod with carved wood finials and ornate wooden brackets, warm natural wood grain finish that complements the room furniture",
+  metal_bar: "hanging from a sleek decorative wrought iron curtain rod with elegant metal finials and ornate metal brackets, polished metallic finish matching the room decor",
+  modern_bar: "hanging from a minimalist modern curtain rod with clean geometric finials and slim metal brackets, contemporary brushed steel or matte black finish",
+  hidden: "neatly installed inside the window frame with a completely hidden ceiling track, clean integrated flush mount with no visible hardware"
+};
+
+const curtainPositionPrompts: Record<string, string> = {
+  closed: "The curtain is fully closed, covering the entire window completely with no gaps, fabric draping in full elegant folds across the whole window width",
+  half_open: "The curtain is elegantly pulled open to the sides, gathered halfway to reveal the center of the window, natural sunlight streaming through the exposed window center"
 };
 
 const opacityPrompts: Record<string, string> = {
@@ -67,8 +73,10 @@ export default function AppPage() {
   const [style, setStyle] = useState('wave');
   const [fabric, setFabric] = useState('velvet');
   const [selectedColor, setSelectedColor] = useState('white');
-  const [mounting, setMounting] = useState('wall');
+  const [barStyle, setBarStyle] = useState('wood_bar');
   const [opacity, setOpacity] = useState('semi');
+  const [addTulle, setAddTulle] = useState(false);
+  const [curtainPosition, setCurtainPosition] = useState('closed');
   
   const [originalImageSrc, setOriginalImageSrc] = useState<string | null>(null);
   const [generatedImageSrc, setGeneratedImageSrc] = useState<string | null>(null);
@@ -169,15 +177,17 @@ export default function AppPage() {
     try {
       const styleDesc = stylePrompts[style];
       const colorDesc = colorPrompts[selectedColor];
-      const mountingDesc = mountingPrompts[mounting];
+      const barDesc = barPrompts[barStyle];
       const opacityDesc = opacityPrompts[opacity];
+      const positionDesc = curtainPositionPrompts[curtainPosition];
 
       let prompt = '';
       if (isBlindStyle(style)) {
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are ${mountingDesc}, precisely installed to the window's exact size and frame, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are neatly installed inside the window frame, precisely fitted to the window's exact size, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
       } else {
         const fabricDesc = fabricPrompts[fabric];
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is ${mountingDesc}, precisely tailored to the window's exact size and frame, hanging naturally and realistically. The curtain fabric is ${opacityDesc}. The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        const tulleLayer = addTulle ? ` Behind the main curtain, there is a secondary sheer white tulle layer with fine mesh netting, adding depth and soft light filtering.${curtainPosition === 'half_open' ? ' The tulle layer is visible through the open center of the curtain, softly diffusing the incoming sunlight.' : ''}` : '';
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is ${barDesc}, precisely tailored to the window's exact size and frame, hanging naturally and realistically. ${positionDesc}. The curtain fabric is ${opacityDesc}.${tulleLayer} The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
       }
 
       const response = await fetch('/api/generate', {
@@ -268,36 +278,121 @@ export default function AppPage() {
       <div className="container">
         <main className="workspace">
           
-          {/* Column 1: التركيب والإضاءة (Left Panel) */}
+          {/* Column 1: التركيب والإعدادات (Left Panel) */}
           <section className="left-column controls-panel">
             <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🔆</span> التركيب والإضاءة
+              <span>🔆</span> التركيب والإعدادات
             </h2>
 
-            {/* Mounting Selection */}
+            {/* Decorative Bar Selection */}
             <div className="form-group">
-              <label className="form-label">طريقة التركيب</label>
+              <label className="form-label">ديكور البار (القضيب)</label>
               <div className="pill-grid">
-                <button
-                  type="button"
-                  className={`pill-btn ${mounting === 'wall' ? 'active' : ''}`}
-                  onClick={() => setMounting('wall')}
-                >
-                  على الحائط (قضيب ظاهر)
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${mounting === 'frame' ? 'active' : ''}`}
-                  onClick={() => setMounting('frame')}
-                >
-                  داخل الإطار (مخفي)
-                </button>
+                {isBlindStyle(style) ? (
+                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
+                    بدون بار (تلقائي للبلايند)
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={`pill-btn ${barStyle === 'wood_bar' ? 'active' : ''}`}
+                      onClick={() => setBarStyle('wood_bar')}
+                    >
+                      🪵 بار خشبي ديكور
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${barStyle === 'metal_bar' ? 'active' : ''}`}
+                      onClick={() => setBarStyle('metal_bar')}
+                    >
+                      ⚙️ بار حديد مزخرف
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${barStyle === 'modern_bar' ? 'active' : ''}`}
+                      onClick={() => setBarStyle('modern_bar')}
+                    >
+                      ✦ بار مودرن بسيط
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${barStyle === 'hidden' ? 'active' : ''}`}
+                      onClick={() => setBarStyle('hidden')}
+                    >
+                      🔲 سكة مخفية (بدون بار)
+                    </button>
+                  </>
+                )}
               </div>
+            </div>
+
+            {/* Curtain Position */}
+            <div className="form-group">
+              <label className="form-label">وضعية الستارة</label>
+              <div className="pill-grid">
+                {isBlindStyle(style) ? (
+                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
+                    تلقائي للبلايند
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={`pill-btn ${curtainPosition === 'closed' ? 'active' : ''}`}
+                      onClick={() => setCurtainPosition('closed')}
+                    >
+                      مغلقة بالكامل
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${curtainPosition === 'half_open' ? 'active' : ''}`}
+                      onClick={() => setCurtainPosition('half_open')}
+                    >
+                      مفتوحة عالنص (تبين الضوء)
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Add Tulle Toggle */}
+            <div className="form-group">
+              <label className="form-label">إضافة طبقة تول</label>
+              <div className="pill-grid">
+                {isBlindStyle(style) ? (
+                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
+                    غير متاح للبلايند
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={`pill-btn ${!addTulle ? 'active' : ''}`}
+                      onClick={() => setAddTulle(false)}
+                    >
+                      بدون تول
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${addTulle ? 'active' : ''}`}
+                      onClick={() => setAddTulle(true)}
+                    >
+                      ✨ إضافة تول خلف الستارة
+                    </button>
+                  </>
+                )}
+              </div>
+              {addTulle && !isBlindStyle(style) && (
+                <span style={{ fontSize: '11px', color: '#3b82f6', marginTop: '4px' }}>
+                  💡 اختر "مفتوحة عالنص" في وضعية الستارة لإظهار التول بوضوح مع أشعة الشمس.
+                </span>
+              )}
             </div>
 
             {/* Opacity Selection */}
             <div className="form-group">
-              <label className="form-label">درجة التعتيم وترشيح الضوء</label>
+              <label className="form-label">درجة التعتيم</label>
               <div className="pill-grid">
                 <button
                   type="button"
@@ -311,14 +406,14 @@ export default function AppPage() {
                   className={`pill-btn ${opacity === 'semi' ? 'active' : ''}`}
                   onClick={() => setOpacity('semi')}
                 >
-                  شبه تعتيم (يصفي الضوء)
+                  شبه تعتيم
                 </button>
                 <button
                   type="button"
                   className={`pill-btn ${opacity === 'blackout' ? 'active' : ''}`}
                   onClick={() => setOpacity('blackout')}
                 >
-                  تعتيم كامل (بلاك آوت)
+                  تعتيم كامل
                 </button>
               </div>
             </div>
@@ -328,8 +423,8 @@ export default function AppPage() {
               <h4 style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px' }}>💡 للحصول على أفضل نتيجة:</h4>
               <ul className="tips-list" style={{ paddingRight: '12px' }}>
                 <li>صور النافذة كاملة بإضاءة نهارية واضحة.</li>
-                <li>تأكد من عدم وجود عوائق كبيرة أمام النافذة أثناء التصوير.</li>
-                <li>تطابق الخيارات المدخلة مع رغبتك الفعلية يُعطيك صورة مطابقة للواقع تماماً.</li>
+                <li>تأكد من عدم وجود عوائق كبيرة أمام النافذة.</li>
+                <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
               </ul>
             </div>
           </section>
@@ -642,13 +737,6 @@ export default function AppPage() {
                       onClick={() => setFabric('lace')}
                     >
                       دانتيل منقوش
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${fabric === 'tulle' ? 'active' : ''}`}
-                      onClick={() => setFabric('tulle')}
-                    >
-                      تول ناعم
                     </button>
                   </>
                 )}
