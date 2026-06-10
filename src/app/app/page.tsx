@@ -15,12 +15,24 @@ const colors = [
 ];
 
 const stylePrompts: Record<string, string> = {
-  modern: "modern sleek contemporary custom curtain with clean vertical lines and neat folds",
-  classic: "luxurious classic elegant traditional curtain, rich dense folds, ornate drapery, premium heavy staging",
-  minimalist: "simple minimalist clean solid curtain, neat and tidy styling, elegant simplicity",
-  roman: "roman style fold-up fabric shade curtain, crisp horizontal pleats, custom fit to the window frame",
-  sheer: "light sheer translucent window curtain, soft filtering natural light, delicate airy fabric texture"
+  wave: "modern ripple fold curtain, S-curve wave style drapes, continuous elegant s-waves hanging perfectly from a top track, neat uniform vertical folds, minimalist clean aesthetic",
+  pleated: "pencil pleat curtains, tightly gathered neat small pleats at the top heading, structured vertical fabric folds, elegant classic drapes",
+  gathered: "rod pocket curtain, gathered casing at the top with a rod running through, bunched fabric style drapes, casual ruffled heading, soft natural gathers",
+  pinch: "pinch pleat curtains, double pinch pleats heading style, classic structured vertical folds gathered in neat pinches at the top, elegant formal drapes",
+  sunscreen: "modern sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look",
+  blackout: "premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism",
+  dk: "modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels, rotating vertical fabric louvers",
+  classic_rod: "classic rod curtain, grommet eyelet rings sliding on a prominent exposed metal curtain rod, heavy drapery hanging with deep folds directly from the pole",
+  zebra: "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid opaque fabric, zebra pattern window blinds",
+  wood_venetian: "horizontal wooden venetian blinds, premium wood slat jalousie blinds, adjustable timber slats, fitted inside the window casing, warm wood grain texture",
+  metal_venetian: "horizontal aluminum venetian blinds, sleek metal slat jalousie blinds, silver-grey adjustable metal slats, minimalist industrial office look",
+  side_pull: "elegant tie-back curtains, side pull draped curtains swept to the sides and held with decorative cords, graceful swags exposing the window center",
+  stage: "dramatic theater stage curtains, heavy deep velvet drapery with massive dense folds, theatrical pleated header, majestic stage style drapery"
 };
+
+const blindStyles = ['sunscreen', 'blackout', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
+const isBlindStyle = (styleId: string) => blindStyles.includes(styleId);
+
 
 const fabricPrompts: Record<string, string> = {
   velvet: "heavy premium soft velvet fabric with a rich matte texture and soft sheen highlights",
@@ -40,7 +52,7 @@ const colorPrompts: Record<string, string> = {
 };
 
 export default function AppPage() {
-  const [style, setStyle] = useState('modern');
+  const [style, setStyle] = useState('wave');
   const [fabric, setFabric] = useState('velvet');
   const [selectedColor, setSelectedColor] = useState('white');
   
@@ -142,10 +154,15 @@ export default function AppPage() {
 
     try {
       const styleDesc = stylePrompts[style];
-      const fabricDesc = fabricPrompts[fabric];
       const colorDesc = colorPrompts[selectedColor];
 
-      const prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is precisely tailored to the window's exact size and frame, hanging naturally and realistically. The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+      let prompt = '';
+      if (isBlindStyle(style)) {
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are precisely installed inside the window frame, fitting the window's exact size, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+      } else {
+        const fabricDesc = fabricPrompts[fabric];
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is precisely tailored to the window's exact size and frame, hanging naturally and realistically. The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+      }
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -226,11 +243,19 @@ export default function AppPage() {
                 value={style}
                 onChange={(e) => setStyle(e.target.value)}
               >
-                <option value="modern">مودرن (Modern)</option>
-                <option value="classic">كلاسيك فاخر (Classic)</option>
-                <option value="minimalist">بسيط هادئ (Minimalist)</option>
-                <option value="roman">روماني مطوي (Roman)</option>
-                <option value="sheer">شيفون شفاف (Sheer)</option>
+                <option value="wave">ويفي (Wave / Ripple fold)</option>
+                <option value="pleated">كسرات (Pleated)</option>
+                <option value="gathered">زم (Gathered / Rod pocket)</option>
+                <option value="pinch">تكسير امريكي (American / Pinch pleat)</option>
+                <option value="sunscreen">رول سنسكرين (Sunscreen roller)</option>
+                <option value="blackout">رول بلاك اوات شامواه (Blackout suede roller)</option>
+                <option value="dk">دي كي (DK blinds / Verti-store)</option>
+                <option value="classic_rod">كلاسيك بوري (Classic rod curtain)</option>
+                <option value="zebra">رول زيبرا (Zebra roller)</option>
+                <option value="wood_venetian">جالوزي خشبي (Wooden Venetian)</option>
+                <option value="metal_venetian">جالوزي معدني (Metal Venetian)</option>
+                <option value="side_pull">رفعات جانبية (Side pull / Tie-back)</option>
+                <option value="stage">مسرحي كسرات (Theater pleated)</option>
               </select>
             </div>
 
@@ -240,14 +265,21 @@ export default function AppPage() {
               <select 
                 id="curtain-fabric" 
                 className="form-control"
-                value={fabric}
+                value={isBlindStyle(style) ? 'auto' : fabric}
                 onChange={(e) => setFabric(e.target.value)}
+                disabled={isBlindStyle(style)}
               >
-                <option value="velvet">مخمل ثقيل (Velvet)</option>
-                <option value="linen">كتان طبيعي (Linen)</option>
-                <option value="silk">حرير ناعم (Silk)</option>
-                <option value="cotton">قطن ناعم (Cotton)</option>
-                <option value="lace">دانتيل منقوش (Lace)</option>
+                {isBlindStyle(style) ? (
+                  <option value="auto">تلقائي للموديل (Automatic)</option>
+                ) : (
+                  <>
+                    <option value="velvet">مخمل ثقيل (Velvet)</option>
+                    <option value="linen">كتان طبيعي (Linen)</option>
+                    <option value="silk">حرير ناعم (Silk)</option>
+                    <option value="cotton">قطن ناعم (Cotton)</option>
+                    <option value="lace">دانتيل منقوش (Lace)</option>
+                  </>
+                )}
               </select>
             </div>
 
