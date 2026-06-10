@@ -224,8 +224,20 @@ export default function AppPage() {
       const positionDesc = curtainPositionPrompts[curtainPosition];
 
       let prompt = '';
+      
+      // Determine lighting instruction based on opacity to resolve the "identical lighting" conflict
+      let lightingInstruction = '';
+      if (opacity === 'sheer') {
+        lightingInstruction = `The room's lighting must be bright and naturally lit by daylight filtering through. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
+      } else if (opacity === 'semi') {
+        lightingInstruction = `The room's lighting must be softly diffused with gentle ambient light. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
+      } else {
+        // blackout
+        lightingInstruction = `The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
+      }
+
       if (isBlindStyle(style)) {
-        prompt = `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} ${styleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The slats, shadows, and light filtering must match the room's natural lighting and window size perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, must remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design.`;
+        prompt = `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} ${styleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityDesc}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
       } else {
         const fabricDesc = fabricPrompts[fabric];
         const colorDesc = colorPrompts[selectedColor];
@@ -263,7 +275,7 @@ export default function AppPage() {
         prompt = `${positionInstruction}
 The curtain must be a custom-fit ${colorDesc.toUpperCase()} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain fabric is ${opacityDesc}.${tulleLayerBehind}
 ${barInstruction}
-All other parts of the room, including the furniture, walls, floor, and lighting, must remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design.`;
+${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
       }
 
       const response = await fetch('/api/generate', {
