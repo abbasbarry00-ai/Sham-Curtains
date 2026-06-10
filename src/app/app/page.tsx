@@ -225,11 +225,46 @@ export default function AppPage() {
 
       let prompt = '';
       if (isBlindStyle(style)) {
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are neatly installed inside the window frame, precisely fitted to the window's exact size, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        prompt = `Edit this photo of the room to add a new custom-fit ${colorDesc} ${styleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The slats, shadows, and light filtering must match the room's natural lighting and window size perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, must remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design.`;
       } else {
         const fabricDesc = fabricPrompts[fabric];
-        const tulleLayer = addTulle ? ` Behind the main curtain, there is a secondary sheer white tulle layer with fine mesh netting, adding depth and soft light filtering.${curtainPosition === 'half_open' ? ' The tulle layer is visible through the open center of the curtain, softly diffusing the incoming sunlight.' : ''}` : '';
-        prompt = `A highly realistic professional photo of the room. ${positionDesc}. ${barDesc} The curtain is a custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style, precisely tailored to the window's exact size and frame, hanging naturally and realistically. The curtain fabric is ${opacityDesc}.${tulleLayer} The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        const colorDesc = colorPrompts[selectedColor];
+        const styleDesc = stylePrompts[style];
+        const opacityDesc = opacityPrompts[opacity];
+        
+        let positionInstruction = '';
+        if (curtainPosition === 'closed') {
+          positionInstruction = `The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
+        } else {
+          // half_open
+          if (addTulle) {
+            positionInstruction = `The main curtain panels are drawn open, gathered and bunched at the left and right edges of the window. In the center, fully covering the window glass, there is a sheer white tulle layer with fine mesh netting (sheer lace layer) that filters the daylight. The sheer tulle curtain covers the middle of the window glass, while the main curtains are on the sides.`;
+          } else {
+            positionInstruction = `The curtain panels are drawn open, gathered and bunched at the left and right edges of the window. The center of the window is fully open and exposed, showing the clear window glass with daylight streaming through, and no tulle or sheer layer.`;
+          }
+        }
+
+        let barInstruction = '';
+        if (barStyle === 'hidden') {
+          barInstruction = `The curtains must hang from a completely hidden, invisible track slot in the ceiling. The fabric emerges directly from a clean narrow gap in the ceiling. There must be no visible curtain rod, no pole, no rings, no finials, and no brackets above the window. The wall above the window is completely empty and clean, and the curtain is flush with the ceiling.`;
+        } else if (barStyle === 'wood_bar') {
+          barInstruction = `Mount the curtains from a highly visible, prominent decorative wooden curtain rod installed on the wall above the window. The wooden rod has ornate wood finials on both ends and wooden brackets, with a rich warm wood grain finish. The rod and brackets are clearly visible.`;
+        } else if (barStyle === 'metal_bar') {
+          barInstruction = `Mount the curtains from a highly visible, prominent decorative wrought iron curtain rod installed on the wall above the window. The rod has elegant ornate metal finials on both ends and iron brackets, with a polished metallic black or brass finish. The rod and brackets are clearly visible.`;
+        } else if (barStyle === 'modern_bar') {
+          barInstruction = `Mount the curtains from a highly visible, prominent sleek minimalist modern curtain rod installed on the wall above the window. The modern rod has clean geometric finials and slim metal brackets in a brushed steel or matte black finish. The rod and brackets are clearly visible.`;
+        }
+
+        // Tulle layer behind if closed
+        const tulleLayerBehind = (addTulle && curtainPosition === 'closed') 
+          ? ' A secondary layer of sheer white tulle is installed behind the closed main curtain, close to the window glass (mostly hidden by the closed main curtain).'
+          : '';
+
+        prompt = `Edit this photo of the room to add a new custom-fit curtain over the window area. 
+The curtain must be a ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain fabric is ${opacityDesc}.${tulleLayerBehind}
+${positionInstruction}
+${barInstruction}
+All other parts of the room, including the furniture, walls, floor, and lighting, must remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design.`;
       }
 
       const response = await fetch('/api/generate', {
