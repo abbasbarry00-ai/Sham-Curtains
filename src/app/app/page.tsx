@@ -52,21 +52,63 @@ const colorPrompts: Record<string, string> = {
 };
 
 const barPrompts: Record<string, string> = {
-  wood_bar: "The curtain hangs from a prominent visible luxurious decorative wooden curtain rod mounted on the wall above the window. The rod has ornate carved wood finials on both ends and decorative wooden brackets. The wood grain finish is warm and complements the room furniture. The rod and brackets must be clearly visible.",
-  metal_bar: "The curtain hangs from a prominent visible decorative wrought iron curtain rod mounted on the wall above the window. The rod has elegant ornate metal finials on both ends and decorative iron brackets. The metallic finish is polished and matches the room decor. The rod and brackets must be clearly visible.",
-  modern_bar: "The curtain hangs from a prominent visible minimalist modern curtain rod mounted on the wall above the window. The rod has clean geometric finials and slim metal brackets in brushed steel or matte black. The rod must be clearly visible.",
-  hidden: "The curtain hangs from a completely hidden recessed ceiling track that is invisible. There is absolutely NO visible curtain rod, NO pole, NO bar, NO finials, NO brackets, and NO exposed mounting hardware whatsoever. The fabric appears to emerge directly from a clean ceiling slot."
+  wood_bar: "The curtains MUST hang from a highly visible, prominent decorative wooden curtain rod mounted on the wall above the window. The wooden rod has ornate wood finials on both ends and wooden brackets, with a rich warm wood grain finish. The rod and mounting brackets are clearly visible.",
+  metal_bar: "The curtains MUST hang from a highly visible, prominent decorative wrought iron curtain rod mounted on the wall above the window. The rod has elegant ornate metal finials on both ends and iron brackets, with a polished metallic black or brass finish. The rod and mounting brackets are clearly visible.",
+  modern_bar: "The curtains MUST hang from a highly visible, prominent sleek minimalist modern curtain rod mounted on the wall above the window. The modern rod has clean geometric finials and slim metal brackets in a brushed steel or matte black finish. The rod and brackets are clearly visible.",
+  hidden: "There must be NO visible curtain rod, NO pole, NO bar, NO finials, and NO brackets above the window. The curtains must hang from a completely hidden, invisible recessed track slot in the ceiling. The fabric emerges directly from a clean narrow gap in the ceiling without any visible hanging hardware."
 };
 
 const curtainPositionPrompts: Record<string, string> = {
-  closed: "IMPORTANT: The curtain panels are FULLY CLOSED, meeting perfectly at the center with no gap. The fabric covers the ENTIRE window from edge to edge with no opening. No part of the window glass or daylight is visible behind the curtain. The fabric hangs in continuous elegant folds across the complete window width.",
-  half_open: "IMPORTANT: The curtain panels are pulled OPEN to both sides, gathered and bunched at the left and right edges of the window. The CENTER of the window is fully EXPOSED and UNCOVERED, with bright natural sunlight streaming through the bare window glass in the middle."
+  closed: "The curtain panels are drawn completely shut, meeting tightly in the center. The fabric covers the entire window from the left edge to the right edge. The window glass and window frame are fully covered and hidden behind the solid continuous curtain fabric, with no center gap or opening.",
+  half_open: "The curtain panels are half-open, drawn apart to the left and right sides. The curtain fabric is gathered and bunched at the left and right window edges, leaving the center of the window fully open and exposed, with natural daylight streaming through the window glass in the middle."
 };
 
 const opacityPrompts: Record<string, string> = {
   sheer: "sheer translucent fabric that lets natural sunlight pass through, creating a bright airy ambiance with soft light filtering",
   semi: "semi-opaque light-filtering fabric that dims the light and offers privacy while maintaining a warm ambient glow",
   blackout: "100% thick blackout fabric that completely blocks out all incoming daylight, providing full room darkening and absolute privacy"
+};
+
+const styleNames: Record<string, string> = {
+  wave: 'ويفي',
+  pleated: 'كسرات',
+  gathered: 'زم',
+  pinch: 'تكسير امريكي',
+  sunscreen: 'رول سنسكرين',
+  blackout: 'بلاك آوت شامواه',
+  dk: 'دي كي (DK)',
+  classic_rod: 'كلاسيك بوري',
+  zebra: 'رول زيبرا',
+  wood_venetian: 'جالوزي خشبي',
+  metal_venetian: 'جالوزي معدني',
+  side_pull: 'رفعات جانبية',
+  stage: 'مسرحي كسرات'
+};
+
+const fabricNames: Record<string, string> = {
+  velvet: 'مخمل ثقيل',
+  linen: 'كتان طبيعي',
+  silk: 'حرير ناعم',
+  cotton: 'قطن ناعم',
+  lace: 'دانتيل منقوش'
+};
+
+const barNames: Record<string, string> = {
+  wood_bar: '🪵 بار خشبي ديكور',
+  metal_bar: '⚙️ بار حديد مزخرف',
+  modern_bar: '✦ بار مودرن بسيط',
+  hidden: '🔲 سكة مخفية (بدون بار)'
+};
+
+const positionNames: Record<string, string> = {
+  closed: 'مغلقة بالكامل',
+  half_open: 'مفتوحة عالنص'
+};
+
+const opacityNames: Record<string, string> = {
+  sheer: 'شفاف يمرر الضوء',
+  semi: 'شبه تعتيم',
+  blackout: 'تعتيم كامل'
 };
 
 export default function AppPage() {
@@ -275,505 +317,397 @@ export default function AppPage() {
     <>
       <Header activePage="app" />
 
-      <div className="container">
-        <main className="workspace">
+      <div className="container container--wide">
+        <div className="workspace-head">
+          <h1 className="section-title">صمّم ستارتك الآن</h1>
           
-          {/* Column 1: التركيب والإعدادات (Left Panel) */}
-          <section className="left-column controls-panel">
-            <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🔆</span> التركيب والإعدادات
+          {/* Steps Progress Indicator */}
+          <div className="workspace-steps">
+            <div className={`workspace-step ${originalImageSrc ? 'completed' : 'active'}`}>
+              <div className="step-badge">١</div>
+              <span className="step-label">ارفع صورة غرفتك</span>
+              <div className="step-connector"></div>
+            </div>
+            <div className={`workspace-step ${originalImageSrc && !generatedImageSrc ? 'active' : ''} ${generatedImageSrc ? 'completed' : ''}`}>
+              <div className="step-badge">٢</div>
+              <span className="step-label">اختر الخيارات وولّد</span>
+              <div className="step-connector"></div>
+            </div>
+            <div className={`workspace-step ${generatedImageSrc ? 'active' : ''}`}>
+              <div className="step-badge">٣</div>
+              <span className="step-label">قارن وحمّل النتيجة</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="studio" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
+          
+          {/* Column 1: Right Panel - المظهر والخامة */}
+          <section className="studio-side studio-side--right" aria-label="خيارات المظهر والخامة">
+            <h2 className="side-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m12 2 8.5 5L12 12 3.5 7 12 2Z"></path>
+                <path d="m3.5 12 8.5 5 8.5-5"></path>
+                <path d="m3.5 17 8.5 5 8.5-5"></path>
+              </svg>
+              <span>المظهر والخامة</span>
             </h2>
 
-            {/* Decorative Bar Selection */}
-            <div className="form-group">
-              <label className="form-label">ديكور البار (القضيب)</label>
-              <div className="pill-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
-                    بدون بار (تلقائي للبلايند)
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className={`pill-btn ${barStyle === 'wood_bar' ? 'active' : ''}`}
-                      onClick={() => setBarStyle('wood_bar')}
-                    >
-                      🪵 بار خشبي ديكور
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${barStyle === 'metal_bar' ? 'active' : ''}`}
-                      onClick={() => setBarStyle('metal_bar')}
-                    >
-                      ⚙️ بار حديد مزخرف
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${barStyle === 'modern_bar' ? 'active' : ''}`}
-                      onClick={() => setBarStyle('modern_bar')}
-                    >
-                      ✦ بار مودرن بسيط
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${barStyle === 'hidden' ? 'active' : ''}`}
-                      onClick={() => setBarStyle('hidden')}
-                    >
-                      🔲 سكة مخفية (بدون بار)
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Curtain Position */}
-            <div className="form-group">
-              <label className="form-label">وضعية الستارة</label>
-              <div className="pill-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
-                    تلقائي للبلايند
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className={`pill-btn ${curtainPosition === 'closed' ? 'active' : ''}`}
-                      onClick={() => setCurtainPosition('closed')}
-                    >
-                      مغلقة بالكامل
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${curtainPosition === 'half_open' ? 'active' : ''}`}
-                      onClick={() => setCurtainPosition('half_open')}
-                    >
-                      مفتوحة عالنص (تبين الضوء)
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Add Tulle Toggle */}
-            <div className="form-group">
-              <label className="form-label">إضافة طبقة تول</label>
-              <div className="pill-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
-                    غير متاح للبلايند
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className={`pill-btn ${!addTulle ? 'active' : ''}`}
-                      onClick={() => setAddTulle(false)}
-                    >
-                      بدون تول
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${addTulle ? 'active' : ''}`}
-                      onClick={() => setAddTulle(true)}
-                    >
-                      ✨ إضافة تول خلف الستارة
-                    </button>
-                  </>
-                )}
-              </div>
-              {addTulle && !isBlindStyle(style) && (
-                <span style={{ fontSize: '11px', color: '#3b82f6', marginTop: '4px' }}>
-                  💡 اختر "مفتوحة عالنص" في وضعية الستارة لإظهار التول بوضوح مع أشعة الشمس.
-                </span>
-              )}
-            </div>
-
-            {/* Opacity Selection */}
-            <div className="form-group">
-              <label className="form-label">درجة التعتيم</label>
-              <div className="pill-grid">
-                <button
-                  type="button"
-                  className={`pill-btn ${opacity === 'sheer' ? 'active' : ''}`}
-                  onClick={() => setOpacity('sheer')}
-                >
-                  شفاف يمرر الضوء
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${opacity === 'semi' ? 'active' : ''}`}
-                  onClick={() => setOpacity('semi')}
-                >
-                  شبه تعتيم
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${opacity === 'blackout' ? 'active' : ''}`}
-                  onClick={() => setOpacity('blackout')}
-                >
-                  تعتيم كامل
-                </button>
-              </div>
-            </div>
-
-            {/* Tips Card */}
-            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '16px', background: 'var(--background)', marginTop: '12px' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px' }}>💡 للحصول على أفضل نتيجة:</h4>
-              <ul className="tips-list" style={{ paddingRight: '12px' }}>
-                <li>صور النافذة كاملة بإضاءة نهارية واضحة.</li>
-                <li>تأكد من عدم وجود عوائق كبيرة أمام النافذة.</li>
-                <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Column 2: Canvas & Steps (Center Panel) */}
-          <section className="center-column">
-            
-            {/* Page Main Title */}
-            <h1 style={{ fontSize: '32px', fontWeight: 800, textAlign: 'center', marginBottom: '24px', color: 'var(--foreground)' }}>
-              صمّم ستارتك الآن
-            </h1>
-
-            {/* Steps Progress Indicator */}
-            <div className="steps-indicator">
-              <div className={`step-item ${originalImageSrc ? 'completed' : 'active'}`}>
-                <span className="step-number">1</span>
-                <span className="step-text">ارفع صورة غرفتك</span>
-              </div>
-              <div className="step-line"></div>
-              <div className={`step-item ${originalImageSrc && !generatedImageSrc ? 'active' : ''} ${generatedImageSrc ? 'completed' : ''}`}>
-                <span className="step-number">2</span>
-                <span className="step-text">اختر الخيارات وولد</span>
-              </div>
-              <div className="step-line"></div>
-              <div className={`step-item ${generatedImageSrc ? 'active' : ''}`}>
-                <span className="step-number">3</span>
-                <span className="step-text">قارن وحمل النتيجة</span>
-              </div>
-            </div>
-
-            {/* Main Canvas Area */}
-            <div className="canvas-panel" style={{ flex: 1 }}>
-              <div className="canvas-header">
-                <h3 className="canvas-title">
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: originalImageSrc ? '#10b981' : '#ccc', display: 'inline-block' }}></span>
-                  <span>
-                    {generatedImageSrc 
-                      ? "تم تصميم ستارتك بنجاح! 🎉" 
-                      : originalImageSrc 
-                        ? "تم رفع الصورة! حدد خيارات الستارة واضغط توليد" 
-                        : "ارفع صورة نافذتك لتبدأ"}
-                  </span>
-                </h3>
-                {originalImageSrc && (
-                  <div className="canvas-toolbar">
-                    <button className="btn btn-secondary" onClick={resetWorkspace} style={{ padding: '6px 14px', fontSize: '13px' }}>
-                      تصميم جديد ↻
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="canvas-container">
-                {/* Subtle Grid Background for canvas */}
-                {!originalImageSrc && !generatedImageSrc && <div className="dropzone-grid-bg"></div>}
-
-                {/* Dropzone for upload */}
-                {!originalImageSrc && !generatedImageSrc && (
-                  <div 
-                    className="dropzone"
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={handleDrop}
-                    style={{ 
-                      borderColor: dragging ? '#3b82f6' : 'var(--border)',
-                      background: dragging ? 'rgba(59, 130, 246, 0.03)' : 'var(--background)',
-                      zIndex: 1
-                    }}
-                  >
-                    {/* Modern Premium SVG icon representing image upload */}
-                    <svg className="dropzone-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px' }}>
-                      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                      <path d="M12 8l-4 4h8z" />
-                      <path d="M12 16v-6" />
-                    </svg>
-                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--foreground)', margin: '4px 0' }}>
-                      اسحب صورة نافذتك إلى هنا
-                    </h3>
-                    <p style={{ fontSize: '13px', color: 'var(--accents-5)', margin: '0 0 12px 0' }}>
-                      أو اضغط لاختيار صورة من جهازك
-                    </p>
-                    <div className="btn btn-secondary dropzone-btn" style={{ pointerEvents: 'none', padding: '8px 18px', fontSize: '13px', borderRadius: '6px', fontWeight: 600 }}>
-                      اختر صورة
-                    </div>
-                    <button 
-                      type="button"
-                      className="btn-link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        loadReadyImage();
-                      }}
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: '#3b82f6', 
-                        fontWeight: 700, 
-                        fontSize: '13px', 
-                        cursor: 'pointer', 
-                        marginTop: '12px',
-                        textDecoration: 'underline',
-                        zIndex: 2
-                      }}
-                    >
-                      أو جرّب بصورة جاهزة
-                    </button>
-                    <span style={{ fontSize: '11px', color: 'var(--accents-5)', marginTop: '8px' }}>
-                      PNG أو JPG – حتى 10 ميجابايت
-                    </span>
-                    <input 
-                      type="file" 
-                      ref={fileInputRef}
-                      onChange={(e) => { if (e.target.files?.length) handleImageFile(e.target.files[0]); }}
-                      accept="image/*" 
-                      style={{ display: 'none' }} 
-                    />
-                  </div>
-                )}
-
-                {/* Source Image Display */}
-                {originalImageSrc && !generatedImageSrc && (
-                  <div className="editor-wrapper" style={{ display: 'block' }}>
-                    <img src={originalImageSrc} className="editor-image" alt="النافذة المرفوعة" />
-                  </div>
-                )}
-
-                {/* Comparison Result View */}
-                {originalImageSrc && generatedImageSrc && (
-                  <div style={{ width: '100%' }}>
-                    <BeforeAfterSlider
-                      beforeImage={originalImageSrc}
-                      afterImage={generatedImageSrc}
-                      beforeAlt="قبل"
-                      afterAlt="بعد"
-                      aspectRatio={imageAspectRatio}
-                    />
-                  </div>
-                )}
-
-                {/* Loading Overlay */}
-                {loading && (
-                  <div className="loading-overlay" style={{ display: 'flex' }}>
-                    <div className="spinner"></div>
-                    <p className="loading-text">{loadingMessage}</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Bottom bar when result is shown */}
-              {originalImageSrc && generatedImageSrc && (
-                <div style={{ borderTop: '1px solid var(--border)', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--accents-1)' }}>
-                  <span style={{ fontSize: '13px', color: 'var(--accents-6)' }}>
-                    اسحب المقبض في المنتصف لمقارنة النتيجة مع النافذة الأصلية.
-                  </span>
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button className="btn btn-secondary" id="btn-download" onClick={handleDownload} style={{ padding: '8px 16px', fontSize: '13px' }}>
-                      تحميل التصميم 💾
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Column 3: المظهر والخامة (Right Panel) */}
-          <section className="right-column controls-panel">
-            <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🥞</span> المظهر والخامة
-            </h2>
-            
             {/* Style Selection */}
             <div className="form-group">
-              <label className="form-label">الطراز</label>
-              <div className="pill-grid">
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'wave' ? 'active' : ''}`}
-                  onClick={() => setStyle('wave')}
-                >
-                  ويفي (Wave)
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'pleated' ? 'active' : ''}`}
-                  onClick={() => setStyle('pleated')}
-                >
-                  كسرات (Pleated)
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'gathered' ? 'active' : ''}`}
-                  onClick={() => setStyle('gathered')}
-                >
-                  زم (Gathered)
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'pinch' ? 'active' : ''}`}
-                  onClick={() => setStyle('pinch')}
-                >
-                  تكسير امريكي
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'sunscreen' ? 'active' : ''}`}
-                  onClick={() => setStyle('sunscreen')}
-                >
-                  رول سنسكرين
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'blackout' ? 'active' : ''}`}
-                  onClick={() => setStyle('blackout')}
-                >
-                  بلاك آوت شامواه
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'dk' ? 'active' : ''}`}
-                  onClick={() => setStyle('dk')}
-                >
-                  دي كي (DK)
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'classic_rod' ? 'active' : ''}`}
-                  onClick={() => setStyle('classic_rod')}
-                >
-                  كلاسيك بوري
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'zebra' ? 'active' : ''}`}
-                  onClick={() => setStyle('zebra')}
-                >
-                  رول زيبرا
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'wood_venetian' ? 'active' : ''}`}
-                  onClick={() => setStyle('wood_venetian')}
-                >
-                  جالوزي خشبي
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'metal_venetian' ? 'active' : ''}`}
-                  onClick={() => setStyle('metal_venetian')}
-                >
-                  جالوزي معدني
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'side_pull' ? 'active' : ''}`}
-                  onClick={() => setStyle('side_pull')}
-                >
-                  رفعات جانبية
-                </button>
-                <button
-                  type="button"
-                  className={`pill-btn ${style === 'stage' ? 'active' : ''}`}
-                  onClick={() => setStyle('stage')}
-                >
-                  مسرحي كسرات
-                </button>
+              <span className="form-label" id="style-label">الطراز</span>
+              <div className="chip-grid" role="group" aria-labelledby="style-label">
+                {Object.keys(styleNames).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`chip ${style === key ? 'selected' : ''}`}
+                    onClick={() => setStyle(key)}
+                    aria-pressed={style === key}
+                  >
+                    {styleNames[key]}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Fabric Selection */}
             <div className="form-group">
-              <label className="form-label">نوع القماش</label>
-              <div className="pill-grid">
+              <span className="form-label" id="fabric-label">نوع القماش</span>
+              <div className="chip-grid" role="group" aria-labelledby="fabric-label">
                 {isBlindStyle(style) ? (
-                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
-                    تلقائي للموديل (Automatic)
+                  <button type="button" className="chip selected" disabled>
+                    تلقائي للموديل
                   </button>
                 ) : (
-                  <>
+                  Object.keys(fabricNames).map((key) => (
                     <button
+                      key={key}
                       type="button"
-                      className={`pill-btn ${fabric === 'velvet' ? 'active' : ''}`}
-                      onClick={() => setFabric('velvet')}
+                      className={`chip ${fabric === key ? 'selected' : ''}`}
+                      onClick={() => setFabric(key)}
+                      aria-pressed={fabric === key}
                     >
-                      مخمل ثقيل
+                      {fabricNames[key]}
                     </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${fabric === 'linen' ? 'active' : ''}`}
-                      onClick={() => setFabric('linen')}
-                    >
-                      كتان طبيعي
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${fabric === 'silk' ? 'active' : ''}`}
-                      onClick={() => setFabric('silk')}
-                    >
-                      حرير ناعم
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${fabric === 'cotton' ? 'active' : ''}`}
-                      onClick={() => setFabric('cotton')}
-                    >
-                      قطن ناعم
-                    </button>
-                    <button
-                      type="button"
-                      className={`pill-btn ${fabric === 'lace' ? 'active' : ''}`}
-                      onClick={() => setFabric('lace')}
-                    >
-                      دانتيل منقوش
-                    </button>
-                  </>
+                  ))
                 )}
               </div>
             </div>
 
             {/* Color Selection */}
             <div className="form-group">
-              <label className="form-label">اللون المفضل</label>
-              <div className="color-swatches" id="color-swatches">
+              <span className="form-label" id="color-label">اللون المفضل</span>
+              <div className="color-swatches" role="group" aria-labelledby="color-label">
                 {colors.map((c) => (
                   <button
                     key={c.id}
+                    type="button"
                     className={`swatch-btn ${selectedColor === c.id ? 'selected' : ''}`}
                     style={{ backgroundColor: c.hex }}
                     onClick={() => setSelectedColor(c.id)}
                     title={c.name}
-                  />
+                    aria-label={c.name}
+                    aria-pressed={selectedColor === c.id}
+                  >
+                    {selectedColor === c.id && (
+                      <svg className={`swatch-check ${c.id === 'white' || c.id === 'beige' ? 'swatch-check--dark' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    )}
+                  </button>
                 ))}
               </div>
-              <span style={{ fontSize: '12px', color: 'var(--accents-5)', marginTop: '4px' }}>
+              <span className="form-hint">
                 اللون المختار: {colors.find(c => c.id === selectedColor)?.name}
               </span>
             </div>
-
-            {/* Generate Button */}
-            <button 
-              className="btn btn-primary" 
-              onClick={triggerGenerate} 
-              disabled={!originalImageSrc || loading}
-              style={{ width: '100%', fontWeight: 700, padding: '12px 20px', fontSize: '15px', marginTop: '12px', background: '#3b82f6', color: '#ffffff', borderColor: '#3b82f6' }}
-            >
-              توليد بالذكاء الاصطناعي ✨
-            </button>
           </section>
 
-        </main>
+          {/* Column 2: Center - Studio Stage */}
+          <section className="studio-stage" aria-label="رفع الصورة والتوليد">
+            <div className="stage-header">
+              <span className="stage-status" aria-live="polite">
+                <span className={`stage-status-dot ${originalImageSrc ? 'is-ready' : ''} ${generatedImageSrc ? 'is-done' : ''} ${loading ? 'is-busy' : ''}`} aria-hidden="true"></span>
+                <span>
+                  {loading 
+                    ? "جاري الاتصال بخادم الذكاء الاصطناعي..." 
+                    : generatedImageSrc 
+                      ? "تم تصميم ستارتك بنجاح! 🎉" 
+                      : originalImageSrc 
+                        ? "تم رفع الصورة! حدد الخيارات واضغط توليد" 
+                        : "ارفع صورة نافذتك لتبدأ"}
+                </span>
+              </span>
+              {originalImageSrc && (
+                <button className="stage-reset" onClick={resetWorkspace}>
+                  تصميم جديد ↻
+                </button>
+              )}
+            </div>
+
+            <div className="stage-canvas">
+              {/* Subtle Grid Background for canvas */}
+              {!originalImageSrc && !generatedImageSrc && <div className="dropzone-grid-bg"></div>}
+
+              {/* Dropzone for upload */}
+              {!originalImageSrc && !generatedImageSrc && (
+                <div 
+                  className="dropzone"
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={handleDrop}
+                >
+                  <svg className="dropzone-icon" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 20V11a7 7 0 0 1 14 0v9" />
+                    <path d="M4 20h16" />
+                    <path d="M12 15V8" />
+                    <path d="m9 11 3-3 3 3" />
+                  </svg>
+                  <h3>اسحب صورة نافذتك إلى هنا</h3>
+                  <p>أو اضغط لاختيار صورة من جهازك</p>
+                  <span className="btn btn-secondary" style={{ pointerEvents: 'none', marginTop: '8px', fontSize: '13px' }}>
+                    اختر صورة
+                  </span>
+                  <button 
+                    type="button"
+                    className="dropzone-sample"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      loadReadyImage();
+                    }}
+                  >
+                    أو جرّب بصورة جاهزة
+                  </button>
+                  <span className="dropzone-formats">
+                    PNG أو JPG – حتى ١٠ ميجابايت
+                  </span>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef}
+                    onChange={(e) => { if (e.target.files?.length) handleImageFile(e.target.files[0]); }}
+                    accept="image/*" 
+                    style={{ display: 'none' }} 
+                    aria-label="رفع صورة النافذة"
+                  />
+                </div>
+              )}
+
+              {/* Source Image Display */}
+              {originalImageSrc && !generatedImageSrc && (
+                <img src={originalImageSrc} className="editor-image" alt="النافذة المرفوعة" />
+              )}
+
+              {/* Comparison Result View */}
+              {originalImageSrc && generatedImageSrc && (
+                <div style={{ width: '100%' }}>
+                  <BeforeAfterSlider
+                    beforeImage={originalImageSrc}
+                    afterImage={generatedImageSrc}
+                    beforeAlt="قبل"
+                    afterAlt="بعد"
+                    aspectRatio={imageAspectRatio}
+                  />
+                </div>
+              )}
+
+              {/* Loading Overlay */}
+              {loading && (
+                <div className="loading-overlay">
+                  <div className="curtain-loader">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <p className="loading-text">{loadingMessage}</p>
+                  <span className="loading-note">قد يستغرق ذلك حوالي ٢٠-٣٠ ثانية. يرجى الانتظار...</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Stage Dock: Summary & Action Buttons */}
+            <div className="stage-dock">
+              {originalImageSrc && (
+                <div className="dock-summary" aria-live="polite">
+                  <span className="dock-tag">{styleNames[style]}</span>
+                  {!isBlindStyle(style) && <span className="dock-tag">{fabricNames[fabric]}</span>}
+                  <span className="dock-tag">
+                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                    {colors.find(c => c.id === selectedColor)?.name}
+                  </span>
+                  {!isBlindStyle(style) && <span className="dock-tag">{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
+                  {!isBlindStyle(style) && <span className="dock-tag">{positionNames[curtainPosition]}</span>}
+                  {!isBlindStyle(style) && addTulle && <span className="dock-tag">مع طبقة تول</span>}
+                  <span className="dock-tag">{opacityNames[opacity]}</span>
+                </div>
+              )}
+
+              {originalImageSrc && generatedImageSrc ? (
+                <div className="dock-actions">
+                  <span className="dock-compare-hint">
+                    اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
+                  </span>
+                  <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ padding: '10px 24px', fontWeight: 600 }}>
+                    تحميل التصميم 💾
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button 
+                    type="button"
+                    className="btn-generate"
+                    onClick={triggerGenerate} 
+                    disabled={!originalImageSrc || loading}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                    </svg>
+                    <span>ولّد التصميم</span>
+                  </button>
+                  {!originalImageSrc && (
+                    <span className="dock-hint">ارفع صورة نافذتك لتتمكن من التوليد.</span>
+                  )}
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Column 3: Left Panel - التركيب والإضاءة */}
+          <section className="studio-side studio-side--left" aria-label="خيارات التركيب والإضاءة">
+            <h2 className="side-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2" />
+                <path d="M12 20v2" />
+                <path d="m4.93 4.93 1.41 1.41" />
+                <path d="m17.66 17.66 1.41 1.41" />
+                <path d="M2 12h2" />
+                <path d="M20 12h2" />
+                <path d="m6.34 17.66-1.41 1.41" />
+                <path d="m19.07 4.93-1.41 1.41" />
+              </svg>
+              <span>التركيب والإضاءة</span>
+            </h2>
+            
+            {/* Decorative Bar Selection */}
+            <div className="form-group">
+              <span className="form-label">ديكور البار (طريقة التركيب)</span>
+              <div className="chip-grid">
+                {isBlindStyle(style) ? (
+                  <button type="button" className="chip selected" disabled>
+                    بدون بار (تلقائي للبلايند)
+                  </button>
+                ) : (
+                  Object.keys(barNames).map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`chip ${barStyle === key ? 'selected' : ''}`}
+                      onClick={() => setBarStyle(key)}
+                      aria-pressed={barStyle === key}
+                    >
+                      {barNames[key]}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Curtain Position */}
+            <div className="form-group">
+              <span className="form-label">وضعية الستارة</span>
+              <div className="chip-grid">
+                {isBlindStyle(style) ? (
+                  <button type="button" className="chip selected" disabled>
+                    تلقائي للبلايند
+                  </button>
+                ) : (
+                  Object.keys(positionNames).map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`chip ${curtainPosition === key ? 'selected' : ''}`}
+                      onClick={() => setCurtainPosition(key)}
+                      aria-pressed={curtainPosition === key}
+                    >
+                      {positionNames[key]}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Add Tulle Toggle */}
+            <div className="form-group">
+              <span className="form-label">إضافة طبقة تول خلف الستارة</span>
+              <div className="chip-grid">
+                {isBlindStyle(style) ? (
+                  <button type="button" className="chip selected" disabled>
+                    غير متاح للبلايند
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={`chip ${!addTulle ? 'selected' : ''}`}
+                      onClick={() => setAddTulle(false)}
+                      aria-pressed={!addTulle}
+                    >
+                      بدون تول
+                    </button>
+                    <button
+                      type="button"
+                      className={`chip ${addTulle ? 'selected' : ''}`}
+                      onClick={() => setAddTulle(true)}
+                      aria-pressed={addTulle}
+                    >
+                      ✨ إضافة تول
+                    </button>
+                  </>
+                )}
+              </div>
+              {addTulle && !isBlindStyle(style) && (
+                <span className="form-hint" style={{ color: 'var(--blue)' }}>
+                  💡 اختر وضعية الستارة "مفتوحة عالنص" لإظهار التول بوضوح مع أشعة الشمس.
+                </span>
+              )}
+            </div>
+
+            {/* Opacity Selection */}
+            <div className="form-group">
+              <span className="form-label">درجة التعتيم وترشيح الضوء</span>
+              <div className="chip-grid">
+                {Object.keys(opacityNames).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`chip ${opacity === key ? 'selected' : ''}`}
+                    onClick={() => setOpacity(key)}
+                    aria-pressed={opacity === key}
+                  >
+                    {opacityNames[key]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tips Card */}
+            <div className="tips-box">
+              <h4>💡 للحصول على أفضل نتيجة:</h4>
+              <ul className="tips-list">
+                <li>صوّر النافذة كاملة بإضاءة نهارية واضحة.</li>
+                <li>تجنّب الصور المائلة جداً أو شديدة الظلام.</li>
+                <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
+              </ul>
+            </div>
+          </section>
+          
+        </div>
       </div>
 
       <Footer />

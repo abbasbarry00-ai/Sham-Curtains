@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
           safety_tolerance: 2,
           prompt_upsampling: false,
           output_format: 'jpg',
-          num_inference_steps: 24
+          num_inference_steps: 35
         }
       }
     );
