@@ -300,16 +300,17 @@ a {
 /* Editor Workspace Layout */
 .workspace {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 280px 1fr 320px;
   gap: 24px;
   padding: 20px 0;
   min-height: calc(100vh - 140px);
+  align-items: start;
 }
 
-@media (max-width: 968px) {
+@media (max-width: 1024px) {
   .workspace {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 24px;
     padding: 12px 0;
   }
 }
@@ -867,4 +868,116 @@ a {
 .store-order-btn:hover {
   background: #128c7e;
   transform: scale(1.02);
+}
+
+/* Progress Step Indicator & Pill Grid */
+.steps-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accents-5);
+}
+.step-item.active {
+  color: #3b82f6;
+}
+.step-item.completed {
+  color: #10b981;
+}
+.step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accents-2);
+  color: var(--accents-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  transition: var(--transition);
+}
+.step-item.active .step-number {
+  background: #3b82f6;
+  color: #ffffff;
+}
+.step-item.completed .step-number {
+  background: #10b981;
+  color: #ffffff;
+}
+.step-line {
+  height: 1px;
+  width: 40px;
+  background: var(--accents-3);
+}
+@media (max-width: 600px) {
+  .steps-indicator {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step-line {
+    display: none;
+  }
+}
+
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.pill-btn {
+  background: var(--background);
+  border: 1px solid var(--border);
+  color: var(--accents-7);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+}
+.pill-btn:hover {
+  background: var(--accents-1);
+  border-color: var(--border-hover);
+}
+.pill-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+.pill-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--accents-1);
+  color: var(--accents-5);
+}
+
+/* Subtle background grid lines for Dropzone */
+.dropzone-grid-bg {
+  background-image: 
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
 }

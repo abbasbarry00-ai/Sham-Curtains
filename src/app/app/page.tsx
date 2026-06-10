@@ -51,10 +51,23 @@ const colorPrompts: Record<string, string> = {
   rose: "dusty rose pink tone"
 };
 
+const mountingPrompts: Record<string, string> = {
+  wall: "mounted on the wall with a prominent visible decorative curtain rod sliding above the window frame",
+  frame: "neatly installed inside the window frame with a hidden track, clean integrated flush mount"
+};
+
+const opacityPrompts: Record<string, string> = {
+  sheer: "sheer translucent fabric that lets natural sunlight pass through, creating a bright airy ambiance with soft light filtering",
+  semi: "semi-opaque light-filtering fabric that dims the light and offers privacy while maintaining a warm ambient glow",
+  blackout: "100% thick blackout fabric that completely blocks out all incoming daylight, providing full room darkening and absolute privacy"
+};
+
 export default function AppPage() {
   const [style, setStyle] = useState('wave');
   const [fabric, setFabric] = useState('velvet');
   const [selectedColor, setSelectedColor] = useState('white');
+  const [mounting, setMounting] = useState('wall');
+  const [opacity, setOpacity] = useState('semi');
   
   const [originalImageSrc, setOriginalImageSrc] = useState<string | null>(null);
   const [generatedImageSrc, setGeneratedImageSrc] = useState<string | null>(null);
@@ -155,13 +168,15 @@ export default function AppPage() {
     try {
       const styleDesc = stylePrompts[style];
       const colorDesc = colorPrompts[selectedColor];
+      const mountingDesc = mountingPrompts[mounting];
+      const opacityDesc = opacityPrompts[opacity];
 
       let prompt = '';
       if (isBlindStyle(style)) {
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are precisely installed inside the window frame, fitting the window's exact size, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} ${styleDesc}. The blinds are ${mountingDesc}, precisely installed to the window's exact size and frame, looking clean and realistic. The slats, shadows, and light filtering match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
       } else {
         const fabricDesc = fabricPrompts[fabric];
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is precisely tailored to the window's exact size and frame, hanging naturally and realistically. The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is ${mountingDesc}, precisely tailored to the window's exact size and frame, hanging naturally and realistically. The curtain fabric is ${opacityDesc}. The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
       }
 
       const response = await fetch('/api/generate', {
@@ -198,6 +213,27 @@ export default function AppPage() {
     }
   };
 
+  const loadReadyImage = async () => {
+    setLoading(true);
+    setLoadingMessage('جاري تحميل الصورة الجاهزة...');
+    try {
+      const response = await fetch('/assets/window-empty.jpg');
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setOriginalImageSrc(reader.result);
+        }
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('Error loading ready image:', error);
+      alert('حدث خطأ أثناء تحميل الصورة الجاهزة.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDownload = async () => {
     if (!generatedImageSrc) return;
     
@@ -230,62 +266,390 @@ export default function AppPage() {
 
       <div className="container">
         <main className="workspace">
-          {/* Left Panel: Controls */}
+          
+          {/* Column 1: التركيب والإضاءة (Left Panel) */}
           <section className="controls-panel">
-            <h2 className="panel-title">خيارات التصميم</h2>
+            <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🔆</span> التركيب والإضاءة
+            </h2>
+
+            {/* Mounting Selection */}
+            <div className="form-group">
+              <label className="form-label">طريقة التركيب</label>
+              <div className="pill-grid">
+                <button
+                  type="button"
+                  className={`pill-btn ${mounting === 'wall' ? 'active' : ''}`}
+                  onClick={() => setMounting('wall')}
+                >
+                  على الحائط (قضيب ظاهر)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${mounting === 'frame' ? 'active' : ''}`}
+                  onClick={() => setMounting('frame')}
+                >
+                  داخل الإطار (مخفي)
+                </button>
+              </div>
+            </div>
+
+            {/* Opacity Selection */}
+            <div className="form-group">
+              <label className="form-label">درجة التعتيم وترشيح الضوء</label>
+              <div className="pill-grid">
+                <button
+                  type="button"
+                  className={`pill-btn ${opacity === 'sheer' ? 'active' : ''}`}
+                  onClick={() => setOpacity('sheer')}
+                >
+                  شفاف يمرر الضوء
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${opacity === 'semi' ? 'active' : ''}`}
+                  onClick={() => setOpacity('semi')}
+                >
+                  شبه تعتيم (يصفي الضوء)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${opacity === 'blackout' ? 'active' : ''}`}
+                  onClick={() => setOpacity('blackout')}
+                >
+                  تعتيم كامل (بلاك آوت)
+                </button>
+              </div>
+            </div>
+
+            {/* Tips Card */}
+            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '16px', background: 'var(--background)', marginTop: '12px' }}>
+              <h4 style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px' }}>💡 للحصول على أفضل نتيجة:</h4>
+              <ul className="tips-list" style={{ paddingRight: '12px' }}>
+                <li>صور النافذة كاملة بإضاءة نهارية واضحة.</li>
+                <li>تأكد من عدم وجود عوائق كبيرة أمام النافذة أثناء التصوير.</li>
+                <li>تطابق الخيارات المدخلة مع رغبتك الفعلية يُعطيك صورة مطابقة للواقع تماماً.</li>
+              </ul>
+            </div>
+          </section>
+
+          {/* Column 2: Canvas & Steps (Center Panel) */}
+          <section style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            
+            {/* Page Main Title */}
+            <h1 style={{ fontSize: '32px', fontWeight: 800, textAlign: 'center', marginBottom: '24px', color: 'var(--foreground)' }}>
+              صمّم ستارتك الآن
+            </h1>
+
+            {/* Steps Progress Indicator */}
+            <div className="steps-indicator">
+              <div className={`step-item ${originalImageSrc ? 'completed' : 'active'}`}>
+                <span className="step-number">1</span>
+                <span className="step-text">ارفع صورة غرفتك</span>
+              </div>
+              <div className="step-line"></div>
+              <div className={`step-item ${originalImageSrc && !generatedImageSrc ? 'active' : ''} ${generatedImageSrc ? 'completed' : ''}`}>
+                <span className="step-number">2</span>
+                <span className="step-text">اختر الخيارات وولد</span>
+              </div>
+              <div className="step-line"></div>
+              <div className={`step-item ${generatedImageSrc ? 'active' : ''}`}>
+                <span className="step-number">3</span>
+                <span className="step-text">قارن وحمل النتيجة</span>
+              </div>
+            </div>
+
+            {/* Main Canvas Area */}
+            <div className="canvas-panel" style={{ flex: 1 }}>
+              <div className="canvas-header">
+                <h3 className="canvas-title">
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: originalImageSrc ? '#10b981' : '#ccc', display: 'inline-block' }}></span>
+                  <span>
+                    {generatedImageSrc 
+                      ? "تم تصميم ستارتك بنجاح! 🎉" 
+                      : originalImageSrc 
+                        ? "تم رفع الصورة! حدد خيارات الستارة واضغط توليد" 
+                        : "ارفع صورة نافذتك لتبدأ"}
+                  </span>
+                </h3>
+                {originalImageSrc && (
+                  <div className="canvas-toolbar">
+                    <button className="btn btn-secondary" onClick={resetWorkspace} style={{ padding: '6px 14px', fontSize: '13px' }}>
+                      تصميم جديد ↻
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="canvas-container" style={{ position: 'relative', minHeight: '420px', overflow: 'hidden' }}>
+                {/* Subtle Grid Background for canvas */}
+                {!originalImageSrc && !generatedImageSrc && <div className="dropzone-grid-bg"></div>}
+
+                {/* Dropzone for upload */}
+                {!originalImageSrc && !generatedImageSrc && (
+                  <div 
+                    className="dropzone"
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                    style={{ 
+                      borderColor: dragging ? '#3b82f6' : 'var(--border)',
+                      background: dragging ? 'rgba(59, 130, 246, 0.03)' : 'var(--background)',
+                      zIndex: 1
+                    }}
+                  >
+                    {/* Modern Premium SVG icon representing image upload */}
+                    <svg className="dropzone-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px' }}>
+                      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                      <path d="M12 8l-4 4h8z" />
+                      <path d="M12 16v-6" />
+                    </svg>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--foreground)', margin: '4px 0' }}>
+                      اسحب صورة نافذتك إلى هنا
+                    </h3>
+                    <p style={{ fontSize: '13px', color: 'var(--accents-5)', margin: '0 0 12px 0' }}>
+                      أو اضغط لاختيار صورة من جهازك
+                    </p>
+                    <div className="btn btn-secondary dropzone-btn" style={{ pointerEvents: 'none', padding: '8px 18px', fontSize: '13px', borderRadius: '6px', fontWeight: 600 }}>
+                      اختر صورة
+                    </div>
+                    <button 
+                      type="button"
+                      className="btn-link"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        loadReadyImage();
+                      }}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: '#3b82f6', 
+                        fontWeight: 700, 
+                        fontSize: '13px', 
+                        cursor: 'pointer', 
+                        marginTop: '12px',
+                        textDecoration: 'underline',
+                        zIndex: 2
+                      }}
+                    >
+                      أو جرّب بصورة جاهزة
+                    </button>
+                    <span style={{ fontSize: '11px', color: 'var(--accents-5)', marginTop: '8px' }}>
+                      PNG أو JPG – حتى 10 ميجابايت
+                    </span>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      onChange={(e) => { if (e.target.files?.length) handleImageFile(e.target.files[0]); }}
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                    />
+                  </div>
+                )}
+
+                {/* Source Image Display */}
+                {originalImageSrc && !generatedImageSrc && (
+                  <div className="editor-wrapper" style={{ display: 'block' }}>
+                    <img src={originalImageSrc} className="editor-image" alt="النافذة المرفوعة" />
+                  </div>
+                )}
+
+                {/* Comparison Result View */}
+                {originalImageSrc && generatedImageSrc && (
+                  <div style={{ width: '100%' }}>
+                    <BeforeAfterSlider
+                      beforeImage={originalImageSrc}
+                      afterImage={generatedImageSrc}
+                      beforeAlt="قبل"
+                      afterAlt="بعد"
+                      aspectRatio={imageAspectRatio}
+                    />
+                  </div>
+                )}
+
+                {/* Loading Overlay */}
+                {loading && (
+                  <div className="loading-overlay" style={{ display: 'flex' }}>
+                    <div className="spinner"></div>
+                    <p className="loading-text">{loadingMessage}</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Bottom bar when result is shown */}
+              {originalImageSrc && generatedImageSrc && (
+                <div style={{ borderTop: '1px solid var(--border)', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--accents-1)' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--accents-6)' }}>
+                    اسحب المقبض في المنتصف لمقارنة النتيجة مع النافذة الأصلية.
+                  </span>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button className="btn btn-secondary" id="btn-download" onClick={handleDownload} style={{ padding: '8px 16px', fontSize: '13px' }}>
+                      تحميل التصميم 💾
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Column 3: المظهر والخامة (Right Panel) */}
+          <section className="controls-panel">
+            <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🥞</span> المظهر والخامة
+            </h2>
             
             {/* Style Selection */}
             <div className="form-group">
-              <label className="form-label" htmlFor="curtain-style">طراز الستارة (Style)</label>
-              <select 
-                id="curtain-style" 
-                className="form-control"
-                value={style}
-                onChange={(e) => setStyle(e.target.value)}
-              >
-                <option value="wave">ويفي (Wave / Ripple fold)</option>
-                <option value="pleated">كسرات (Pleated)</option>
-                <option value="gathered">زم (Gathered / Rod pocket)</option>
-                <option value="pinch">تكسير امريكي (American / Pinch pleat)</option>
-                <option value="sunscreen">رول سنسكرين (Sunscreen roller)</option>
-                <option value="blackout">رول بلاك اوات شامواه (Blackout suede roller)</option>
-                <option value="dk">دي كي (DK blinds / Verti-store)</option>
-                <option value="classic_rod">كلاسيك بوري (Classic rod curtain)</option>
-                <option value="zebra">رول زيبرا (Zebra roller)</option>
-                <option value="wood_venetian">جالوزي خشبي (Wooden Venetian)</option>
-                <option value="metal_venetian">جالوزي معدني (Metal Venetian)</option>
-                <option value="side_pull">رفعات جانبية (Side pull / Tie-back)</option>
-                <option value="stage">مسرحي كسرات (Theater pleated)</option>
-              </select>
+              <label className="form-label">الطراز</label>
+              <div className="pill-grid">
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'wave' ? 'active' : ''}`}
+                  onClick={() => setStyle('wave')}
+                >
+                  ويفي (Wave)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'pleated' ? 'active' : ''}`}
+                  onClick={() => setStyle('pleated')}
+                >
+                  كسرات (Pleated)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'gathered' ? 'active' : ''}`}
+                  onClick={() => setStyle('gathered')}
+                >
+                  زم (Gathered)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'pinch' ? 'active' : ''}`}
+                  onClick={() => setStyle('pinch')}
+                >
+                  تكسير امريكي
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'sunscreen' ? 'active' : ''}`}
+                  onClick={() => setStyle('sunscreen')}
+                >
+                  رول سنسكرين
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'blackout' ? 'active' : ''}`}
+                  onClick={() => setStyle('blackout')}
+                >
+                  بلاك آوت شامواه
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'dk' ? 'active' : ''}`}
+                  onClick={() => setStyle('dk')}
+                >
+                  دي كي (DK)
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'classic_rod' ? 'active' : ''}`}
+                  onClick={() => setStyle('classic_rod')}
+                >
+                  كلاسيك بوري
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'zebra' ? 'active' : ''}`}
+                  onClick={() => setStyle('zebra')}
+                >
+                  رول زيبرا
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'wood_venetian' ? 'active' : ''}`}
+                  onClick={() => setStyle('wood_venetian')}
+                >
+                  جالوزي خشبي
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'metal_venetian' ? 'active' : ''}`}
+                  onClick={() => setStyle('metal_venetian')}
+                >
+                  جالوزي معدني
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'side_pull' ? 'active' : ''}`}
+                  onClick={() => setStyle('side_pull')}
+                >
+                  رفعات جانبية
+                </button>
+                <button
+                  type="button"
+                  className={`pill-btn ${style === 'stage' ? 'active' : ''}`}
+                  onClick={() => setStyle('stage')}
+                >
+                  مسرحي كسرات
+                </button>
+              </div>
             </div>
 
             {/* Fabric Selection */}
             <div className="form-group">
-              <label className="form-label" htmlFor="curtain-fabric">نوع القماش (Fabric)</label>
-              <select 
-                id="curtain-fabric" 
-                className="form-control"
-                value={isBlindStyle(style) ? 'auto' : fabric}
-                onChange={(e) => setFabric(e.target.value)}
-                disabled={isBlindStyle(style)}
-              >
+              <label className="form-label">نوع القماش</label>
+              <div className="pill-grid">
                 {isBlindStyle(style) ? (
-                  <option value="auto">تلقائي للموديل (Automatic)</option>
+                  <button type="button" className="pill-btn active" style={{ background: 'var(--accents-2)', color: 'var(--accents-6)', border: 'none' }} disabled>
+                    تلقائي للموديل (Automatic)
+                  </button>
                 ) : (
                   <>
-                    <option value="velvet">مخمل ثقيل (Velvet)</option>
-                    <option value="linen">كتان طبيعي (Linen)</option>
-                    <option value="silk">حرير ناعم (Silk)</option>
-                    <option value="cotton">قطن ناعم (Cotton)</option>
-                    <option value="lace">دانتيل منقوش (Lace)</option>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'velvet' ? 'active' : ''}`}
+                      onClick={() => setFabric('velvet')}
+                    >
+                      مخمل ثقيل
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'linen' ? 'active' : ''}`}
+                      onClick={() => setFabric('linen')}
+                    >
+                      كتان طبيعي
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'silk' ? 'active' : ''}`}
+                      onClick={() => setFabric('silk')}
+                    >
+                      حرير ناعم
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'cotton' ? 'active' : ''}`}
+                      onClick={() => setFabric('cotton')}
+                    >
+                      قطن ناعم
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'lace' ? 'active' : ''}`}
+                      onClick={() => setFabric('lace')}
+                    >
+                      دانتيل منقوش
+                    </button>
                   </>
                 )}
-              </select>
+              </div>
             </div>
 
             {/* Color Selection */}
             <div className="form-group">
-              <label className="form-label">اللون المفضل (Color)</label>
+              <label className="form-label">اللون المفضل</label>
               <div className="color-swatches" id="color-swatches">
                 {colors.map((c) => (
                   <button
@@ -307,130 +671,12 @@ export default function AppPage() {
               className="btn btn-primary" 
               onClick={triggerGenerate} 
               disabled={!originalImageSrc || loading}
-              style={{ width: '100%', fontWeight: 600, padding: '10px 20px', fontSize: '14px' }}
+              style={{ width: '100%', fontWeight: 700, padding: '12px 20px', fontSize: '15px', marginTop: '12px', background: '#3b82f6', color: '#ffffff', borderColor: '#3b82f6' }}
             >
               توليد بالذكاء الاصطناعي ✨
             </button>
-
-            {/* Instructions Card */}
-            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '12px', background: 'rgba(255,255,255,0.015)' }}>
-              <h4 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '6px' }}>💡 تعليمات الاستخدام:</h4>
-              <ul className="tips-list">
-                <li>ارفع صورة واضحة لنافذتك وغرفتك الحقيقية بالكامل.</li>
-                <li>اختر الطراز المفضل لديك ونوع القماش ولون الستارة من اللوحة.</li>
-                <li>اضغط توليد وسيتولى نموذج Flux Kontext Pro الذكي دمج الستارة بدقة فائقة مع إضاءة غرفتك الأصلية.</li>
-              </ul>
-            </div>
           </section>
 
-          {/* Right Panel: Workspace */}
-          <section className="canvas-panel">
-            <div className="canvas-header">
-              <h3 className="canvas-title">
-                <span>
-                  {generatedImageSrc 
-                    ? "تم تصميم ستارتك بنجاح! 🎉" 
-                    : originalImageSrc 
-                      ? "تم رفع الصورة! اختر خيارات الستارة ثم اضغط توليد" 
-                      : "لوحة التصميم"}
-                </span>
-              </h3>
-              {originalImageSrc && (
-                <div className="canvas-toolbar">
-                  <button className="btn btn-secondary" onClick={resetWorkspace} style={{ padding: '6px 14px', fontSize: '13px' }}>
-                    تصميم جديد ↻
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="canvas-container" style={{ position: 'relative', minHeight: '400px' }}>
-              {/* Dropzone for upload */}
-              {!originalImageSrc && !generatedImageSrc && (
-                <div 
-                  className="dropzone"
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                  onDragLeave={() => setDragging(false)}
-                  onDrop={handleDrop}
-                  style={{ 
-                    borderColor: dragging ? 'var(--foreground)' : 'var(--border)',
-                    background: dragging ? 'rgba(255, 255, 255, 0.03)' : undefined
-                  }}
-                >
-                  {/* Modern Premium SVG icon representing image upload */}
-                  <svg className="dropzone-svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accents-5)', marginBottom: '4px' }}>
-                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" />
-                    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                    <rect x="7" y="11" width="10" height="7" rx="1" />
-                    <path d="m7 16 3-3 3 3" />
-                    <circle cx="14" cy="13" r="0.5" fill="currentColor" />
-                  </svg>
-                  <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--foreground)', margin: '2px 0 0 0' }}>
-                    اسحب صورة نافذتك هنا
-                  </h3>
-                  <p style={{ fontSize: '12px', color: 'var(--accents-5)', margin: 0 }}>
-                    أو اضغط لتصفح الملفات
-                  </p>
-                  <div className="btn btn-secondary dropzone-btn" style={{ pointerEvents: 'none', padding: '6px 14px', fontSize: '12px', marginTop: '6px', borderRadius: '6px' }}>
-                    اختر صورة
-                  </div>
-                  <span style={{ fontSize: '10px', color: 'var(--accents-4)', marginTop: '8px' }}>
-                    الصيغ المدعومة: PNG, JPG (الحد الأقصى: 10 ميجابايت)
-                  </span>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    onChange={(e) => { if (e.target.files?.length) handleImageFile(e.target.files[0]); }}
-                    accept="image/*" 
-                    style={{ display: 'none' }} 
-                  />
-                </div>
-              )}
-
-              {/* Source Image Display */}
-              {originalImageSrc && !generatedImageSrc && (
-                <div className="editor-wrapper" style={{ display: 'block' }}>
-                  <img src={originalImageSrc} className="editor-image" alt="النافذة المرفوعة" />
-                </div>
-              )}
-
-              {/* Comparison Result View */}
-              {originalImageSrc && generatedImageSrc && (
-                <div style={{ width: '100%' }}>
-                  <BeforeAfterSlider
-                    beforeImage={originalImageSrc}
-                    afterImage={generatedImageSrc}
-                    beforeAlt="قبل"
-                    afterAlt="بعد"
-                    aspectRatio={imageAspectRatio}
-                  />
-                </div>
-              )}
-
-              {/* Loading Overlay */}
-              {loading && (
-                <div className="loading-overlay" style={{ display: 'flex' }}>
-                  <div className="spinner"></div>
-                  <p className="loading-text">{loadingMessage}</p>
-                </div>
-              )}
-            </div>
-            
-            {/* Bottom bar when result is shown */}
-            {originalImageSrc && generatedImageSrc && (
-              <div style={{ borderTop: '1px solid var(--border)', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--accents-1)' }}>
-                <span style={{ fontSize: '12px', color: 'var(--accents-5)' }}>
-                  اسحب المقبض في المنتصف لمقارنة النتيجة مع النافذة الأصلية.
-                </span>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button className="btn btn-secondary" id="btn-download" onClick={handleDownload} style={{ padding: '8px 16px', fontSize: '13px' }}>
-                    تحميل التصميم 💾
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
         </main>
       </div>
 
@@ -438,3 +684,4 @@ export default function AppPage() {
     </>
   );
 }
+
