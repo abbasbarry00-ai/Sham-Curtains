@@ -52,15 +52,15 @@ const colorPrompts: Record<string, string> = {
 };
 
 const barPrompts: Record<string, string> = {
-  wood_bar: "hanging from a luxurious decorative wooden curtain rod with carved wood finials and ornate wooden brackets, warm natural wood grain finish that complements the room furniture",
-  metal_bar: "hanging from a sleek decorative wrought iron curtain rod with elegant metal finials and ornate metal brackets, polished metallic finish matching the room decor",
-  modern_bar: "hanging from a minimalist modern curtain rod with clean geometric finials and slim metal brackets, contemporary brushed steel or matte black finish",
-  hidden: "neatly installed inside the window frame with a completely hidden ceiling track, clean integrated flush mount with no visible hardware"
+  wood_bar: "The curtain hangs from a prominent visible luxurious decorative wooden curtain rod mounted on the wall above the window. The rod has ornate carved wood finials on both ends and decorative wooden brackets. The wood grain finish is warm and complements the room furniture. The rod and brackets must be clearly visible.",
+  metal_bar: "The curtain hangs from a prominent visible decorative wrought iron curtain rod mounted on the wall above the window. The rod has elegant ornate metal finials on both ends and decorative iron brackets. The metallic finish is polished and matches the room decor. The rod and brackets must be clearly visible.",
+  modern_bar: "The curtain hangs from a prominent visible minimalist modern curtain rod mounted on the wall above the window. The rod has clean geometric finials and slim metal brackets in brushed steel or matte black. The rod must be clearly visible.",
+  hidden: "The curtain hangs from a completely hidden recessed ceiling track that is invisible. There is absolutely NO visible curtain rod, NO pole, NO bar, NO finials, NO brackets, and NO exposed mounting hardware whatsoever. The fabric appears to emerge directly from a clean ceiling slot."
 };
 
 const curtainPositionPrompts: Record<string, string> = {
-  closed: "The curtain is fully closed, covering the entire window completely with no gaps, fabric draping in full elegant folds across the whole window width",
-  half_open: "The curtain is elegantly pulled open to the sides, gathered halfway to reveal the center of the window, natural sunlight streaming through the exposed window center"
+  closed: "IMPORTANT: The curtain panels are FULLY CLOSED, meeting perfectly at the center with no gap. The fabric covers the ENTIRE window from edge to edge with no opening. No part of the window glass or daylight is visible behind the curtain. The fabric hangs in continuous elegant folds across the complete window width.",
+  half_open: "IMPORTANT: The curtain panels are pulled OPEN to both sides, gathered and bunched at the left and right edges of the window. The CENTER of the window is fully EXPOSED and UNCOVERED, with bright natural sunlight streaming through the bare window glass in the middle."
 };
 
 const opacityPrompts: Record<string, string> = {
@@ -187,7 +187,7 @@ export default function AppPage() {
       } else {
         const fabricDesc = fabricPrompts[fabric];
         const tulleLayer = addTulle ? ` Behind the main curtain, there is a secondary sheer white tulle layer with fine mesh netting, adding depth and soft light filtering.${curtainPosition === 'half_open' ? ' The tulle layer is visible through the open center of the curtain, softly diffusing the incoming sunlight.' : ''}` : '';
-        prompt = `A highly realistic professional photo of the room featuring a new custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain is ${barDesc}, precisely tailored to the window's exact size and frame, hanging naturally and realistically. ${positionDesc}. The curtain fabric is ${opacityDesc}.${tulleLayer} The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
+        prompt = `A highly realistic professional photo of the room. ${positionDesc}. ${barDesc} The curtain is a custom-fit ${colorDesc} curtain made of ${fabricDesc} in a ${styleDesc} style, precisely tailored to the window's exact size and frame, hanging naturally and realistically. The curtain fabric is ${opacityDesc}.${tulleLayer} The fabric folds, shadows, and draping match the room's lighting, window size, and overall environment perfectly. All other parts of the room, including the furniture, walls, floor, and lighting, remain completely identical and unchanged. High-resolution architectural photography, photorealistic interior design, virtual staging.`;
       }
 
       const response = await fetch('/api/generate', {
