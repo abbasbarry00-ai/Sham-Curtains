@@ -39,7 +39,8 @@ const fabricPrompts: Record<string, string> = {
   linen: "textured natural organic linen fabric with a visible weave and rustic elegance",
   silk: "shiny smooth premium mulberry silk fabric with elegant flowing draping and soft highlights",
   cotton: "soft high-quality organic cotton fabric with a clean smooth matte finish",
-  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture"
+  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture",
+  tulle: "light delicate sheer tulle fabric with a fine mesh netting and soft elegant draping"
 };
 
 const colorPrompts: Record<string, string> = {
@@ -268,7 +269,7 @@ export default function AppPage() {
         <main className="workspace">
           
           {/* Column 1: التركيب والإضاءة (Left Panel) */}
-          <section className="controls-panel">
+          <section className="left-column controls-panel">
             <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>🔆</span> التركيب والإضاءة
             </h2>
@@ -334,7 +335,7 @@ export default function AppPage() {
           </section>
 
           {/* Column 2: Canvas & Steps (Center Panel) */}
-          <section style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+          <section className="center-column">
             
             {/* Page Main Title */}
             <h1 style={{ fontSize: '32px', fontWeight: 800, textAlign: 'center', marginBottom: '24px', color: 'var(--foreground)' }}>
@@ -381,7 +382,7 @@ export default function AppPage() {
                 )}
               </div>
 
-              <div className="canvas-container" style={{ position: 'relative', minHeight: '420px', overflow: 'hidden' }}>
+              <div className="canvas-container">
                 {/* Subtle Grid Background for canvas */}
                 {!originalImageSrc && !generatedImageSrc && <div className="dropzone-grid-bg"></div>}
 
@@ -494,7 +495,7 @@ export default function AppPage() {
           </section>
 
           {/* Column 3: المظهر والخامة (Right Panel) */}
-          <section className="controls-panel">
+          <section className="right-column controls-panel">
             <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>🥞</span> المظهر والخامة
             </h2>
@@ -641,6 +642,13 @@ export default function AppPage() {
                       onClick={() => setFabric('lace')}
                     >
                       دانتيل منقوش
+                    </button>
+                    <button
+                      type="button"
+                      className={`pill-btn ${fabric === 'tulle' ? 'active' : ''}`}
+                      onClick={() => setFabric('tulle')}
+                    >
+                      تول ناعم
                     </button>
                   </>
                 )}

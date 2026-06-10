@@ -307,11 +307,29 @@ a {
   align-items: start;
 }
 
+.center-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 @media (max-width: 1024px) {
   .workspace {
     grid-template-columns: 1fr;
     gap: 24px;
     padding: 12px 0;
+  }
+  .center-column {
+    order: 1;
+  }
+  .right-column {
+    order: 2;
+  }
+  .left-column {
+    order: 3;
+  }
+  .controls-panel {
+    position: static;
   }
 }
 
@@ -447,6 +465,8 @@ a {
   padding: 16px;
   position: relative;
   background: #f8f9fa;
+  min-height: 420px;
+  overflow: hidden;
 }
 
 .dropzone {
@@ -921,11 +941,45 @@ a {
 }
 @media (max-width: 600px) {
   .steps-indicator {
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: space-between;
+  }
+  .step-item {
+    font-size: 10px;
+    gap: 4px;
+  }
+  .step-number {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+    min-width: 18px;
   }
   .step-line {
-    display: none;
+    display: block;
+    height: 1px;
+    flex: 1;
+    min-width: 10px;
+    margin: 0 4px;
+  }
+  .step-text {
+    font-size: 10px;
+  }
+  .workspace h1 {
+    font-size: 24px !important;
+    margin-bottom: 16px !important;
+  }
+  .canvas-panel {
+    min-height: 320px;
+  }
+  .canvas-container {
+    min-height: 300px;
+    padding: 8px;
+  }
+  .dropzone {
+    padding: 16px;
+    aspect-ratio: auto;
+    width: 100%;
   }
 }
 
