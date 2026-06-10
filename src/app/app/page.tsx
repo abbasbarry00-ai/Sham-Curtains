@@ -15,19 +15,19 @@ const colors = [
 ];
 
 const stylePrompts: Record<string, string> = {
-  wave: "modern ripple fold curtain, S-curve wave style drapes, continuous elegant s-waves hanging perfectly from a top track, neat uniform vertical folds, minimalist clean aesthetic",
-  pleated: "pencil pleat curtains, tightly gathered neat small pleats at the top heading, structured vertical fabric folds, elegant classic drapes",
-  gathered: "rod pocket curtain, gathered casing at the top with a rod running through, bunched fabric style drapes, casual ruffled heading, soft natural gathers",
-  pinch: "pinch pleat curtains, double pinch pleats heading style, classic structured vertical folds gathered in neat pinches at the top, elegant formal drapes",
+  wave: "modern ripple fold curtain with continuous elegant S-curve wave pattern, neat uniform vertical undulating folds, minimalist clean aesthetic, smooth flowing fabric waves",
+  pleated: "pencil pleat curtain with tightly gathered neat small pleats at the top heading, structured vertical fabric folds flowing downward, elegant classic draping style",
+  gathered: "gathered curtain with soft bunched fabric style, casual ruffled heading at the top, soft natural gathers creating a relaxed organic look",
+  pinch: "pinch pleat curtain with double pinch pleats heading style, classic structured vertical folds gathered in neat pinches at the top, elegant formal draping",
   sunscreen: "modern sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look",
   blackout: "premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism",
   dk: "modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels, rotating vertical fabric louvers",
-  classic_rod: "classic rod curtain, grommet eyelet rings sliding on a prominent exposed metal curtain rod, heavy drapery hanging with deep folds directly from the pole",
+  classic_rod: "classic grommet eyelet curtain with large metal ring grommets punched along the top edge, heavy drapery with deep luxurious folds, formal traditional draping style",
   zebra: "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid opaque fabric, zebra pattern window blinds",
   wood_venetian: "horizontal wooden venetian blinds, premium wood slat jalousie blinds, adjustable timber slats, fitted inside the window casing, warm wood grain texture",
   metal_venetian: "horizontal aluminum venetian blinds, sleek metal slat jalousie blinds, silver-grey adjustable metal slats, minimalist industrial office look",
-  side_pull: "elegant tie-back curtains, side pull draped curtains swept to the sides and held with decorative cords, graceful swags exposing the window center",
-  stage: "dramatic theater stage curtains, heavy deep velvet drapery with massive dense folds, theatrical pleated header, majestic stage style drapery"
+  side_pull: "elegant side-gathered curtain with decorative tie-back cords holding the fabric to the sides, graceful draped swag style with flowing curves",
+  stage: "dramatic theater style curtain with heavy deep velvet drapery, massive dense folds, theatrical pleated header, majestic grand stage style draping"
 };
 
 const blindStyles = ['sunscreen', 'blackout', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
