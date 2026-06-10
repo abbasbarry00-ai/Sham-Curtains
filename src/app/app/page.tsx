@@ -217,33 +217,62 @@ export default function AppPage() {
     setLoadingMessage('جاري الاتصال بخادم الذكاء الاصطناعي... قد يستغرق ذلك 20-30 ثانية');
 
     try {
-      const styleDesc = stylePrompts[style];
-      const colorDesc = colorPrompts[selectedColor];
-      const barDesc = barPrompts[barStyle];
-      const opacityDesc = opacityPrompts[opacity];
-      const positionDesc = curtainPositionPrompts[curtainPosition];
-
-      let prompt = '';
-      
-      // Determine lighting instruction based on opacity to resolve the "identical lighting" conflict
-      let lightingInstruction = '';
-      if (opacity === 'sheer') {
-        lightingInstruction = `The room's lighting must be bright and naturally lit by daylight filtering through. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
-      } else if (opacity === 'semi') {
-        lightingInstruction = `The room's lighting must be softly diffused with gentle ambient light. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
-      } else {
-        // blackout
-        lightingInstruction = `The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.`;
-      }
-
-      if (isBlindStyle(style)) {
-        prompt = `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} ${styleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityDesc}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
-      } else {
-        const fabricDesc = fabricPrompts[fabric];
+      const getCohesivePrompt = () => {
         const colorDesc = colorPrompts[selectedColor];
+        
+        let lightingInstruction = '';
+        if (opacity === 'sheer') {
+          lightingInstruction = "The room's lighting must be bright and naturally lit by daylight filtering through the open or sheer window coverings. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
+        } else if (opacity === 'semi') {
+          lightingInstruction = "The room's lighting must be softly diffused with gentle ambient light. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
+        } else {
+          // blackout
+          lightingInstruction = "The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
+        }
+
+        if (isBlindStyle(style)) {
+          let blindStyleDesc = '';
+          if (style === 'sunscreen') {
+            if (opacity === 'blackout') {
+              blindStyleDesc = "modern solid blackout roller blinds, flat opaque fabric roller shades, completely blocking all light, fitted neatly inside the window frame, minimal tech look";
+            } else if (opacity === 'sheer') {
+              blindStyleDesc = "modern sheer sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look";
+            } else { // semi
+              blindStyleDesc = "modern semi-opaque sunscreen roller blinds, flat light-filtering mesh roller shades, fitted neatly inside the window frame, minimal tech look";
+            }
+          } else if (style === 'blackout') {
+            blindStyleDesc = "premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism";
+          } else if (style === 'zebra') {
+            if (opacity === 'blackout') {
+              blindStyleDesc = "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and thick solid blackout fabric, zebra pattern window blinds";
+            } else {
+              blindStyleDesc = "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid light-filtering fabric, zebra pattern window blinds";
+            }
+          } else if (style === 'wood_venetian' || style === 'metal_venetian') {
+            const material = style === 'wood_venetian' ? 'wooden timber' : 'aluminum metal';
+            if (opacity === 'blackout') {
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully closed and tilted shut to block out all incoming daylight, fitted inside the window casing`;
+            } else if (opacity === 'sheer') {
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully open and tilted horizontally to let maximum sunlight stream in, fitted inside the window casing`;
+            } else {
+              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are tilted partially open to filter the light, fitted inside the window casing`;
+            }
+          } else if (style === 'dk') {
+            if (opacity === 'blackout') {
+              blindStyleDesc = "modern vertical day and night blinds, DK vertical sheer and thick blackout fabric slats, slats are turned to the closed blackout position to block all light";
+            } else {
+              blindStyleDesc = "modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels";
+            }
+          }
+
+          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[opacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
+        }
+
+        // Curtains
+        const fabricDesc = fabricPrompts[fabric];
         const styleDesc = stylePrompts[style];
         const opacityDesc = opacityPrompts[opacity];
-        
+
         let positionInstruction = '';
         if (curtainPosition === 'closed') {
           positionInstruction = `In this photo, REPLACE the window view by completely covering the entire window with a CLOSED, SHUT, solid ${colorDesc.toUpperCase()} curtain. The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
@@ -272,11 +301,13 @@ export default function AppPage() {
           ? ' A secondary layer of sheer white tulle is installed behind the closed main curtain, close to the window glass (mostly hidden by the closed main curtain).'
           : '';
 
-        prompt = `${positionInstruction}
+        return `${positionInstruction}
 The curtain must be a custom-fit ${colorDesc.toUpperCase()} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain fabric is ${opacityDesc}.${tulleLayerBehind}
 ${barInstruction}
 ${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
-      }
+      };
+
+      const prompt = getCohesivePrompt();
 
       const response = await fetch('/api/generate', {
         method: 'POST',
