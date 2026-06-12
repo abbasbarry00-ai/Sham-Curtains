@@ -26,21 +26,7 @@ export default function Home() {
           <rect width="100%" height="100%" fill="url(#hero-grid)" />
         </svg>
 
-        {/* Floating Fabric Swatches — Hidden on Mobile, Premium Swatches on Large Screen */}
-        <div className="pointer-events-none" aria-hidden="true">
-          {/* Swatch 1 (Linen/كتان) — Top Left */}
-          <div className="hero-swatch swatch-pos-1 hidden lg:block">
-            <img src="https://images.unsplash.com/photo-1563291583-04b3a167ac4d?q=80&w=200" alt="Linen Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-          </div>
-          {/* Swatch 2 (Dark Velvet/مخمل داكن) — Bottom Right */}
-          <div className="hero-swatch swatch-pos-2 hidden lg:block">
-            <img src="https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?q=80&w=200" alt="Dark Velvet Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-          </div>
-          {/* Swatch 3 (Silk/حرير) — Top Right */}
-          <div className="hero-swatch swatch-pos-3 hidden lg:block">
-            <img src="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?q=80&w=200" alt="Silk Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-          </div>
-        </div>
+
 
         {/* Main Hero Content */}
         <div className="container hero-container" style={{ position: 'relative', zIndex: 10 }}>
