@@ -26,26 +26,20 @@ export default function Home() {
           <rect width="100%" height="100%" fill="url(#hero-grid)" />
         </svg>
 
-        {/* Floating Fabric Swatches */}
-        {/* Swatch 1 — Linen Texture (Top Right) */}
-        <div className="hero-swatch swatch-top-right" aria-hidden="true">
-          <img src="https://images.unsplash.com/photo-1584824486509-114594d52103?w=200&q=80" alt="Linen Fabric Swatch" />
-        </div>
-        {/* Swatch 2 — Blue Luxury Velvet (Bottom Left) */}
-        <div className="hero-swatch swatch-bottom-left" aria-hidden="true">
-          <img src="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=200&q=80" alt="Blue Velvet Fabric Swatch" />
-        </div>
-        {/* Swatch 3 — Satin Silk (Mid Right) */}
-        <div className="hero-swatch swatch-mid-right" aria-hidden="true">
-          <img src="https://images.unsplash.com/photo-1618220179428-22790b461013?w=200&q=80" alt="Silk Fabric Swatch" />
-        </div>
-        {/* Swatch 4 — Textured Linen Gray (Top Left) */}
-        <div className="hero-swatch swatch-top-left" aria-hidden="true">
-          <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=200&q=80" alt="Gray Linen Fabric Swatch" />
-        </div>
-        {/* Swatch 5 — Sheer White Tulle (Bottom Right) */}
-        <div className="hero-swatch swatch-bottom-right" aria-hidden="true">
-          <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&q=80" alt="Sheer White Tulle Swatch" />
+        {/* Floating Fabric Swatches — Hidden on Mobile, Premium Swatches on Large Screen */}
+        <div className="pointer-events-none" aria-hidden="true">
+          {/* Swatch 1 (Linen/كتان) — Top Left */}
+          <div className="hero-swatch swatch-pos-1 hidden lg:block">
+            <img src="https://images.unsplash.com/photo-1563291583-04b3a167ac4d?q=80&w=200" alt="Linen Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+          </div>
+          {/* Swatch 2 (Dark Velvet/مخمل داكن) — Bottom Right */}
+          <div className="hero-swatch swatch-pos-2 hidden lg:block">
+            <img src="https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?q=80&w=200" alt="Dark Velvet Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+          </div>
+          {/* Swatch 3 (Silk/حرير) — Top Right */}
+          <div className="hero-swatch swatch-pos-3 hidden lg:block">
+            <img src="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?q=80&w=200" alt="Silk Fabric Texture" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+          </div>
         </div>
 
         {/* Main Hero Content */}
