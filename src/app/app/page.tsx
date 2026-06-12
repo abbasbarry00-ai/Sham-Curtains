@@ -15,22 +15,22 @@ const colors = [
 ];
 
 const stylePrompts: Record<string, string> = {
-  wave: "modern ripple fold curtain with continuous elegant S-curve wave pattern, neat uniform vertical undulating folds, minimalist clean aesthetic, smooth flowing fabric waves",
-  pleated: "pencil pleat curtain with tightly gathered neat small pleats at the top heading, structured vertical fabric folds flowing downward, elegant classic draping style",
-  gathered: "gathered curtain with soft bunched fabric style, casual ruffled heading at the top, soft natural gathers creating a relaxed organic look",
-  pinch: "pinch pleat curtain with double pinch pleats heading style, classic structured vertical folds gathered in neat pinches at the top, elegant formal draping",
-  sunscreen: "modern sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look",
-  blackout: "premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism",
-  dk: "modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels, rotating vertical fabric louvers",
-  classic_rod: "classic grommet eyelet curtain with large metal ring grommets punched along the top edge, heavy drapery with deep luxurious folds, formal traditional draping style",
-  zebra: "zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid opaque fabric, zebra pattern window blinds",
-  wood_venetian: "horizontal wooden venetian blinds, premium wood slat jalousie blinds, adjustable timber slats, fitted inside the window casing, warm wood grain texture",
-  metal_venetian: "horizontal aluminum venetian blinds, sleek metal slat jalousie blinds, silver-grey adjustable metal slats, minimalist industrial office look",
-  side_pull: "elegant side-gathered curtain with decorative tie-back cords holding the fabric to the sides, graceful draped swag style with flowing curves",
-  stage: "dramatic theater style curtain with heavy deep velvet drapery, massive dense folds, theatrical pleated header, majestic grand stage style draping"
+  wave: "modern wave fold ripple fold curtain, elegant continuous uniform s-curve vertical folds, sleek architectural draping",
+  pleated: "tailored pleated curtain, crisp structured vertical fabric folds, neat tailoring",
+  gathered: "tightly gathered rod pocket curtain, bunched fabric firmly gathered at the top header, soft dense continuous ruffles",
+  pinch: "classic American pinch pleat custom curtain, rigid tailored 3-finger pinch folds firmly sewn at the top header, elegant traditional drape",
+  sunscreen: "sleek architectural sunscreen roller blind, ONE single completely flat continuous vertical translucent fabric sheet, smooth surface, NO folds, NO wrinkles",
+  blackout: "premium heavy suede chamois blackout curtain, 100% opaque thick matte texture, heavy vertical drop, straight hem",
+  dk: "modern day and night double roller blind system, flat clean architectural window covering, flat vertical surface",
+  classic_rod: "classic eyelet grommet curtain, large metal rings cleanly threaded through a thick visible horizontal metal pipe rod, deep wavy folds",
+  zebra: "modern zebra blind, flat alternating horizontal translucent and solid opaque fabric stripes, straight flat surface, NO folds",
+  wood_venetian: "luxurious wooden horizontal Venetian blinds, distinct thick natural wood horizontal slats, architectural window treatment",
+  metal_venetian: "sleek architectural aluminum mini Venetian blinds, thin sharp horizontal metal slats, modern minimalist style",
+  side_pull: "elegant drapery smoothly swept to the outer sides and tightly secured with decorative fabric tie-backs, sweeping curved drape opening clearly in the center",
+  stage: "grand theatrical drape, heavy luxurious dramatic curtains with extremely deep rich vertical pleats, opulent thick hanging, extreme fabric fullness"
 };
 
-const blindStyles = ['sunscreen', 'blackout', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
+const blindStyles = ['sunscreen', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
 const isBlindStyle = (styleId: string) => blindStyles.includes(styleId);
 
 
@@ -130,6 +130,23 @@ export default function AppPage() {
   const [dragging, setDragging] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Layout revamp states
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const [styleCategory, setStyleCategory] = useState<'fabric' | 'roller'>('fabric');
+
+  const toggleStep = (stepNumber: number) => {
+    setActiveStep(activeStep === stepNumber ? 0 : stepNumber);
+  };
+
+  const handleCategoryChange = (cat: 'fabric' | 'roller') => {
+    setStyleCategory(cat);
+    if (cat === 'fabric' && isBlindStyle(style)) {
+      setStyle('wave');
+    } else if (cat === 'roller' && !isBlindStyle(style)) {
+      setStyle('sunscreen');
+    }
+  };
 
   // Measure and set original image aspect ratio dynamically
   React.useEffect(() => {
@@ -236,40 +253,7 @@ export default function AppPage() {
         const qualityDirectives = "This is a professional architectural photograph. Avoid any cartoonish, 3D render, digital illustration, flat vector, or artificial look. The materials must have realistic photographic textures, natural fabric folds, physical shadows, and ambient reflections matching a high-end interior design catalog photo.";
 
         if (isBlindStyle(style)) {
-          let blindStyleDesc = '';
-          if (style === 'sunscreen') {
-            if (opacity === 'blackout') {
-              blindStyleDesc = `modern solid blackout roller blinds, flat opaque fabric roller shades, completely blocking all light, fitted neatly inside the window frame, minimal tech look, with premium realistic fabric texture`;
-            } else if (opacity === 'sheer') {
-              blindStyleDesc = `modern sheer sunscreen roller blinds, flat translucent mesh roller shades, sun filtering weave, fitted neatly inside the window frame, minimal tech look, with visible fine mesh fabric texture`;
-            } else { // semi
-              blindStyleDesc = `modern semi-opaque sunscreen roller blinds, flat light-filtering mesh roller shades, fitted neatly inside the window frame, minimal tech look, with premium fabric texture`;
-            }
-          } else if (style === 'blackout') {
-            blindStyleDesc = `premium blackout suede roller blinds, thick matte suede fabric roll-up shade, 100% light-blocking solid fabric flat panel, neat clean roller mechanism, with rich matte fabric texture`;
-          } else if (style === 'zebra') {
-            if (opacity === 'blackout') {
-              blindStyleDesc = `zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and thick solid blackout fabric, zebra pattern window blinds, with photographic fabric textures`;
-            } else {
-              blindStyleDesc = `zebra roller blinds, dual-layer roller shade with alternating horizontal stripes of sheer mesh and solid light-filtering fabric, zebra pattern window blinds, with photographic fabric textures`;
-            }
-          } else if (style === 'wood_venetian' || style === 'metal_venetian') {
-            const material = style === 'wood_venetian' ? 'wooden timber' : 'aluminum metal';
-            if (opacity === 'blackout') {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully closed and tilted shut to block out all incoming daylight, fitted inside the window casing, with realistic physical texture`;
-            } else if (opacity === 'sheer') {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are fully open and tilted horizontally to let maximum sunlight stream in, fitted inside the window casing, with realistic physical texture`;
-            } else {
-              blindStyleDesc = `horizontal ${material} venetian blinds, premium jalousie blinds with adjustable slats, the slats are tilted partially open to filter the light, fitted inside the window casing, with realistic physical texture`;
-            }
-          } else if (style === 'dk') {
-            if (opacity === 'blackout') {
-              blindStyleDesc = `modern vertical day and night blinds, DK vertical sheer and thick blackout fabric slats, slats are turned to the closed blackout position to block all light, with realistic vertical slat textures`;
-            } else {
-              blindStyleDesc = `modern vertical day and night blinds, DK vertical sheer and opaque fabric slats, vertical zebra style panels, with realistic vertical slat textures`;
-            }
-          }
-
+          const blindStyleDesc = stylePrompts[style];
           return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[opacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives}`;
         }
 
@@ -322,6 +306,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
         body: JSON.stringify({
           image: originalImageSrc,
           prompt: prompt,
+          style: styleNames[style],
         }),
       });
 
@@ -424,90 +409,446 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
 
         <div className="studio" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
-          {/* Column 1: Right Panel - المظهر والخامة */}
-          <section className="studio-side studio-side--right" aria-label="خيارات المظهر والخامة">
-            <h2 className="side-title">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="m12 2 8.5 5L12 12 3.5 7 12 2Z"></path>
-                <path d="m3.5 12 8.5 5 8.5-5"></path>
-                <path d="m3.5 17 8.5 5 8.5-5"></path>
-              </svg>
-              <span>المظهر والخامة</span>
-            </h2>
-
-            {/* Style Selection */}
-            <div className="form-group">
-              <span className="form-label" id="style-label">الطراز</span>
-              <div className="chip-grid" role="group" aria-labelledby="style-label">
-                {Object.keys(styleNames).map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className={`chip ${style === key ? 'selected' : ''}`}
-                    onClick={() => setStyle(key)}
-                    aria-pressed={style === key}
-                  >
-                    {styleNames[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Fabric Selection */}
-            <div className="form-group">
-              <span className="form-label" id="fabric-label">نوع القماش</span>
-              <div className="chip-grid" role="group" aria-labelledby="fabric-label">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="chip selected" disabled>
-                    تلقائي للموديل
-                  </button>
-                ) : (
-                  Object.keys(fabricNames).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      className={`chip ${fabric === key ? 'selected' : ''}`}
-                      onClick={() => setFabric(key)}
-                      aria-pressed={fabric === key}
-                    >
-                      {fabricNames[key]}
-                    </button>
-                  ))
+          {/* Column 1: Right Sidebar - Consolidated Options panel */}
+          <aside className="studio-sidebar" aria-label="خيارات التصميم">
+            
+            {/* Accordion system */}
+            <div className="accordion">
+              
+              {/* Step 1: المظهر والطراز */}
+              <div className={`accordion-item ${activeStep === 1 ? 'active' : ''}`}>
+                <button 
+                  type="button" 
+                  className="accordion-header" 
+                  onClick={() => toggleStep(1)}
+                  aria-expanded={activeStep === 1}
+                >
+                  <span className="accordion-header-title">
+                    <span>١. المظهر والطراز</span>
+                  </span>
+                  <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                {activeStep === 1 && (
+                  <div className="accordion-content">
+                    <div className="category-tabs">
+                      <button 
+                        type="button" 
+                        className={`category-tab ${styleCategory === 'fabric' ? 'active' : ''}`}
+                        onClick={() => handleCategoryChange('fabric')}
+                      >
+                        🧵 ستائر قماشية
+                      </button>
+                      <button 
+                        type="button" 
+                        className={`category-tab ${styleCategory === 'roller' ? 'active' : ''}`}
+                        onClick={() => handleCategoryChange('roller')}
+                      >
+                        ⚙️ رول وجالوزي
+                      </button>
+                    </div>
+                    
+                    <div className="option-grid">
+                      {styleCategory === 'fabric' ? (
+                        <>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'wave' ? 'selected' : ''}`}
+                            onClick={() => setStyle('wave')}
+                          >
+                            <span className="option-card-title">ويفي</span>
+                            <span className="option-card-subtitle">Ripple Fold</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'pleated' ? 'selected' : ''}`}
+                            onClick={() => setStyle('pleated')}
+                          >
+                            <span className="option-card-title">كسرات</span>
+                            <span className="option-card-subtitle">Pleated</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'gathered' ? 'selected' : ''}`}
+                            onClick={() => setStyle('gathered')}
+                          >
+                            <span className="option-card-title">زم</span>
+                            <span className="option-card-subtitle">Rod Pocket</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'pinch' ? 'selected' : ''}`}
+                            onClick={() => setStyle('pinch')}
+                          >
+                            <span className="option-card-title">تكسير أمريكي</span>
+                            <span className="option-card-subtitle">Pinch Pleat</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'classic_rod' ? 'selected' : ''}`}
+                            onClick={() => setStyle('classic_rod')}
+                          >
+                            <span className="option-card-title">كلاسيك بوري</span>
+                            <span className="option-card-subtitle">Eyelet Grommet</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'side_pull' ? 'selected' : ''}`}
+                            onClick={() => setStyle('side_pull')}
+                          >
+                            <span className="option-card-title">رفعات جانبية</span>
+                            <span className="option-card-subtitle">Sweep Pull</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'stage' ? 'selected' : ''}`}
+                            onClick={() => setStyle('stage')}
+                          >
+                            <span className="option-card-title">مسرحي كسرات</span>
+                            <span className="option-card-subtitle">Theatrical</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'blackout' ? 'selected' : ''}`}
+                            onClick={() => setStyle('blackout')}
+                          >
+                            <span className="option-card-title">بلاك آوت شامواه</span>
+                            <span className="option-card-subtitle">Suede Blackout</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'sunscreen' ? 'selected' : ''}`}
+                            onClick={() => setStyle('sunscreen')}
+                          >
+                            <span className="option-card-title">رول سنسكرين</span>
+                            <span className="option-card-subtitle">Sunscreen</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'dk' ? 'selected' : ''}`}
+                            onClick={() => setStyle('dk')}
+                          >
+                            <span className="option-card-title">دي كي (DK)</span>
+                            <span className="option-card-subtitle">Double Roller</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'zebra' ? 'selected' : ''}`}
+                            onClick={() => setStyle('zebra')}
+                          >
+                            <span className="option-card-title">رول زيبرا</span>
+                            <span className="option-card-subtitle">Zebra Roller</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'wood_venetian' ? 'selected' : ''}`}
+                            onClick={() => setStyle('wood_venetian')}
+                          >
+                            <span className="option-card-title">جالوزي خشبي</span>
+                            <span className="option-card-subtitle">Wood Venetian</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${style === 'metal_venetian' ? 'selected' : ''}`}
+                            onClick={() => setStyle('metal_venetian')}
+                          >
+                            <span className="option-card-title">جالوزي معدني</span>
+                            <span className="option-card-subtitle">Alum Venetian</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
 
-            {/* Color Selection */}
-            <div className="form-group">
-              <span className="form-label" id="color-label">اللون المفضل</span>
-              <div className="color-swatches" role="group" aria-labelledby="color-label">
-                {colors.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className={`swatch-btn ${selectedColor === c.id ? 'selected' : ''}`}
-                    style={{ backgroundColor: c.hex }}
-                    onClick={() => setSelectedColor(c.id)}
-                    title={c.name}
-                    aria-label={c.name}
-                    aria-pressed={selectedColor === c.id}
-                  >
-                    {selectedColor === c.id && (
-                      <svg className={`swatch-check ${c.id === 'white' || c.id === 'beige' ? 'swatch-check--dark' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M20 6 9 17l-5-5"></path>
-                      </svg>
-                    )}
-                  </button>
-                ))}
+              {/* Step 2: القماش والتعتيم */}
+              <div className={`accordion-item ${activeStep === 2 ? 'active' : ''}`}>
+                <button 
+                  type="button" 
+                  className="accordion-header" 
+                  onClick={() => toggleStep(2)}
+                  aria-expanded={activeStep === 2}
+                >
+                  <span className="accordion-header-title">
+                    <span>٢. القماش والتعتيم</span>
+                  </span>
+                  <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                {activeStep === 2 && (
+                  <div className="accordion-content">
+                    {/* Fabric Selection */}
+                    <div className="form-group">
+                      <span className="form-label">نوع القماش</span>
+                      {isBlindStyle(style) ? (
+                        <div className="option-card disabled">
+                          <span className="option-card-title">تلقائي للموديل</span>
+                          <span className="option-card-subtitle">Auto fabric for blinds</span>
+                        </div>
+                      ) : (
+                        <div className="option-grid">
+                          {Object.keys(fabricNames).map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              className={`option-card ${fabric === key ? 'selected' : ''}`}
+                              onClick={() => setFabric(key)}
+                            >
+                              <span className="option-card-title">{fabricNames[key]}</span>
+                              <span className="option-card-subtitle">
+                                {key === 'velvet' ? 'Velvet' : key === 'linen' ? 'Linen' : key === 'silk' ? 'Silk' : key === 'cotton' ? 'Cotton' : 'Lace'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Color Selection */}
+                    <div className="form-group">
+                      <span className="form-label">اللون المفضل</span>
+                      <div className="color-swatch-grid">
+                        {colors.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            className={`swatch-btn ${selectedColor === c.id ? 'selected' : ''}`}
+                            style={{ backgroundColor: c.hex, width: '100%', aspectRatio: '1/1', borderRadius: '50%' }}
+                            onClick={() => setSelectedColor(c.id)}
+                            title={c.name}
+                            aria-label={c.name}
+                          >
+                            {selectedColor === c.id && (
+                              <svg className={`swatch-check ${c.id === 'white' || c.id === 'beige' ? 'swatch-check--dark' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5"></path>
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <span className="form-hint">
+                        اللون المختار: {colors.find(c => c.id === selectedColor)?.name}
+                      </span>
+                    </div>
+
+                    {/* Opacity Selection */}
+                    <div className="form-group">
+                      <span className="form-label">درجة التعتيم وترشيح الضوء</span>
+                      <div className="option-grid">
+                        {Object.keys(opacityNames).map((key) => (
+                          <button
+                            key={key}
+                            type="button"
+                            className={`option-card ${opacity === key ? 'selected' : ''}`}
+                            onClick={() => setOpacity(key)}
+                          >
+                            <span className="option-card-title">{opacityNames[key]}</span>
+                            <span className="option-card-subtitle">
+                              {key === 'sheer' ? 'Sheer' : key === 'semi' ? 'Semi-Opaque' : 'Blackout'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <span className="form-hint">
-                اللون المختار: {colors.find(c => c.id === selectedColor)?.name}
-              </span>
-            </div>
-          </section>
 
-          {/* Column 2: Center - Studio Stage */}
-          <section className="studio-stage" aria-label="رفع الصورة والتوليد">
+              {/* Step 3: الملحقات */}
+              <div className={`accordion-item ${activeStep === 3 ? 'active' : ''}`}>
+                <button 
+                  type="button" 
+                  className="accordion-header" 
+                  onClick={() => toggleStep(3)}
+                  aria-expanded={activeStep === 3}
+                >
+                  <span className="accordion-header-title">
+                    <span>٣. الملحقات والإضافات</span>
+                  </span>
+                  <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                {activeStep === 3 && (
+                  <div className="accordion-content">
+                    {/* Decorative Bar Selection */}
+                    <div className="form-group">
+                      <span className="form-label">ديكور البار (طريقة التركيب)</span>
+                      {isBlindStyle(style) ? (
+                        <div className="option-card disabled">
+                          <span className="option-card-title">غير متاح للرول</span>
+                          <span className="option-card-subtitle">Not applicable for blinds</span>
+                        </div>
+                      ) : (
+                        <div className="option-grid">
+                          {Object.keys(barNames).map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              className={`option-card ${barStyle === key ? 'selected' : ''}`}
+                              onClick={() => setBarStyle(key)}
+                            >
+                              <span className="option-card-title">{barNames[key].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>
+                              <span className="option-card-subtitle">
+                                {key === 'wood_bar' ? 'Wood Bar' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Add Tulle Toggle */}
+                    <div className="form-group">
+                      <span className="form-label">إضافة طبقة تول خلف الستارة</span>
+                      {isBlindStyle(style) ? (
+                        <div className="option-card disabled">
+                          <span className="option-card-title">غير متاح للرول</span>
+                          <span className="option-card-subtitle">Not applicable for blinds</span>
+                        </div>
+                      ) : (
+                        <div className="option-grid">
+                          <button
+                            type="button"
+                            className={`option-card ${!addTulle ? 'selected' : ''}`}
+                            onClick={() => setAddTulle(false)}
+                          >
+                            <span className="option-card-title">بدون تول</span>
+                            <span className="option-card-subtitle">No Sheer Tulle</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`option-card ${addTulle ? 'selected' : ''}`}
+                            onClick={() => setAddTulle(true)}
+                          >
+                            <span className="option-card-title">إضافة تول ✨</span>
+                            <span className="option-card-subtitle">Add Sheer Layer</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 4: المعاينة والوضعية */}
+              <div className={`accordion-item ${activeStep === 4 ? 'active' : ''}`}>
+                <button 
+                  type="button" 
+                  className="accordion-header" 
+                  onClick={() => toggleStep(4)}
+                  aria-expanded={activeStep === 4}
+                >
+                  <span className="accordion-header-title">
+                    <span>٤. المعاينة والوضعية</span>
+                  </span>
+                  <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                {activeStep === 4 && (
+                  <div className="accordion-content">
+                    {/* Curtain Position */}
+                    <div className="form-group">
+                      <span className="form-label">وضعية الستارة</span>
+                      {isBlindStyle(style) ? (
+                        <div className="option-card disabled">
+                          <span className="option-card-title">تلقائي للموديل</span>
+                          <span className="option-card-subtitle">Auto position for blinds</span>
+                        </div>
+                      ) : (
+                        <div className="option-grid">
+                          {Object.keys(positionNames).map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              className={`option-card ${curtainPosition === key ? 'selected' : ''}`}
+                              onClick={() => setCurtainPosition(key)}
+                            >
+                              <span className="option-card-title">{positionNames[key]}</span>
+                              <span className="option-card-subtitle">
+                                {key === 'closed' ? 'Closed panels' : 'Half open panels'}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tips Box inside Step 4 */}
+                    <div className="tips-box" style={{ marginTop: '8px' }}>
+                      <h4>💡 للحصول على أفضل نتيجة:</h4>
+                      <ul className="tips-list">
+                        <li>صوّر النافذة كاملة بإضاءة نهارية واضحة.</li>
+                        <li>تجنّب الصور المائلة جداً أو شديدة الظلام.</li>
+                        <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* Sidebar Dock: Action Buttons & Selected Options Summary */}
+            <div className="sidebar-dock" style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+              {originalImageSrc && (
+                <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{fabricNames[fabric]}</span>}
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                    {colors.find(c => c.id === selectedColor)?.name}
+                  </span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
+                  {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
+                </div>
+              )}
+
+              {originalImageSrc && generatedImageSrc ? (
+                <div className="dock-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <span className="dock-compare-hint" style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
+                    اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
+                  </span>
+                  <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                    تحميل التصميم 💾
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button 
+                    type="button"
+                    className="btn-generate"
+                    onClick={triggerGenerate} 
+                    disabled={!originalImageSrc || loading}
+                    style={{ width: '100%', padding: '14px', borderRadius: '980px', fontWeight: 700 }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                    </svg>
+                    <span>ولّد التصميم</span>
+                  </button>
+                  {!originalImageSrc && (
+                    <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
+                  )}
+                </>
+              )}
+            </div>
+
+          </aside>
+
+          {/* Column 2: Left/Center - Studio Stage */}
+          <section className="studio-stage" aria-label="معاينة الصورة والتوليد">
             <div className="stage-header">
               <span className="stage-status" aria-live="polite">
                 <span className={`stage-status-dot ${originalImageSrc ? 'is-ready' : ''} ${generatedImageSrc ? 'is-done' : ''} ${loading ? 'is-busy' : ''}`} aria-hidden="true"></span>
@@ -529,7 +870,6 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
             </div>
 
             <div className="stage-canvas">
-              {/* Subtle Grid Background for canvas */}
               {!originalImageSrc && !generatedImageSrc && <div className="dropzone-grid-bg"></div>}
 
               {/* Dropzone for upload */}
@@ -609,186 +949,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                 </div>
               )}
             </div>
-            
-            {/* Stage Dock: Summary & Action Buttons */}
-            <div className="stage-dock">
-              {originalImageSrc && (
-                <div className="dock-summary" aria-live="polite">
-                  <span className="dock-tag">{styleNames[style]}</span>
-                  {!isBlindStyle(style) && <span className="dock-tag">{fabricNames[fabric]}</span>}
-                  <span className="dock-tag">
-                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
-                    {colors.find(c => c.id === selectedColor)?.name}
-                  </span>
-                  {!isBlindStyle(style) && <span className="dock-tag">{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
-                  {!isBlindStyle(style) && <span className="dock-tag">{positionNames[curtainPosition]}</span>}
-                  {!isBlindStyle(style) && addTulle && <span className="dock-tag">مع طبقة تول</span>}
-                  <span className="dock-tag">{opacityNames[opacity]}</span>
-                </div>
-              )}
-
-              {originalImageSrc && generatedImageSrc ? (
-                <div className="dock-actions">
-                  <span className="dock-compare-hint">
-                    اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
-                  </span>
-                  <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ padding: '10px 24px', fontWeight: 600 }}>
-                    تحميل التصميم 💾
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <button 
-                    type="button"
-                    className="btn-generate"
-                    onClick={triggerGenerate} 
-                    disabled={!originalImageSrc || loading}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                      <path d="M20 3v4"></path>
-                      <path d="M22 5h-4"></path>
-                    </svg>
-                    <span>ولّد التصميم</span>
-                  </button>
-                  {!originalImageSrc && (
-                    <span className="dock-hint">ارفع صورة نافذتك لتتمكن من التوليد.</span>
-                  )}
-                </>
-              )}
-            </div>
           </section>
-
-          {/* Column 3: Left Panel - التركيب والإضاءة */}
-          <section className="studio-side studio-side--left" aria-label="خيارات التركيب والإضاءة">
-            <h2 className="side-title">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2" />
-                <path d="M12 20v2" />
-                <path d="m4.93 4.93 1.41 1.41" />
-                <path d="m17.66 17.66 1.41 1.41" />
-                <path d="M2 12h2" />
-                <path d="M20 12h2" />
-                <path d="m6.34 17.66-1.41 1.41" />
-                <path d="m19.07 4.93-1.41 1.41" />
-              </svg>
-              <span>التركيب والإضاءة</span>
-            </h2>
-            
-            {/* Decorative Bar Selection */}
-            <div className="form-group">
-              <span className="form-label">ديكور البار (طريقة التركيب)</span>
-              <div className="chip-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="chip selected" disabled>
-                    بدون بار (تلقائي للبلايند)
-                  </button>
-                ) : (
-                  Object.keys(barNames).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      className={`chip ${barStyle === key ? 'selected' : ''}`}
-                      onClick={() => setBarStyle(key)}
-                      aria-pressed={barStyle === key}
-                    >
-                      {barNames[key]}
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Curtain Position */}
-            <div className="form-group">
-              <span className="form-label">وضعية الستارة</span>
-              <div className="chip-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="chip selected" disabled>
-                    تلقائي للبلايند
-                  </button>
-                ) : (
-                  Object.keys(positionNames).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      className={`chip ${curtainPosition === key ? 'selected' : ''}`}
-                      onClick={() => setCurtainPosition(key)}
-                      aria-pressed={curtainPosition === key}
-                    >
-                      {positionNames[key]}
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Add Tulle Toggle */}
-            <div className="form-group">
-              <span className="form-label">إضافة طبقة تول خلف الستارة</span>
-              <div className="chip-grid">
-                {isBlindStyle(style) ? (
-                  <button type="button" className="chip selected" disabled>
-                    غير متاح للبلايند
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className={`chip ${!addTulle ? 'selected' : ''}`}
-                      onClick={() => setAddTulle(false)}
-                      aria-pressed={!addTulle}
-                    >
-                      بدون تول
-                    </button>
-                    <button
-                      type="button"
-                      className={`chip ${addTulle ? 'selected' : ''}`}
-                      onClick={() => setAddTulle(true)}
-                      aria-pressed={addTulle}
-                    >
-                      ✨ إضافة تول
-                    </button>
-                  </>
-                )}
-              </div>
-              {addTulle && !isBlindStyle(style) && (
-                <span className="form-hint" style={{ color: 'var(--blue)' }}>
-                  💡 اختر وضعية الستارة "مفتوحة عالنص" لإظهار التول بوضوح مع أشعة الشمس.
-                </span>
-              )}
-            </div>
-
-            {/* Opacity Selection */}
-            <div className="form-group">
-              <span className="form-label">درجة التعتيم وترشيح الضوء</span>
-              <div className="chip-grid">
-                {Object.keys(opacityNames).map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className={`chip ${opacity === key ? 'selected' : ''}`}
-                    onClick={() => setOpacity(key)}
-                    aria-pressed={opacity === key}
-                  >
-                    {opacityNames[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tips Card */}
-            <div className="tips-box">
-              <h4>💡 للحصول على أفضل نتيجة:</h4>
-              <ul className="tips-list">
-                <li>صوّر النافذة كاملة بإضاءة نهارية واضحة.</li>
-                <li>تجنّب الصور المائلة جداً أو شديدة الظلام.</li>
-                <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
-              </ul>
-            </div>
-          </section>
-          
         </div>
       </div>
 
