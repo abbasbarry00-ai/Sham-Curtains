@@ -9,9 +9,67 @@ export default function Home() {
     <>
       <Header activePage="home" />
 
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="container hero-container">
+      {/* Hero Section — Architectural Grid */}
+      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+
+        {/* SVG Geometric Grid Background */}
+        <svg
+          aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#E5E7EB" strokeWidth="0.6" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-grid)" />
+        </svg>
+
+        {/* Floating Fabric Swatches */}
+        {/* Swatch 1 — Linen Beige */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '18%', left: '6%',
+          width: '52px', height: '52px',
+          background: '#D6C5A8',
+          border: '1px solid #C8B89A',
+          zIndex: 1, opacity: 0.85
+        }} />
+        {/* Swatch 2 — Navy Sapphire */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '55%', left: '9%',
+          width: '36px', height: '36px',
+          background: '#2C3E50',
+          border: '1px solid #1B2E4B',
+          zIndex: 1, opacity: 0.75
+        }} />
+        {/* Swatch 3 — Dark Wood Brown */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '22%', right: '7%',
+          width: '44px', height: '44px',
+          background: '#6B4A2A',
+          border: '1px solid #5A3D22',
+          zIndex: 1, opacity: 0.8
+        }} />
+        {/* Swatch 4 — Dusty Rose */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '62%', right: '5%',
+          width: '60px', height: '60px',
+          background: '#DCAEBB',
+          border: '1px solid #C99EAB',
+          zIndex: 1, opacity: 0.7
+        }} />
+        {/* Swatch 5 — Off-white line accent */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', bottom: '15%', left: '18%',
+          width: '28px', height: '28px',
+          background: '#F0EBE3',
+          border: '1px solid #D1C9BD',
+          zIndex: 1, opacity: 0.9
+        }} />
+
+        {/* Main Hero Content */}
+        <div className="container hero-container" style={{ position: 'relative', zIndex: 2 }}>
           <div className="hero-content-center">
 
             <div className="hero-copy-center">
@@ -21,13 +79,32 @@ export default function Home() {
               <p>
                 ارفع صورة حقيقية لغرفتك، اختر الطراز والقماش واللون، ودع الذكاء الاصطناعي يركّب الستارة بإضاءة وظلال واقعية خلال ثوانٍ من معرض ستائر شام.
               </p>
-              <div className="hero-actions-center">
-                <Link href="/app" className="btn btn-primary btn-large">
-                  ابدأ التصميم مجاناً
-                </Link>
-                <Link href="/gallery" className="btn btn-secondary btn-large">
-                  تصفح معرض الأعمال
-                </Link>
+
+              {/* Dual CTA Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginTop: '32px' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {/* Primary: Manual Design */}
+                  <Link href="/app" className="hero-primary-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    صمّم بنفسك
+                  </Link>
+
+                  {/* Secondary: AI Suggestion */}
+                  <Link href="/app" className="hero-ai-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                      <path d="M20 3v4"/><path d="M22 5h-4"/>
+                    </svg>
+                    اقتراح الذكاء الاصطناعي
+                  </Link>
+                </div>
+
+                {/* AI hint text */}
+                <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, textAlign: 'center', maxWidth: '360px', lineHeight: 1.6 }}>
+                  سيقوم الذكاء الاصطناعي بتحليل إضاءة وألوان غرفتك لاقتراح الستارة المثالية
+                </p>
               </div>
             </div>
 
