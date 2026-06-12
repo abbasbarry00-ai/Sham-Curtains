@@ -1660,7 +1660,7 @@ body {
   background-color: var(--accent);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments & High-Fidelity Mobile Optimizations */
 @media (max-width: 1024px) {
   .hero-section {
     background-position: 25% center;
@@ -1674,7 +1674,7 @@ body {
 
 @media (max-width: 768px) {
   .hero-section {
-    background-image: linear-gradient(rgba(234, 227, 210, 0.88), rgba(234, 227, 210, 0.88)), url('/hero.bg.png');
+    background-image: linear-gradient(rgba(234, 227, 210, 0.9), rgba(234, 227, 210, 0.9)), url('/hero.bg.png');
     background-position: center;
     padding-block: 48px;
   }
@@ -1683,6 +1683,15 @@ body {
     text-align: center;
     align-items: center;
   }
+  .hero-copy-right h1 {
+    font-size: clamp(24px, 6.2vw, 36px) !important;
+    line-height: 1.3 !important;
+  }
+  .hero-copy-right p {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 24px !important;
+  }
   .hero-actions-right {
     justify-content: center;
   }
@@ -1690,6 +1699,169 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     gap: 16px;
+  }
+  .vintage-watermark {
+    max-width: 280px !important;
+    animation: none !important; /* Disable resource-heavy animations on mobile browsers */
+  }
+  .vintage-divider {
+    margin-block: 32px !important;
+  }
+  
+  /* Feature alignment centering on tablets/mobile */
+  .feature-body {
+    text-align: center !important;
+    align-items: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .feature-body h3 {
+    font-size: 20px !important;
+    text-align: center !important;
+  }
+  .feature-body p {
+    font-size: 15px !important;
+    text-align: center !important;
+    margin-inline: auto !important;
+  }
+  .feature-list {
+    align-self: center !important;
+    text-align: right !important; /* Retain RTL listing order */
+    width: fit-content !important;
+    margin-inline: auto !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-stats-right {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 16px 20px !important;
+    padding-top: 16px !important;
+    margin-top: 20px !important;
+  }
+  .hero-stat-item {
+    text-align: center !important;
+    align-items: center !important;
+    min-width: 110px !important;
+    flex: 1 1 30% !important;
+  }
+  .hero-stat-item strong {
+    font-size: 24px !important;
+  }
+  .hero-stat-item span {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Mobile Header Layout */
+  .header-container {
+    padding-inline: 12px !important;
+    height: auto;
+    padding-block: 8px;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .logo {
+    font-size: 17px !important;
+    justify-content: center;
+    width: 100%;
+  }
+  .nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    gap: 2px;
+  }
+  .nav-link {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+  
+  /* Mobile Hero Buttons stack */
+  .hero-actions-right {
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .hero-actions-right .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-block: 12px !important;
+  }
+  
+  /* Card spacing adjustments */
+  .step {
+    padding: 24px 20px 28px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .step::before {
+    border-radius: calc(var(--radius-md) - 5px) !important;
+  }
+  .step h3 {
+    font-size: 17px !important;
+  }
+  .step p {
+    font-size: 14px !important;
+  }
+  
+  .card-content-info {
+    padding: 16px 18px !important;
+  }
+  .card-content-info h3 {
+    font-size: 14.5px !important;
+  }
+  .card-tag {
+    font-size: 10.5px !important;
+    padding: 2px 6px !important;
+  }
+  
+  /* Container mobile padding safety */
+  .container {
+    padding-inline: 16px !important;
+  }
+  
+  /* Store card footer adjustments on mobile */
+  .store-card-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding-top: 12px !important;
+  }
+  .store-card-price {
+    text-align: center !important;
+  }
+  .store-order-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-block: 10px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Horizontal scroll for filter buttons on mobile */
+@media (max-width: 600px) {
+  .store-filter-container {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    scrollbar-width: none;
+  }
+  .store-filter-container::-webkit-scrollbar {
+    display: none;
+  }
+  .store-filter-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
 }
 

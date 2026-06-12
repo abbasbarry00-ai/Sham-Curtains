@@ -22,7 +22,7 @@ export default function Header({ activePage }: HeaderProps) {
             معرض أعمالنا
           </Link>
         </nav>
-        <div>
+        <div className="header-cta">
           <Link href="/app" className="btn btn-primary">
             ابدأ التصميم
           </Link>

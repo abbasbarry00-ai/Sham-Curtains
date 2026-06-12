@@ -153,7 +153,7 @@ export default function BeforeAfterSlider({
         />
       </div>
       
-      {/* Handle line */}
+      {/* Handle line & Touch Knob */}
       <div
         className="comparison-handle"
         onMouseDown={handleMouseDown}
@@ -163,13 +163,38 @@ export default function BeforeAfterSlider({
           top: 0,
           bottom: 0,
           left: `${sliderPosition}%`,
-          width: '3px',
-          background: 'var(--foreground)',
+          width: '2px',
+          background: 'var(--accent, #AD8B4A)',
           cursor: 'ew-resize',
           zIndex: 10,
           transform: 'translateX(-50%)',
+          boxShadow: '0 0 8px rgba(0,0,0,0.3)',
         }}
-      />
+      >
+        <div 
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: '#FFFFFF',
+            border: '2px solid var(--accent, #AD8B4A)',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+            pointerEvents: 'none',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent, #AD8B4A)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18-6-6 6-6" />
+            <path d="m15 6 6 6-6 6" />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }
