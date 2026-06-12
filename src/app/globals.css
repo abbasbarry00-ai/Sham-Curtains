@@ -112,24 +112,12 @@ a {
   gap: 8px;
 }
 
-.logo-icon {
-  width: 28px;
-  height: 28px;
-  background: var(--primary);
-  border-radius: 6px;
+.logo-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
   display: inline-block;
-  position: relative;
-}
-
-.logo-icon::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  right: 6px;
-  bottom: 6px;
-  border-radius: 3px;
-  background: var(--background);
 }
 
 .nav {

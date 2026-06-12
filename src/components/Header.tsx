@@ -9,7 +9,7 @@ export default function Header({ activePage }: HeaderProps) {
     <header className="header">
       <div className="container header-container">
         <Link href="/" className="logo">
-          <span className="logo-icon"></span>
+          <img src="/flower_logo.png" alt="شعار ستائر شام" className="logo-image" />
           <span>معرض ستائر شام</span>
         </Link>
         <nav className="nav">
