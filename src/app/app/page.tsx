@@ -407,13 +407,13 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           </div>
         </div>
 
-        <div className="studio flex flex-col lg:flex-row h-screen w-full overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
+        <div className="studio flex flex-col w-full min-h-screen lg:flex-row lg:h-screen lg:overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
           {/* Column 1: Right Sidebar - Consolidated Options panel */}
-          <aside className="studio-sidebar relative w-full h-[55vh] flex flex-col lg:w-[30%] lg:h-full" aria-label="خيارات التصميم">
+          <aside className="studio-sidebar relative w-full h-auto flex flex-col lg:w-[30%] lg:h-full lg:overflow-y-auto" aria-label="خيارات التصميم">
             
-            {/* Accordion system — scrollable area */}
-            <div className="accordion overflow-y-auto overscroll-contain pb-32 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
+            {/* Accordion system — no inner scroll on mobile, natural body scroll */}
+            <div className="accordion pb-32">
               
               {/* Step 1: المظهر والطراز */}
               <div className={`accordion-item ${activeStep === 1 ? 'active' : ''} border-b border-gray-300 bg-white`}>
@@ -876,7 +876,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           </div>
 
           {/* Column 2: Left/Center - Studio Stage */}
-          <section className="studio-stage w-full h-[45vh] relative lg:w-[70%] lg:h-full" aria-label="معاينة الصورة والتوليد">
+          <section className="studio-stage w-full relative lg:w-[70%] lg:h-full" style={{ minHeight: '60vw' }} aria-label="معاينة الصورة والتوليد">
             <div className="stage-header">
               <span className="stage-status" aria-live="polite">
                 <span className={`stage-status-dot ${originalImageSrc ? 'is-ready' : ''} ${generatedImageSrc ? 'is-done' : ''} ${loading ? 'is-busy' : ''}`} aria-hidden="true"></span>

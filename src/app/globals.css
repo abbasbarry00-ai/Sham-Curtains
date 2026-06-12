@@ -1827,7 +1827,7 @@ h1, h2, h3, h4, .section-title, .logo, .footer-cta-title, .side-title {
   background: #2C3E50 !important;
 }
 
-/* Mobile responsive stage */
+/* Mobile responsive stage — natural height on mobile */
 .studio-stage {
   border: 1px solid #E5E7EB !important;
   background: #FFFFFF !important;
@@ -1837,6 +1837,23 @@ h1, h2, h3, h4, .section-title, .logo, .footer-cta-title, .side-title {
   border: 1px solid #E5E7EB !important;
   background: #FFFFFF !important;
 }
+
+/* Desktop: sidebar scrolls internally, stage fills full height */
+@media (min-width: 1024px) {
+  .studio-sidebar {
+    overflow-y: auto !important;
+    /* Hide scrollbar visually on desktop too */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  .studio-sidebar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .studio-stage {
+    min-height: unset !important;
+  }
+}
+
 
 /* Flat white footer and overrides */
 .footer {
