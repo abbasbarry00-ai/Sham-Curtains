@@ -12,11 +12,7 @@ export default function Home() {
       <section className="hero-section">
         <div className="container hero-container">
           <div className="hero-content-right">
-            <div className="badge">
-              <span className="badge-dot"></span>
-              <span>بتقنية Flux-Kontext-Pro المتطورة</span>
-            </div>
-            
+
             <div className="hero-copy-right">
               <h1>
                 شاهد ستارتك الجديدة <span className="hero-accent">في غرفتك</span>، قبل أن تقتنيها
