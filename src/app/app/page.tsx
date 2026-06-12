@@ -135,6 +135,22 @@ export default function AppPage() {
   // Layout revamp states
   const [activeStep, setActiveStep] = useState<number>(1);
   const [styleCategory, setStyleCategory] = useState<'fabric' | 'roller'>('fabric');
+  const [isMagicMode, setIsMagicMode] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('magic') === 'true' || params.get('mode') === 'magic') {
+        setIsMagicMode(true);
+        // Automatically trigger file upload on page load if no image is uploaded
+        if (!originalImageSrc) {
+          setTimeout(() => {
+            fileInputRef.current?.click();
+          }, 350);
+        }
+      }
+    }
+  }, []);
 
   const toggleStep = (stepNumber: number) => {
     setActiveStep(activeStep === stepNumber ? 0 : stepNumber);
@@ -203,16 +219,26 @@ export default function AppPage() {
       if (e.target?.result && typeof e.target.result === 'string') {
         const rawBase64 = e.target.result;
         setLoading(true);
-        setLoadingMessage('جاري معالجة الصورة وضغطها...');
+        setLoadingMessage(isMagicMode 
+          ? 'يقوم الذكاء الاصطناعي بتحليل الإضاءة والألوان لاختيار الستارة المثالية...' 
+          : 'جاري معالجة الصورة وضغطها...');
         
         try {
           const resized = await getResizedImageBase64(rawBase64, 1024);
           setOriginalImageSrc(resized);
+          if (isMagicMode) {
+            await triggerGenerate(resized);
+          } else {
+            setLoading(false);
+          }
         } catch (err) {
           console.error(err);
           setOriginalImageSrc(rawBase64);
-        } finally {
-          setLoading(false);
+          if (isMagicMode) {
+            await triggerGenerate(rawBase64);
+          } else {
+            setLoading(false);
+          }
         }
       }
     };
@@ -228,62 +254,67 @@ export default function AppPage() {
     }
   };
 
-  const triggerGenerate = async () => {
-    if (!originalImageSrc) return;
+  const triggerGenerate = async (overrideImage?: string) => {
+    const imageToUse = overrideImage || originalImageSrc;
+    if (!imageToUse) return;
 
     setLoading(true);
-    setLoadingMessage('جاري الاتصال بخادم الذكاء الاصطناعي... قد يستغرق ذلك 20-30 ثانية');
+    setLoadingMessage(isMagicMode 
+      ? 'يقوم الذكاء الاصطناعي بتحليل الإضاءة والألوان لاختيار الستارة المثالية...' 
+      : 'جاري الاتصال بخادم الذكاء الاصطناعي... قد يستغرق ذلك 20-30 ثانية');
 
     try {
       const getCohesivePrompt = () => {
-        // Resolve active color — preset or custom palette
-        let colorName: string;
-        let colorHex: string;
-        let colorDesc: string;
+        // In magic mode, use default/auto parameters
+        const activeStyle = isMagicMode ? 'wave' : style;
+        const activeFabric = isMagicMode ? 'linen' : fabric;
+        const activeColor = isMagicMode ? 'beige' : selectedColor;
+        const activeBar = isMagicMode ? 'hidden' : barStyle;
+        const activeOpacity = isMagicMode ? 'semi' : opacity;
+        const activePosition = isMagicMode ? 'closed' : curtainPosition;
+        const activeAddTulle = isMagicMode ? true : addTulle;
 
-        if (selectedColor === 'custom') {
+        let colorDesc: string;
+        let colorHex: string;
+
+        if (!isMagicMode && selectedColor === 'custom') {
           colorHex = customColor;
-          // Convert hex to a descriptive name for the prompt
           const r = parseInt(colorHex.slice(1,3), 16);
           const g = parseInt(colorHex.slice(3,5), 16);
           const b = parseInt(colorHex.slice(5,7), 16);
-          colorName = `custom color (RGB ${r},${g},${b})`;
           colorDesc = `exact custom color with hex code ${colorHex}, RGB values (${r}, ${g}, ${b}) — use this precise color exactly as specified`;
         } else {
-          const colorObj = colors.find(c => c.id === selectedColor);
-          colorName = colorObj ? colorObj.name : 'أبيض';
+          const colorObj = colors.find(c => c.id === activeColor);
           colorHex = colorObj ? colorObj.hex : '#ffffff';
-          colorDesc = colorPrompts[selectedColor] ?? 'pure solid white tone';
+          colorDesc = colorPrompts[activeColor] ?? 'pure solid white tone';
         }
         
         let lightingInstruction = '';
-        if (opacity === 'sheer') {
+        if (activeOpacity === 'sheer') {
           lightingInstruction = "The room's lighting must be bright and naturally lit by daylight filtering through the open or sheer window coverings. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
-        } else if (opacity === 'semi') {
+        } else if (activeOpacity === 'semi') {
           lightingInstruction = "The room's lighting must be softly diffused with gentle ambient light. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
         } else {
-          // blackout
           lightingInstruction = "The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
         }
 
         const qualityDirectives = "This is a professional architectural photograph. Avoid any cartoonish, 3D render, digital illustration, flat vector, or artificial look. The materials must have realistic photographic textures, natural fabric folds, physical shadows, and ambient reflections matching a high-end interior design catalog photo.";
 
-        if (isBlindStyle(style)) {
-          const blindStyleDesc = stylePrompts[style];
-          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[opacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives}`;
+        if (isBlindStyle(activeStyle)) {
+          const blindStyleDesc = stylePrompts[activeStyle];
+          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[activeOpacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives}`;
         }
 
         // Curtains
-        const fabricDesc = fabricPrompts[fabric];
-        const styleDesc = stylePrompts[style];
-        const opacityDesc = opacityPrompts[opacity];
+        const fabricDesc = fabricPrompts[activeFabric];
+        const styleDesc = stylePrompts[activeStyle];
+        const opacityDesc = opacityPrompts[activeOpacity];
 
         let positionInstruction = '';
-        if (curtainPosition === 'closed') {
+        if (activePosition === 'closed') {
           positionInstruction = `In this photo, REPLACE the window view by completely covering the entire window with a CLOSED, SHUT, solid ${colorDesc.toUpperCase()} (${colorHex}) curtain. The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
         } else {
-          // half_open
-          if (addTulle) {
+          if (activeAddTulle) {
             positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window, and REPLACE the center window glass with a sheer white tulle layer. The main curtain panels are drawn open, gathered and bunched at the left and right edges of the window. In the center, fully covering the window glass, there is a sheer white tulle layer with fine mesh netting (sheer lace layer) that filters the daylight. The sheer tulle curtain covers the middle of the window glass, while the main curtains are on the sides.`;
           } else {
             positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window. The curtain panels are drawn open, gathered and bunched at the left and right edges of the window. The center of the window is fully open and exposed, showing the clear window glass with daylight streaming through, and no tulle or sheer layer.`;
@@ -291,18 +322,17 @@ export default function AppPage() {
         }
 
         let barInstruction = '';
-        if (barStyle === 'hidden') {
+        if (activeBar === 'hidden') {
           barInstruction = `The curtains must hang from a completely hidden, invisible ceiling track mount. The fabric emerges directly from a clean narrow gap in the ceiling. There must be no visible curtain rod, no metal pole, no rings, no finials, and no brackets above the window. The wall above the window is completely empty and clean, and the curtain is flush with the ceiling.`;
-        } else if (barStyle === 'wood_bar') {
+        } else if (activeBar === 'wood_bar') {
           barInstruction = `Mount the curtains from a highly visible, prominent decorative wooden curtain rod installed on the wall above the window. The wooden rod has ornate wood finials on both ends and wooden brackets, with a rich warm wood grain finish. The rod and brackets are clearly visible.`;
-        } else if (barStyle === 'metal_bar') {
+        } else if (activeBar === 'metal_bar') {
           barInstruction = `Mount the curtains from a highly visible, prominent decorative wrought iron curtain rod installed on the wall above the window. The rod has elegant ornate metal finials on both ends and iron brackets, with a polished metallic black or brass finish. The rod and brackets are clearly visible.`;
-        } else if (barStyle === 'modern_bar') {
+        } else if (activeBar === 'modern_bar') {
           barInstruction = `Mount the curtains from a highly visible, prominent sleek minimalist modern curtain rod installed on the wall above the window. The modern rod has clean geometric finials and slim metal brackets in a brushed steel or matte black finish. The rod and brackets are clearly visible.`;
         }
 
-        // Tulle layer behind if closed
-        const tulleLayerBehind = (addTulle && curtainPosition === 'closed') 
+        const tulleLayerBehind = (activeAddTulle && activePosition === 'closed') 
           ? ' A secondary layer of sheer white tulle is installed behind the closed main curtain, close to the window glass (mostly hidden by the closed main curtain).'
           : '';
 
@@ -320,9 +350,9 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image: originalImageSrc,
+          image: imageToUse,
           prompt: prompt,
-          style: styleNames[style],
+          style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
 
@@ -346,6 +376,11 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
     setGeneratedImageSrc(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    if (isMagicMode) {
+      setTimeout(() => {
+        fileInputRef.current?.click();
+      }, 350);
     }
   };
 
@@ -375,7 +410,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
     
     try {
       const btn = document.getElementById('btn-download');
-      if (btn) btn.textContent = 'جاري التحميل... ⏳';
+      if (btn) btn.textContent = 'جاري التحميل...';
       
       const response = await fetch(generatedImageSrc);
       const blob = await response.blob();
@@ -389,7 +424,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
       
-      if (btn) btn.textContent = 'تحميل التصميم 💾';
+      if (btn) btn.textContent = 'تحميل التصميم';
     } catch (e) {
       console.error(e);
       window.open(generatedImageSrc, '_blank');
@@ -413,7 +448,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
             </div>
             <div className={`workspace-step ${originalImageSrc && !generatedImageSrc ? 'active' : ''} ${generatedImageSrc ? 'completed' : ''}`}>
               <div className="step-badge">٢</div>
-              <span className="step-label">اختر الخيارات وولّد</span>
+              <span className="step-label">{isMagicMode ? 'التوليد السحري' : 'اختر الخيارات وولّد'}</span>
               <div className="step-connector"></div>
             </div>
             <div className={`workspace-step ${generatedImageSrc ? 'active' : ''}`}>
@@ -426,7 +461,8 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
         <div className="studio flex flex-col w-full min-h-screen lg:flex-row lg:h-screen lg:overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
           {/* Column 1: Right Sidebar - Consolidated Options panel */}
-          <aside className="studio-sidebar relative w-full h-auto flex flex-col lg:w-[30%] lg:h-full lg:overflow-y-auto" aria-label="خيارات التصميم">
+          {!isMagicMode && (
+            <aside className="studio-sidebar relative w-full h-auto flex flex-col lg:w-[30%] lg:h-full lg:overflow-y-auto" aria-label="خيارات التصميم">
             
             {/* Accordion system — no inner scroll on mobile, natural body scroll */}
             <div className="accordion pb-32">
@@ -856,7 +892,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
 
                     {/* Tips Box inside Step 4 */}
                     <div className="tips-box" style={{ marginTop: '8px' }}>
-                      <h4>💡 للحصول على أفضل نتيجة:</h4>
+                      <h4>للحصول على أفضل نتيجة:</h4>
                       <ul className="tips-list">
                         <li>صوّر النافذة كاملة بإضاءة نهارية واضحة.</li>
                         <li>تجنّب الصور المائلة جداً أو شديدة الظلام.</li>
@@ -869,95 +905,100 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
 
             </div>
           </aside>
+          )}
 
-          {/* ── Fixed-bottom CTA bar (mobile) / Sticky (desktop) ── */}
-          <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 px-4 py-3 lg:hidden">
-            {/* Selected options summary strip */}
-            {originalImageSrc && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '10px' }}>
-                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{styleNames[style]}</span>
-                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{fabricNames[fabric]}</span>}
-                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                  <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
-                  {colors.find(c => c.id === selectedColor)?.name}
-                </span>
-                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{opacityNames[opacity]}</span>
-              </div>
-            )}
-            {originalImageSrc && generatedImageSrc ? (
-              <button className="btn btn-primary" id="btn-download-mobile" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
-                تحميل التصميم 💾
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="btn-generate"
-                  onClick={triggerGenerate}
-                  disabled={!originalImageSrc || loading}
-                  style={{ width: '100%', padding: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                    <path d="M20 3v4"></path>
-                    <path d="M22 5h-4"></path>
-                  </svg>
-                  <span>{!originalImageSrc ? 'ارفع صورة أولاً' : 'ولّد التصميم'}</span>
+          {/* ── Fixed-bottom CTA bar (mobile) ── */}
+          {!isMagicMode && (
+            <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 px-4 py-3 lg:hidden">
+              {/* Selected options summary strip */}
+              {originalImageSrc && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '10px' }}>
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{styleNames[style]}</span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{fabricNames[fabric]}</span>}
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                    {colors.find(c => c.id === selectedColor)?.name}
+                  </span>
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{opacityNames[opacity]}</span>
+                </div>
+              )}
+              {originalImageSrc && generatedImageSrc ? (
+                <button className="btn btn-primary" id="btn-download-mobile" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                  تحميل التصميم
                 </button>
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn-generate"
+                    onClick={() => triggerGenerate()}
+                    disabled={!originalImageSrc || loading}
+                    style={{ width: '100%', padding: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                    </svg>
+                    <span>{!originalImageSrc ? 'ارفع صورة أولاً' : 'ولّد التصميم'}</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
-          {/* ── Desktop Sidebar Dock: sticky inside aside ── */}
-          <div className="sidebar-dock hidden lg:block lg:sticky lg:bottom-0 lg:z-10 lg:w-[30%]" style={{ borderTop: '1px solid var(--border)', padding: '20px 16px', backgroundColor: 'var(--bg)' }}>
-            {originalImageSrc && (
-              <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
-                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{fabricNames[fabric]}</span>}
-                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
-                  {colors.find(c => c.id === selectedColor)?.name}
-                </span>
-                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle]}</span>}
-                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
-                {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
-                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
-              </div>
-            )}
-            {originalImageSrc && generatedImageSrc ? (
-              <div className="dock-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <span className="dock-compare-hint" style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
-                  اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
-                </span>
-                <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
-                  تحميل التصميم 💾
-                </button>
-              </div>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="btn-generate"
-                  onClick={triggerGenerate}
-                  disabled={!originalImageSrc || loading}
-                  style={{ width: '100%', padding: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                    <path d="M20 3v4"></path>
-                    <path d="M22 5h-4"></path>
-                  </svg>
-                  <span>ولّد التصميم</span>
-                </button>
-                {!originalImageSrc && (
-                  <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
-                )}
-              </>
-            )}
-          </div>
+          {/* ── Desktop Sidebar Dock ── */}
+          {!isMagicMode && (
+            <div className="sidebar-dock hidden lg:block lg:sticky lg:bottom-0 lg:z-10 lg:w-[30%]" style={{ borderTop: '1px solid var(--border)', padding: '20px 16px', backgroundColor: 'var(--bg)' }}>
+              {originalImageSrc && (
+                <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{fabricNames[fabric]}</span>}
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                    {colors.find(c => c.id === selectedColor)?.name}
+                  </span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle]}</span>}
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
+                  {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
+                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
+                </div>
+              )}
+              {originalImageSrc && generatedImageSrc ? (
+                <div className="dock-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <span className="dock-compare-hint" style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
+                    اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
+                  </span>
+                  <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                    تحميل التصميم
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn-generate"
+                    onClick={() => triggerGenerate()}
+                    disabled={!originalImageSrc || loading}
+                    style={{ width: '100%', padding: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                    </svg>
+                    <span>ولّد التصميم</span>
+                  </button>
+                  {!originalImageSrc && (
+                    <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
           {/* Column 2: Left/Center - Studio Stage */}
-          <section className="studio-stage w-full relative lg:w-[70%] lg:h-full" style={{ minHeight: '60vw' }} aria-label="معاينة الصورة والتوليد">
+          <section className={`studio-stage w-full relative lg:h-full ${isMagicMode ? 'lg:w-full' : 'lg:w-[70%]'}`} style={{ minHeight: '60vw' }} aria-label="معاينة الصورة والتوليد">
             <div className="stage-header">
               <span className="stage-status" aria-live="polite">
                 <span className={`stage-status-dot ${originalImageSrc ? 'is-ready' : ''} ${generatedImageSrc ? 'is-done' : ''} ${loading ? 'is-busy' : ''}`} aria-hidden="true"></span>
@@ -965,17 +1006,24 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                   {loading 
                     ? "جاري الاتصال بخادم الذكاء الاصطناعي..." 
                     : generatedImageSrc 
-                      ? "تم تصميم ستارتك بنجاح! 🎉" 
+                      ? "تم تصميم ستارتك بنجاح" 
                       : originalImageSrc 
-                        ? "تم رفع الصورة! حدد الخيارات واضغط توليد" 
+                        ? (isMagicMode ? "تم رفع الصورة وبدء التوليد السحري" : "تم رفع الصورة! حدد الخيارات واضغط توليد") 
                         : "ارفع صورة نافذتك لتبدأ"}
                 </span>
               </span>
-              {originalImageSrc && (
-                <button className="stage-reset" onClick={resetWorkspace}>
-                  تصميم جديد ↻
-                </button>
-              )}
+              <div className="flex gap-2">
+                {originalImageSrc && generatedImageSrc && isMagicMode && (
+                  <button className="btn btn-primary" onClick={handleDownload} style={{ padding: '6px 16px', fontSize: '13px', fontWeight: 700 }}>
+                    تحميل التصميم
+                  </button>
+                )}
+                {originalImageSrc && (
+                  <button className="stage-reset" onClick={resetWorkspace}>
+                    تصميم جديد
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="stage-canvas">
