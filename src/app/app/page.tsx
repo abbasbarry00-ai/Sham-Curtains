@@ -410,10 +410,10 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
         <div className="studio flex flex-col lg:flex-row h-screen w-full overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
           {/* Column 1: Right Sidebar - Consolidated Options panel */}
-          <aside className="studio-sidebar w-full h-[55vh] overflow-y-auto pb-24 lg:w-[30%] lg:h-full" aria-label="خيارات التصميم">
+          <aside className="studio-sidebar relative w-full h-[55vh] flex flex-col lg:w-[30%] lg:h-full" aria-label="خيارات التصميم">
             
-            {/* Accordion system */}
-            <div className="accordion">
+            {/* Accordion system — scrollable area */}
+            <div className="accordion overflow-y-auto overscroll-contain pb-32 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
               
               {/* Step 1: المظهر والطراز */}
               <div className={`accordion-item ${activeStep === 1 ? 'active' : ''} border-b border-gray-300 bg-white`}>
@@ -787,57 +787,93 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
               </div>
 
             </div>
-
-            {/* Sidebar Dock: Action Buttons & Selected Options Summary */}
-            <div className="sidebar-dock sticky bottom-0 z-10 w-full" style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', paddingBottom: '20px', backgroundColor: 'var(--bg)', marginTop: '20px' }}>
-              {originalImageSrc && (
-                <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
-                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{fabricNames[fabric]}</span>}
-                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
-                    {colors.find(c => c.id === selectedColor)?.name}
-                  </span>
-                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
-                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
-                  {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
-                  <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
-                </div>
-              )}
-
-              {originalImageSrc && generatedImageSrc ? (
-                <div className="dock-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <span className="dock-compare-hint" style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
-                    اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
-                  </span>
-                  <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
-                    تحميل التصميم 💾
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <button 
-                    type="button"
-                    className="btn-generate"
-                    onClick={triggerGenerate} 
-                    disabled={!originalImageSrc || loading}
-                    style={{ width: '100%', padding: '14px', fontWeight: 700 }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                      <path d="M20 3v4"></path>
-                      <path d="M22 5h-4"></path>
-                    </svg>
-                    <span>ولّد التصميم</span>
-                  </button>
-                  {!originalImageSrc && (
-                    <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
-                  )}
-                </>
-              )}
-            </div>
-
           </aside>
+
+          {/* ── Fixed-bottom CTA bar (mobile) / Sticky (desktop) ── */}
+          <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 px-4 py-3 lg:hidden">
+            {/* Selected options summary strip */}
+            {originalImageSrc && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '10px' }}>
+                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{styleNames[style]}</span>
+                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{fabricNames[fabric]}</span>}
+                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                  {colors.find(c => c.id === selectedColor)?.name}
+                </span>
+                <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{opacityNames[opacity]}</span>
+              </div>
+            )}
+            {originalImageSrc && generatedImageSrc ? (
+              <button className="btn btn-primary" id="btn-download-mobile" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                تحميل التصميم 💾
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn-generate"
+                  onClick={triggerGenerate}
+                  disabled={!originalImageSrc || loading}
+                  style={{ width: '100%', padding: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                    <path d="M20 3v4"></path>
+                    <path d="M22 5h-4"></path>
+                  </svg>
+                  <span>{!originalImageSrc ? 'ارفع صورة أولاً' : 'ولّد التصميم'}</span>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* ── Desktop Sidebar Dock: sticky inside aside ── */}
+          <div className="sidebar-dock hidden lg:block lg:sticky lg:bottom-0 lg:z-10 lg:w-[30%]" style={{ borderTop: '1px solid var(--border)', padding: '20px 16px', backgroundColor: 'var(--bg)' }}>
+            {originalImageSrc && (
+              <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
+                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{fabricNames[fabric]}</span>}
+                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                  {colors.find(c => c.id === selectedColor)?.name}
+                </span>
+                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
+                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
+                {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
+                <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
+              </div>
+            )}
+            {originalImageSrc && generatedImageSrc ? (
+              <div className="dock-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <span className="dock-compare-hint" style={{ fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
+                  اسحب المقبض في المنتصف لمقارنة التصميم الجديد بالنافذة الأصلية.
+                </span>
+                <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                  تحميل التصميم 💾
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn-generate"
+                  onClick={triggerGenerate}
+                  disabled={!originalImageSrc || loading}
+                  style={{ width: '100%', padding: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                    <path d="M20 3v4"></path>
+                    <path d="M22 5h-4"></path>
+                  </svg>
+                  <span>ولّد التصميم</span>
+                </button>
+                {!originalImageSrc && (
+                  <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
+                )}
+              </>
+            )}
+          </div>
 
           {/* Column 2: Left/Center - Studio Stage */}
           <section className="studio-stage w-full h-[45vh] relative lg:w-[70%] lg:h-full" aria-label="معاينة الصورة والتوليد">
