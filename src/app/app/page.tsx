@@ -94,10 +94,10 @@ const fabricNames: Record<string, string> = {
 };
 
 const barNames: Record<string, string> = {
-  wood_bar: '🪵 بار خشبي ديكور',
-  metal_bar: '⚙️ بار حديد مزخرف',
-  modern_bar: '✦ بار مودرن بسيط',
-  hidden: '🔲 سكة مخفية (بدون بار)'
+  wood_bar: 'بار خشبي ديكور',
+  metal_bar: 'بار حديد مزخرف',
+  modern_bar: 'بار مودرن بسيط',
+  hidden: 'سكة مخفية (بدون بار)'
 };
 
 const positionNames: Record<string, string> = {
@@ -452,14 +452,14 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                         className={`flex-1 py-3 text-center font-bold cursor-pointer rounded-none border-none ${styleCategory === 'fabric' ? 'bg-[#111111] text-white' : 'bg-gray-100 text-[#111111]'}`}
                         onClick={() => handleCategoryChange('fabric')}
                       >
-                        🧵 ستائر قماشية
+                        ستائر قماشية
                       </button>
                       <button 
                         type="button" 
                         className={`flex-1 py-3 text-center font-bold cursor-pointer rounded-none border-none ${styleCategory === 'roller' ? 'bg-[#111111] text-white' : 'bg-gray-100 text-[#111111]'}`}
                         onClick={() => handleCategoryChange('roller')}
                       >
-                        ⚙️ رول وجالوزي
+                        رول وجالوزي
                       </button>
                     </div>
                     
@@ -769,7 +769,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                               className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${barStyle === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                               onClick={() => setBarStyle(key)}
                             >
-                              <span className="font-bold text-sm">{barNames[key].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>
+                              <span className="font-bold text-sm">{barNames[key]}</span>
                               <span className={`text-xs mt-1 ${barStyle === key ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {key === 'wood_bar' ? 'Wood Bar' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
                               </span>
@@ -802,7 +802,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${addTulle ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setAddTulle(true)}
                           >
-                            <span className="font-bold text-sm">إضافة تول ✨</span>
+                            <span className="font-bold text-sm">إضافة تول</span>
                             <span className={`text-xs mt-1 ${addTulle ? 'text-gray-300' : 'text-gray-500'}`}>Add Sheer Layer</span>
                           </button>
                         </div>
@@ -918,7 +918,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                   <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
                   {colors.find(c => c.id === selectedColor)?.name}
                 </span>
-                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>}
+                {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{barNames[barStyle]}</span>}
                 {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{positionNames[curtainPosition]}</span>}
                 {!isBlindStyle(style) && addTulle && <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>مع تول</span>}
                 <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{opacityNames[opacity]}</span>
