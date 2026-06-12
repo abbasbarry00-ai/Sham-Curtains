@@ -22,7 +22,7 @@ export default function Home() {
                 ارفع صورة حقيقية لغرفتك، اختر الطراز والقماش واللون، ودع الذكاء الاصطناعي يركّب الستارة بإضاءة وظلال واقعية خلال ثوانٍ من معرض ستائر شام.
               </p>
               <div className="hero-actions-right">
-                <Link href="/app" className="btn btn-primary btn-large" style={{ background: 'var(--accent)', color: '#ffffff', borderColor: 'var(--accent)' }}>
+                <Link href="/app" className="btn btn-primary btn-large">
                   ابدأ التصميم مجاناً
                 </Link>
                 <Link href="/gallery" className="btn btn-secondary btn-large">
@@ -318,7 +318,7 @@ export default function Home() {
               <h2 className="footer-cta-title">جاهز لتجربة ستارتك الأولى؟</h2>
               <p className="footer-cta-desc">ارفع صورة غرفتك وشاهد النتيجة خلال ثوانٍ.</p>
             </div>
-            <Link href="/app" className="btn btn-primary btn-large" style={{ background: 'var(--accent)', color: '#ffffff', borderColor: 'var(--accent)', fontWeight: 700 }}>
+            <Link href="/app" className="btn btn-primary btn-large">
               ابدأ التصميم الآن
             </Link>
           </div>

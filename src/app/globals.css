@@ -2090,5 +2090,215 @@ body {
   }
 }
 
+/* Luxury Minimalist Editorial Theme Overrides */
+
+/* 1. Sharp edges & Zero shadows globally */
+*, :before, :after {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* 2. Thin crisp borders */
+.step, .interactive-card, .tips-box, .accordion-item, .option-card, .dropzone, .gallery-card, .modal-content, .meta-item, .alert {
+  border: 1px solid var(--border) !important;
+}
+
+/* Eliminate dashed gold framing or cartoonish gold borders from elements */
+.step::before, .interactive-card::before, .tips-box::before {
+  display: none !important;
+}
+
+/* Remove corner scroll bracket absolute items if they render cartoonish decoration */
+.vintage-corner {
+  display: none !important;
+}
+
+/* 3. Header / Navigation styling */
+.header {
+  background: var(--bg) !important; /* blends with site background */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  transition: none !important;
+}
+.header-inner {
+  height: 64px !important; /* more breathing room */
+}
+.nav-link {
+  border-radius: 0px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+}
+.nav-link:hover {
+  background: rgba(58, 42, 34, 0.05) !important;
+  color: var(--ink) !important;
+}
+.nav-link.active {
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+.nav-link.active:after {
+  display: none !important; /* remove line below active tab */
+}
+
+/* 4. Solid rectangle buttons with dark wood brown color */
+.btn, .btn-primary, .btn-accent, .btn-secondary, .btn-generate, .btn-large {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  border: 1px solid var(--border) !important;
+  transition: opacity 0.25s var(--ease) !important;
+  cursor: pointer;
+}
+
+.btn-primary, .btn-accent, .btn-generate, .newsletter-submit {
+  background: #3A2A22 !important; /* Solid dark wood brown */
+  color: #EAE3D2 !important; /* Light text */
+  border: 1px solid #3A2A22 !important;
+  animation: none !important; /* disable drift animations */
+}
+.btn-primary:hover, .btn-accent:hover, .btn-generate:hover, .newsletter-submit:hover {
+  opacity: 0.85 !important;
+  background: #3A2A22 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.btn-primary:active, .btn-accent:active, .btn-generate:active, .newsletter-submit:active {
+  transform: none !important;
+}
+.btn-generate::after {
+  display: none !important; /* remove sheen sweep */
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: #3A2A22 !important;
+  border: 1px solid var(--border) !important;
+}
+.btn-secondary:hover {
+  opacity: 0.85 !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Disable card and item translate hover effects for flat editorial look */
+.store-card:hover, .interactive-card:hover, .step:hover, .gallery-card:hover, .option-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 5. Typography and breathing space (Editorial Look) */
+.section {
+  padding-block: 80px !important; /* double spacing for catalog look */
+}
+.studio {
+  padding-block: 40px 80px !important;
+}
+.studio-sidebar {
+  background: rgba(245, 239, 225, 0.4) !important;
+  padding: 32px 24px !important; /* doubled padding */
+  border: 1px solid var(--border) !important;
+}
+.accordion-item {
+  margin-bottom: 16px !important;
+}
+.accordion-header {
+  padding: 20px 24px !important; /* doubled padding */
+}
+.accordion-content {
+  padding: 24px !important; /* double padding */
+  gap: 24px !important;
+}
+.form-group {
+  gap: 14px !important;
+}
+.option-card {
+  padding: 18px 12px !important; /* doubled padding */
+  min-height: 84px !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.25s var(--ease) !important;
+}
+.option-card:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: var(--blue) !important;
+  transform: none !important; /* flat look, no scale up */
+}
+.option-card.selected {
+  background: #3A2A22 !important; /* dark wood brown when selected */
+  border-color: #3A2A22 !important;
+  color: #EAE3D2 !important;
+}
+.option-card.selected .option-card-title,
+.option-card.selected .option-card-subtitle {
+  color: #EAE3D2 !important;
+}
+
+.option-card-title {
+  font-family: var(--sans) !important;
+  font-size: 13.5px !important;
+  letter-spacing: 0.02em;
+}
+.option-card-subtitle {
+  font-size: 10px !important;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+/* Category Tab styling */
+.category-tabs {
+  padding: 6px !important;
+  background: rgba(58, 42, 34, 0.05) !important;
+}
+.category-tab {
+  padding: 10px !important;
+  font-size: 13px !important;
+}
+.category-tab.active {
+  background: #3A2A22 !important;
+  color: #EAE3D2 !important;
+}
+
+/* Color swatch selectors */
+.color-swatch-grid {
+  gap: 12px !important;
+}
+.swatch-btn {
+  border: 1px solid var(--border) !important;
+  border-radius: 0px !important; /* square swatches */
+  transition: opacity 0.2s !important;
+}
+.swatch-btn:hover {
+  transform: none !important;
+  opacity: 0.85;
+}
+.swatch-btn.selected {
+  outline: 2px solid #3A2A22 !important;
+  outline-offset: 2px !important;
+}
+
+/* Step Progress Indicator (sharp look) */
+.workspace-step .step-badge {
+  border-radius: 0px !important; /* square badge */
+}
+
+/* Comparison bar handle styling and knob */
+.compare-handle {
+  box-shadow: none !important;
+}
+.compare-knob {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Clean up watermark animation background (if rotating watermark CPU bottleneck) */
+.watermark-svg {
+  animation: none !important;
+}
+
+
 
 
