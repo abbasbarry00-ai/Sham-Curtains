@@ -9,31 +9,53 @@ export default function Home() {
       <Header activePage="home" />
 
       {/* Hero Section */}
-      <section className="hero" style={{ padding: '60px 0 40px 0' }}>
-        <div className="container">
-          <div className="badge">
-            <span className="badge-dot"></span>
-            <span>بتقنية Flux-Kontext-Pro المتطورة</span>
-          </div>
-          
-          <div className="hero-copy" style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '48px', fontWeight: 800, lineHeight: '1.2', marginBottom: '20px' }}>
-              شاهد ستارتك الجديدة <span className="hero-accent">في غرفتك</span>، قبل أن تقتنيها
-            </h1>
-            <p style={{ fontSize: '18px', color: 'var(--accents-6)', maxWidth: '640px', margin: '0 auto 32px auto', lineHeight: '1.6' }}>
-              ارفع صورة حقيقية لغرفتك، اختر الطراز والقماش واللون، ودع الذكاء الاصطناعي يركّب الستارة بإضاءة وظلال واقعية خلال ثوانٍ من معرض ستائر شام.
-            </p>
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '48px', flexWrap: 'wrap' }}>
-              <Link href="/app" className="btn btn-primary btn-large" style={{ background: '#3b82f6', color: '#ffffff', borderColor: '#3b82f6' }}>
-                ابدأ التصميم مجاناً
-              </Link>
-              <Link href="/gallery" className="btn btn-secondary btn-large">
-                تصفح معرض الأعمال
-              </Link>
+      <section className="hero-section">
+        <div className="container hero-container">
+          <div className="hero-content-right">
+            <div className="badge">
+              <span className="badge-dot"></span>
+              <span>بتقنية Flux-Kontext-Pro المتطورة</span>
+            </div>
+            
+            <div className="hero-copy-right">
+              <h1>
+                شاهد ستارتك الجديدة <span className="hero-accent">في غرفتك</span>، قبل أن تقتنيها
+              </h1>
+              <p>
+                ارفع صورة حقيقية لغرفتك، اختر الطراز والقماش واللون، ودع الذكاء الاصطناعي يركّب الستارة بإضاءة وظلال واقعية خلال ثوانٍ من معرض ستائر شام.
+              </p>
+              <div className="hero-actions-right">
+                <Link href="/app" className="btn btn-primary btn-large" style={{ background: 'var(--accent)', color: '#ffffff', borderColor: 'var(--accent)' }}>
+                  ابدأ التصميم مجاناً
+                </Link>
+                <Link href="/gallery" className="btn btn-secondary btn-large">
+                  تصفح معرض الأعمال
+                </Link>
+              </div>
+            </div>
+
+            {/* Hero Stats */}
+            <div className="hero-stats-right">
+              <div className="hero-stat-item">
+                <strong>+150</strong>
+                <span>تركيبة من الطرز والأقمشة والألوان</span>
+              </div>
+              <div className="hero-stat-item">
+                <strong>~30 ثانية</strong>
+                <span>من رفع الصورة حتى النتيجة</span>
+              </div>
+              <div className="hero-stat-item">
+                <strong>مجاناً</strong>
+                <span>بدون تسجيل أو بطاقة دفع</span>
+              </div>
             </div>
           </div>
-          
-          {/* Main Hero BeforeAfter Comparison */}
+        </div>
+      </section>
+
+      {/* Main Hero BeforeAfter Comparison Section (Moved below Hero to keep watercolor background clear) */}
+      <section className="section" style={{ padding: '48px 0 24px 0' }}>
+        <div className="container">
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <BeforeAfterSlider
               beforeImage="/assets/window-empty.jpg"
@@ -50,22 +72,6 @@ export default function Home() {
               <path d="m15 6 6 6-6 6"></path>
             </svg>
             <span>اسحب المقبض لمقارنة الغرفة قبل وبعد</span>
-          </div>
-
-          {/* Hero Stats */}
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <strong>+150</strong>
-              <span>تركيبة من الطرز والأقمشة والألوان</span>
-            </div>
-            <div className="hero-stat">
-              <strong>~30 ثانية</strong>
-              <span>من رفع الصورة حتى النتيجة</span>
-            </div>
-            <div className="hero-stat">
-              <strong>مجاناً</strong>
-              <span>بدون تسجيل أو بطاقة دفع</span>
-            </div>
           </div>
         </div>
       </section>
@@ -275,7 +281,7 @@ export default function Home() {
               <h2 className="footer-cta-title">جاهز لتجربة ستارتك الأولى؟</h2>
               <p className="footer-cta-desc">ارفع صورة غرفتك وشاهد النتيجة خلال ثوانٍ.</p>
             </div>
-            <Link href="/app" className="btn btn-primary btn-large" style={{ background: '#3b82f6', color: '#ffffff', borderColor: '#3b82f6', fontWeight: 700 }}>
+            <Link href="/app" className="btn btn-primary btn-large" style={{ background: 'var(--accent)', color: '#ffffff', borderColor: 'var(--accent)', fontWeight: 700 }}>
               ابدأ التصميم الآن
             </Link>
           </div>
