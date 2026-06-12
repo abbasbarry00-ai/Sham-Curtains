@@ -115,6 +115,7 @@ export default function AppPage() {
   const [style, setStyle] = useState('wave');
   const [fabric, setFabric] = useState('velvet');
   const [selectedColor, setSelectedColor] = useState('white');
+  const [customColor, setCustomColor] = useState('#c0a080'); // custom hex from palette
   const [barStyle, setBarStyle] = useState('wood_bar');
   const [opacity, setOpacity] = useState('semi');
   const [addTulle, setAddTulle] = useState(false);
@@ -235,10 +236,25 @@ export default function AppPage() {
 
     try {
       const getCohesivePrompt = () => {
-        const colorObj = colors.find(c => c.id === selectedColor);
-        const colorName = colorObj ? colorObj.name : 'أبيض';
-        const colorHex = colorObj ? colorObj.hex : '#ffffff';
-        const colorDesc = colorPrompts[selectedColor];
+        // Resolve active color — preset or custom palette
+        let colorName: string;
+        let colorHex: string;
+        let colorDesc: string;
+
+        if (selectedColor === 'custom') {
+          colorHex = customColor;
+          // Convert hex to a descriptive name for the prompt
+          const r = parseInt(colorHex.slice(1,3), 16);
+          const g = parseInt(colorHex.slice(3,5), 16);
+          const b = parseInt(colorHex.slice(5,7), 16);
+          colorName = `custom color (RGB ${r},${g},${b})`;
+          colorDesc = `exact custom color with hex code ${colorHex}, RGB values (${r}, ${g}, ${b}) — use this precise color exactly as specified`;
+        } else {
+          const colorObj = colors.find(c => c.id === selectedColor);
+          colorName = colorObj ? colorObj.name : 'أبيض';
+          colorHex = colorObj ? colorObj.hex : '#ffffff';
+          colorDesc = colorPrompts[selectedColor] ?? 'pure solid white tone';
+        }
         
         let lightingInstruction = '';
         if (opacity === 'sheer') {
@@ -609,27 +625,92 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                     {/* Color Selection */}
                     <div className="form-group mb-4">
                       <span className="form-label font-bold text-black mb-2 block">اللون المفضل</span>
-                      <div className="color-swatch-grid">
+
+                      {/* Preset color squares — 7 per row */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '10px' }}>
                         {colors.map((c) => (
                           <button
                             key={c.id}
                             type="button"
-                            className={`swatch-btn ${selectedColor === c.id ? 'selected' : ''}`}
-                            style={{ backgroundColor: c.hex, width: '100%', aspectRatio: '1/1', borderRadius: '0px' }}
                             onClick={() => setSelectedColor(c.id)}
                             title={c.name}
                             aria-label={c.name}
+                            style={{
+                              backgroundColor: c.hex,
+                              width: '100%',
+                              aspectRatio: '1/1',
+                              borderRadius: '0px',
+                              border: selectedColor === c.id ? '2.5px solid #111111' : '1.5px solid #D1D5DB',
+                              outline: selectedColor === c.id ? '2px solid #111111' : 'none',
+                              outlineOffset: '2px',
+                              cursor: 'pointer',
+                              position: 'relative',
+                              padding: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
                           >
                             {selectedColor === c.id && (
-                              <svg className={`swatch-check ${c.id === 'white' || c.id === 'beige' ? 'swatch-check--dark' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <path d="M20 6 9 17l-5-5"></path>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c.id === 'white' || c.id === 'beige' ? '#333' : '#fff'} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5"/>
                               </svg>
                             )}
                           </button>
                         ))}
+
+                        {/* Color Palette Button */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedColor('custom')}
+                          title="لوحة الألوان"
+                          aria-label="لوحة الألوان"
+                          style={{
+                            width: '100%',
+                            aspectRatio: '1/1',
+                            borderRadius: '0px',
+                            border: selectedColor === 'custom' ? '2.5px solid #111111' : '1.5px solid #D1D5DB',
+                            outline: selectedColor === 'custom' ? '2px solid #111111' : 'none',
+                            outlineOffset: '2px',
+                            cursor: 'pointer',
+                            padding: 0,
+                            background: 'conic-gradient(from 0deg, #ff0000, #ff8000, #ffff00, #00cc00, #0000ff, #8800ff, #ff0000)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative',
+                          }}
+                        >
+                          {selectedColor === 'custom' && (
+                            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20 6 9 17l-5-5"/>
+                              </svg>
+                            </div>
+                          )}
+                        </button>
                       </div>
-                      <span className="form-hint text-xs text-gray-500 mt-2 block">
-                        اللون المختار: {colors.find(c => c.id === selectedColor)?.name}
+
+                      {/* Custom Color Picker — shows only when palette selected */}
+                      {selectedColor === 'custom' && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', padding: '10px', border: '1px solid #E5E7EB', background: '#F9F9F9' }}>
+                          <input
+                            type="color"
+                            value={customColor}
+                            onChange={(e) => setCustomColor(e.target.value)}
+                            style={{ width: '44px', height: '44px', border: '1px solid #D1D5DB', borderRadius: '0px', cursor: 'pointer', padding: '2px', background: 'white' }}
+                            aria-label="اختر لوناً مخصصاً"
+                          />
+                          <div>
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: '#111111', display: 'block' }}>لون مخصص</span>
+                            <span style={{ fontSize: '11px', color: '#666', fontFamily: 'monospace' }}>{customColor.toUpperCase()}</span>
+                          </div>
+                          <div style={{ flex: 1, height: '44px', background: customColor, border: '1px solid #E5E7EB' }} aria-hidden="true" />
+                        </div>
+                      )}
+
+                      <span className="form-hint text-xs text-gray-500 mt-1 block">
+                        اللون المختار: {selectedColor === 'custom' ? `مخصص ${customColor.toUpperCase()}` : colors.find(c => c.id === selectedColor)?.name}
                       </span>
                     </div>
 
