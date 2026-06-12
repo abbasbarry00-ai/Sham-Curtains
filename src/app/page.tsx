@@ -2,6 +2,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BeforeAfterSlider from '@/components/BeforeAfterSlider';
 import Link from 'next/link';
+import VintageFlourish, { VintageDivider, VintageWatermark, VintageSideVines, VintageCorner } from '@/components/VintageFlourish';
 
 export default function Home() {
   return (
@@ -51,7 +52,10 @@ export default function Home() {
 
       {/* Main Hero BeforeAfter Comparison Section (Moved below Hero to keep watercolor background clear) */}
       <section className="section" style={{ padding: '48px 0 24px 0' }}>
+        <VintageSideVines />
         <div className="container">
+          <h2 className="section-title">شاهد الستارة في غرفتك قبل وبعد التركيب</h2>
+          <VintageFlourish />
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <BeforeAfterSlider
               beforeImage="/assets/window-empty.jpg"
@@ -72,25 +76,42 @@ export default function Home() {
         </div>
       </section>
 
+      <VintageDivider />
+
       {/* Steps Section */}
       <section className="section section--tinted">
-        <div className="container">
+        <VintageSideVines />
+        <VintageWatermark />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="section-title">ثلاث خطوات تفصلك عن ستارتك الجديدة</h2>
+          <VintageFlourish />
           
           <div className="steps">
             <div className="step">
+              <VintageCorner position="top-left" />
+              <VintageCorner position="top-right" />
+              <VintageCorner position="bottom-left" />
+              <VintageCorner position="bottom-right" />
               <span className="step-num">01</span>
               <h3>ارفع صورة غرفتك</h3>
               <p>صوّر نافذتك بإضاءة نهارية واضحة بحيث تظهر النافذة كاملة، ثم ارفع الصورة مباشرة من جهازك.</p>
             </div>
             
             <div className="step">
+              <VintageCorner position="top-left" />
+              <VintageCorner position="top-right" />
+              <VintageCorner position="bottom-left" />
+              <VintageCorner position="bottom-right" />
               <span className="step-num">02</span>
               <h3>حدّد ذوقك</h3>
               <p>اختر من 13 طرازاً حديثاً و6 ألوان وأقمشة متعددة — من المخمل الكلاسيكي والتول والكتان حتى رول سنسكرين.</p>
             </div>
             
             <div className="step">
+              <VintageCorner position="top-left" />
+              <VintageCorner position="top-right" />
+              <VintageCorner position="bottom-left" />
+              <VintageCorner position="bottom-right" />
               <span className="step-num">03</span>
               <h3>قارن النتيجة</h3>
               <p>يولّد النموذج الستارة مدموجة بإضاءة غرفتك الأصلية، وتقارنها مع الصورة الأولى بسحب مقبض واحد.</p>
@@ -101,8 +122,11 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="section">
-        <div className="container">
+        <VintageSideVines />
+        <VintageWatermark />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="section-title">مصمم لغرفتك أنت، لا لغرفة في كتالوج</h2>
+          <VintageFlourish />
           
           <div className="features">
             {/* Feature 1 */}
@@ -168,10 +192,13 @@ export default function Home() {
         </div>
       </section>
 
+      <VintageDivider />
+
       {/* Interactive Gallery Preview Section */}
       <section className="section section--tinted">
         <div className="container" style={{ textAlign: 'center' }}>
           <h2 className="section-title">تصاميم وُلّدت بنفس المحرك المتاح لك</h2>
+          <VintageFlourish />
           
           <div className="peek-grid">
             {/* Card 1 */}
@@ -186,6 +213,10 @@ export default function Home() {
                 />
               </div>
               <div className="card-content-info">
+                <VintageCorner position="top-left" />
+                <VintageCorner position="top-right" />
+                <VintageCorner position="bottom-left" />
+                <VintageCorner position="bottom-right" />
                 <h3>ستارة ويفي كتان ناصعة البياض</h3>
                 <div className="card-tags">
                   <span className="card-tag">مودرن</span>
@@ -214,6 +245,10 @@ export default function Home() {
                 />
               </div>
               <div className="card-content-info">
+                <VintageCorner position="top-left" />
+                <VintageCorner position="top-right" />
+                <VintageCorner position="bottom-left" />
+                <VintageCorner position="bottom-right" />
                 <h3>ستارة شيفون ناعمة لتصفية الضوء</h3>
                 <div className="card-tags">
                   <span className="card-tag">بسيط</span>
@@ -242,6 +277,10 @@ export default function Home() {
                 />
               </div>
               <div className="card-content-info">
+                <VintageCorner position="top-left" />
+                <VintageCorner position="top-right" />
+                <VintageCorner position="bottom-left" />
+                <VintageCorner position="bottom-right" />
                 <h3>ستارة دانتيل بنقوش كلاسيكية ناعمة</h3>
                 <div className="card-tags">
                   <span className="card-tag">مودرن</span>
@@ -268,6 +307,8 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      <VintageDivider />
 
       {/* Footer Call to Action (CTA) */}
       <section className="section" style={{ padding: '40px 0' }}>
