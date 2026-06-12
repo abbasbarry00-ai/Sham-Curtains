@@ -1536,6 +1536,96 @@ h1, h2, h3, h4, .section-title, .logo, .footer-cta-title, .side-title {
   transform: translateY(0);
 }
 
+/* 4. Floating Fabric Swatches (Architectural Moodboard) */
+.hero-swatch {
+  position: absolute !important;
+  z-index: 1 !important; /* Above grid, below content */
+  border: 1px solid #D1D5DB !important; /* border-gray-300 */
+  border-radius: 0px !important; /* rounded-none */
+  overflow: hidden;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.1) !important; /* solid drop shadow */
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+  cursor: pointer;
+}
+
+.hero-swatch:hover {
+  transform: scale(1.08) rotate(3deg) !important;
+  box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 0.15) !important;
+}
+
+.hero-swatch img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+/* Swatch Positioning */
+.swatch-top-right {
+  top: 10% !important;
+  right: 5% !important;
+  width: 70px !important;
+  height: 70px !important;
+}
+
+.swatch-bottom-left {
+  bottom: 22% !important;
+  left: 6% !important;
+  width: 75px !important;
+  height: 75px !important;
+}
+
+.swatch-mid-right {
+  top: 48% !important;
+  right: 6% !important;
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.swatch-top-left {
+  top: 15% !important;
+  left: 8% !important;
+  width: 65px !important;
+  height: 65px !important;
+}
+
+.swatch-bottom-right {
+  bottom: 12% !important;
+  right: 14% !important;
+  width: 55px !important;
+  height: 55px !important;
+}
+
+/* Mobile Responsiveness for Swatches */
+@media (max-width: 768px) {
+  .hero-swatch {
+    width: 42px !important;
+    height: 42px !important;
+    box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Hide middle/bottom-right swatches on mobile to keep layout clean and prevent overlap */
+  .swatch-mid-right,
+  .swatch-bottom-right {
+    display: none !important;
+  }
+  
+  .swatch-top-right {
+    top: 6% !important;
+    right: 4% !important;
+  }
+  
+  .swatch-bottom-left {
+    bottom: 25% !important;
+    left: 4% !important;
+  }
+  
+  .swatch-top-left {
+    top: 12% !important;
+    left: 4% !important;
+  }
+}
+
 .hero-stats-center {
   display: flex;
   gap: 48px;

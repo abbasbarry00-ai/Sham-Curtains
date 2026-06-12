@@ -27,49 +27,29 @@ export default function Home() {
         </svg>
 
         {/* Floating Fabric Swatches */}
-        {/* Swatch 1 — Linen Beige */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: '18%', left: '6%',
-          width: '52px', height: '52px',
-          background: '#D6C5A8',
-          border: '1px solid #C8B89A',
-          zIndex: 1, opacity: 0.85
-        }} />
-        {/* Swatch 2 — Navy Sapphire */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: '55%', left: '9%',
-          width: '36px', height: '36px',
-          background: '#2C3E50',
-          border: '1px solid #1B2E4B',
-          zIndex: 1, opacity: 0.75
-        }} />
-        {/* Swatch 3 — Dark Wood Brown */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: '22%', right: '7%',
-          width: '44px', height: '44px',
-          background: '#6B4A2A',
-          border: '1px solid #5A3D22',
-          zIndex: 1, opacity: 0.8
-        }} />
-        {/* Swatch 4 — Dusty Rose */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: '62%', right: '5%',
-          width: '60px', height: '60px',
-          background: '#DCAEBB',
-          border: '1px solid #C99EAB',
-          zIndex: 1, opacity: 0.7
-        }} />
-        {/* Swatch 5 — Off-white line accent */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', bottom: '15%', left: '18%',
-          width: '28px', height: '28px',
-          background: '#F0EBE3',
-          border: '1px solid #D1C9BD',
-          zIndex: 1, opacity: 0.9
-        }} />
+        {/* Swatch 1 — Linen Texture (Top Right) */}
+        <div className="hero-swatch swatch-top-right" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1584824486509-114594d52103?w=200&q=80" alt="Linen Fabric Swatch" />
+        </div>
+        {/* Swatch 2 — Blue Luxury Velvet (Bottom Left) */}
+        <div className="hero-swatch swatch-bottom-left" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=200&q=80" alt="Blue Velvet Fabric Swatch" />
+        </div>
+        {/* Swatch 3 — Satin Silk (Mid Right) */}
+        <div className="hero-swatch swatch-mid-right" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1618220179428-22790b461013?w=200&q=80" alt="Silk Fabric Swatch" />
+        </div>
+        {/* Swatch 4 — Textured Linen Gray (Top Left) */}
+        <div className="hero-swatch swatch-top-left" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=200&q=80" alt="Gray Linen Fabric Swatch" />
+        </div>
+        {/* Swatch 5 — Sheer White Tulle (Bottom Right) */}
+        <div className="hero-swatch swatch-bottom-right" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&q=80" alt="Sheer White Tulle Swatch" />
+        </div>
 
         {/* Main Hero Content */}
-        <div className="container hero-container" style={{ position: 'relative', zIndex: 2 }}>
+        <div className="container hero-container" style={{ position: 'relative', zIndex: 10 }}>
           <div className="hero-content-center">
 
             <div className="hero-copy-center">
