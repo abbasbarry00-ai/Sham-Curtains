@@ -407,157 +407,155 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           </div>
         </div>
 
-        <div className="studio" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
+        <div className="studio flex flex-col lg:flex-row h-screen w-full overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
           {/* Column 1: Right Sidebar - Consolidated Options panel */}
-          <aside className="studio-sidebar" aria-label="خيارات التصميم">
+          <aside className="studio-sidebar w-full h-[55vh] overflow-y-auto pb-24 lg:w-[30%] lg:h-full" aria-label="خيارات التصميم">
             
             {/* Accordion system */}
             <div className="accordion">
               
               {/* Step 1: المظهر والطراز */}
-              <div className={`accordion-item ${activeStep === 1 ? 'active' : ''}`}>
+              <div className={`accordion-item ${activeStep === 1 ? 'active' : ''} border-b border-gray-300 bg-white`}>
                 <button 
                   type="button" 
                   className="accordion-header" 
                   onClick={() => toggleStep(1)}
                   aria-expanded={activeStep === 1}
                 >
-                  <span className="accordion-header-title">
-                    <span>١. المظهر والطراز</span>
-                  </span>
+                  <span className="font-bold text-black">١. المظهر والطراز</span>
                   <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
                 </button>
                 {activeStep === 1 && (
                   <div className="accordion-content">
-                    <div className="category-tabs">
+                    <div className="flex w-full mb-4 rounded-none">
                       <button 
                         type="button" 
-                        className={`category-tab ${styleCategory === 'fabric' ? 'active' : ''}`}
+                        className={`flex-1 py-3 text-center font-bold cursor-pointer rounded-none border-none ${styleCategory === 'fabric' ? 'bg-[#111111] text-white' : 'bg-gray-100 text-[#111111]'}`}
                         onClick={() => handleCategoryChange('fabric')}
                       >
                         🧵 ستائر قماشية
                       </button>
                       <button 
                         type="button" 
-                        className={`category-tab ${styleCategory === 'roller' ? 'active' : ''}`}
+                        className={`flex-1 py-3 text-center font-bold cursor-pointer rounded-none border-none ${styleCategory === 'roller' ? 'bg-[#111111] text-white' : 'bg-gray-100 text-[#111111]'}`}
                         onClick={() => handleCategoryChange('roller')}
                       >
                         ⚙️ رول وجالوزي
                       </button>
                     </div>
                     
-                    <div className="option-grid">
+                    <div className="grid grid-cols-2 gap-3">
                       {styleCategory === 'fabric' ? (
                         <>
                           <button
                             type="button"
-                            className={`option-card ${style === 'wave' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'wave' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('wave')}
                           >
-                            <span className="option-card-title">ويفي</span>
-                            <span className="option-card-subtitle">Ripple Fold</span>
+                            <span className="font-bold text-sm">ويفي</span>
+                            <span className={`text-xs mt-1 ${style === 'wave' ? 'text-gray-300' : 'text-gray-500'}`}>Ripple Fold</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'pleated' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'pleated' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('pleated')}
                           >
-                            <span className="option-card-title">كسرات</span>
-                            <span className="option-card-subtitle">Pleated</span>
+                            <span className="font-bold text-sm">كسرات</span>
+                            <span className={`text-xs mt-1 ${style === 'pleated' ? 'text-gray-300' : 'text-gray-500'}`}>Pleated</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'gathered' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'gathered' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('gathered')}
                           >
-                            <span className="option-card-title">زم</span>
-                            <span className="option-card-subtitle">Rod Pocket</span>
+                            <span className="font-bold text-sm">زم</span>
+                            <span className={`text-xs mt-1 ${style === 'gathered' ? 'text-gray-300' : 'text-gray-500'}`}>Rod Pocket</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'pinch' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'pinch' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('pinch')}
                           >
-                            <span className="option-card-title">تكسير أمريكي</span>
-                            <span className="option-card-subtitle">Pinch Pleat</span>
+                            <span className="font-bold text-sm">تكسير أمريكي</span>
+                            <span className={`text-xs mt-1 ${style === 'pinch' ? 'text-gray-300' : 'text-gray-500'}`}>Pinch Pleat</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'classic_rod' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'classic_rod' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('classic_rod')}
                           >
-                            <span className="option-card-title">كلاسيك بوري</span>
-                            <span className="option-card-subtitle">Eyelet Grommet</span>
+                            <span className="font-bold text-sm">كلاسيك بوري</span>
+                            <span className={`text-xs mt-1 ${style === 'classic_rod' ? 'text-gray-300' : 'text-gray-500'}`}>Eyelet Grommet</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'side_pull' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'side_pull' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('side_pull')}
                           >
-                            <span className="option-card-title">رفعات جانبية</span>
-                            <span className="option-card-subtitle">Sweep Pull</span>
+                            <span className="font-bold text-sm">رفعات جانبية</span>
+                            <span className={`text-xs mt-1 ${style === 'side_pull' ? 'text-gray-300' : 'text-gray-500'}`}>Sweep Pull</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'stage' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'stage' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('stage')}
                           >
-                            <span className="option-card-title">مسرحي كسرات</span>
-                            <span className="option-card-subtitle">Theatrical</span>
+                            <span className="font-bold text-sm">مسرحي كسرات</span>
+                            <span className={`text-xs mt-1 ${style === 'stage' ? 'text-gray-300' : 'text-gray-500'}`}>Theatrical</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'blackout' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'blackout' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('blackout')}
                           >
-                            <span className="option-card-title">بلاك آوت شامواه</span>
-                            <span className="option-card-subtitle">Suede Blackout</span>
+                            <span className="font-bold text-sm">بلاك آوت شامواه</span>
+                            <span className={`text-xs mt-1 ${style === 'blackout' ? 'text-gray-300' : 'text-gray-500'}`}>Suede Blackout</span>
                           </button>
                         </>
                       ) : (
                         <>
                           <button
                             type="button"
-                            className={`option-card ${style === 'sunscreen' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'sunscreen' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('sunscreen')}
                           >
-                            <span className="option-card-title">رول سنسكرين</span>
-                            <span className="option-card-subtitle">Sunscreen</span>
+                            <span className="font-bold text-sm">رول سنسكرين</span>
+                            <span className={`text-xs mt-1 ${style === 'sunscreen' ? 'text-gray-300' : 'text-gray-500'}`}>Sunscreen</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'dk' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'dk' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('dk')}
                           >
-                            <span className="option-card-title">دي كي (DK)</span>
-                            <span className="option-card-subtitle">Double Roller</span>
+                            <span className="font-bold text-sm">دي كي (DK)</span>
+                            <span className={`text-xs mt-1 ${style === 'dk' ? 'text-gray-300' : 'text-gray-500'}`}>Double Roller</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'zebra' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'zebra' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('zebra')}
                           >
-                            <span className="option-card-title">رول زيبرا</span>
-                            <span className="option-card-subtitle">Zebra Roller</span>
+                            <span className="font-bold text-sm">رول زيبرا</span>
+                            <span className={`text-xs mt-1 ${style === 'zebra' ? 'text-gray-300' : 'text-gray-500'}`}>Zebra Roller</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'wood_venetian' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'wood_venetian' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('wood_venetian')}
                           >
-                            <span className="option-card-title">جالوزي خشبي</span>
-                            <span className="option-card-subtitle">Wood Venetian</span>
+                            <span className="font-bold text-sm">جالوزي خشبي</span>
+                            <span className={`text-xs mt-1 ${style === 'wood_venetian' ? 'text-gray-300' : 'text-gray-500'}`}>Wood Venetian</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${style === 'metal_venetian' ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'metal_venetian' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setStyle('metal_venetian')}
                           >
-                            <span className="option-card-title">جالوزي معدني</span>
-                            <span className="option-card-subtitle">Alum Venetian</span>
+                            <span className="font-bold text-sm">جالوزي معدني</span>
+                            <span className={`text-xs mt-1 ${style === 'metal_venetian' ? 'text-gray-300' : 'text-gray-500'}`}>Alum Venetian</span>
                           </button>
                         </>
                       )}
@@ -567,16 +565,14 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
               </div>
 
               {/* Step 2: القماش والتعتيم */}
-              <div className={`accordion-item ${activeStep === 2 ? 'active' : ''}`}>
+              <div className={`accordion-item ${activeStep === 2 ? 'active' : ''} border-b border-gray-300 bg-white`}>
                 <button 
                   type="button" 
                   className="accordion-header" 
                   onClick={() => toggleStep(2)}
                   aria-expanded={activeStep === 2}
                 >
-                  <span className="accordion-header-title">
-                    <span>٢. القماش والتعتيم</span>
-                  </span>
+                  <span className="font-bold text-black">٢. القماش والتعتيم</span>
                   <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
@@ -584,24 +580,24 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                 {activeStep === 2 && (
                   <div className="accordion-content">
                     {/* Fabric Selection */}
-                    <div className="form-group">
-                      <span className="form-label">نوع القماش</span>
+                    <div className="form-group mb-4">
+                      <span className="form-label font-bold text-black mb-2 block">نوع القماش</span>
                       {isBlindStyle(style) ? (
-                        <div className="option-card disabled">
-                          <span className="option-card-title">تلقائي للموديل</span>
-                          <span className="option-card-subtitle">Auto fabric for blinds</span>
+                        <div className="border border-gray-300 rounded-none p-3 bg-gray-100 text-[#111111]">
+                          <span className="font-bold text-sm block">تلقائي للموديل</span>
+                          <span className="text-xs text-gray-500 mt-1">Auto fabric for blinds</span>
                         </div>
                       ) : (
-                        <div className="option-grid">
+                        <div className="grid grid-cols-2 gap-3">
                           {Object.keys(fabricNames).map((key) => (
                             <button
                               key={key}
                               type="button"
-                              className={`option-card ${fabric === key ? 'selected' : ''}`}
+                              className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${fabric === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                               onClick={() => setFabric(key)}
                             >
-                              <span className="option-card-title">{fabricNames[key]}</span>
-                              <span className="option-card-subtitle">
+                              <span className="font-bold text-sm">{fabricNames[key]}</span>
+                              <span className={`text-xs mt-1 ${fabric === key ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {key === 'velvet' ? 'Velvet' : key === 'linen' ? 'Linen' : key === 'silk' ? 'Silk' : key === 'cotton' ? 'Cotton' : 'Lace'}
                               </span>
                             </button>
@@ -611,15 +607,15 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                     </div>
 
                     {/* Color Selection */}
-                    <div className="form-group">
-                      <span className="form-label">اللون المفضل</span>
+                    <div className="form-group mb-4">
+                      <span className="form-label font-bold text-black mb-2 block">اللون المفضل</span>
                       <div className="color-swatch-grid">
                         {colors.map((c) => (
                           <button
                             key={c.id}
                             type="button"
                             className={`swatch-btn ${selectedColor === c.id ? 'selected' : ''}`}
-                            style={{ backgroundColor: c.hex, width: '100%', aspectRatio: '1/1', borderRadius: '50%' }}
+                            style={{ backgroundColor: c.hex, width: '100%', aspectRatio: '1/1', borderRadius: '0px' }}
                             onClick={() => setSelectedColor(c.id)}
                             title={c.name}
                             aria-label={c.name}
@@ -632,24 +628,24 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                           </button>
                         ))}
                       </div>
-                      <span className="form-hint">
+                      <span className="form-hint text-xs text-gray-500 mt-2 block">
                         اللون المختار: {colors.find(c => c.id === selectedColor)?.name}
                       </span>
                     </div>
 
                     {/* Opacity Selection */}
                     <div className="form-group">
-                      <span className="form-label">درجة التعتيم وترشيح الضوء</span>
-                      <div className="option-grid">
+                      <span className="form-label font-bold text-black mb-2 block">درجة التعتيم وترشيح الضوء</span>
+                      <div className="grid grid-cols-2 gap-3">
                         {Object.keys(opacityNames).map((key) => (
                           <button
                             key={key}
                             type="button"
-                            className={`option-card ${opacity === key ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${opacity === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setOpacity(key)}
                           >
-                            <span className="option-card-title">{opacityNames[key]}</span>
-                            <span className="option-card-subtitle">
+                            <span className="font-bold text-sm">{opacityNames[key]}</span>
+                            <span className={`text-xs mt-1 ${opacity === key ? 'text-gray-300' : 'text-gray-500'}`}>
                               {key === 'sheer' ? 'Sheer' : key === 'semi' ? 'Semi-Opaque' : 'Blackout'}
                             </span>
                           </button>
@@ -661,16 +657,14 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
               </div>
 
               {/* Step 3: الملحقات */}
-              <div className={`accordion-item ${activeStep === 3 ? 'active' : ''}`}>
+              <div className={`accordion-item ${activeStep === 3 ? 'active' : ''} border-b border-gray-300 bg-white`}>
                 <button 
                   type="button" 
                   className="accordion-header" 
                   onClick={() => toggleStep(3)}
                   aria-expanded={activeStep === 3}
                 >
-                  <span className="accordion-header-title">
-                    <span>٣. الملحقات والإضافات</span>
-                  </span>
+                  <span className="font-bold text-black">٣. الملحقات والإضافات</span>
                   <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
@@ -678,24 +672,24 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                 {activeStep === 3 && (
                   <div className="accordion-content">
                     {/* Decorative Bar Selection */}
-                    <div className="form-group">
-                      <span className="form-label">ديكور البار (طريقة التركيب)</span>
+                    <div className="form-group mb-4">
+                      <span className="form-label font-bold text-black mb-2 block">ديكور البار (طريقة التركيب)</span>
                       {isBlindStyle(style) ? (
-                        <div className="option-card disabled">
-                          <span className="option-card-title">غير متاح للرول</span>
-                          <span className="option-card-subtitle">Not applicable for blinds</span>
+                        <div className="border border-gray-300 rounded-none p-3 bg-gray-100 text-[#111111]">
+                          <span className="font-bold text-sm block">غير متاح للرول</span>
+                          <span className="text-xs text-gray-500 mt-1">Not applicable for blinds</span>
                         </div>
                       ) : (
-                        <div className="option-grid">
+                        <div className="grid grid-cols-2 gap-3">
                           {Object.keys(barNames).map((key) => (
                             <button
                               key={key}
                               type="button"
-                              className={`option-card ${barStyle === key ? 'selected' : ''}`}
+                              className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${barStyle === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                               onClick={() => setBarStyle(key)}
                             >
-                              <span className="option-card-title">{barNames[key].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>
-                              <span className="option-card-subtitle">
+                              <span className="font-bold text-sm">{barNames[key].replace(/🪵 |⚙️ |✦ |🔲 /g, '')}</span>
+                              <span className={`text-xs mt-1 ${barStyle === key ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {key === 'wood_bar' ? 'Wood Bar' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
                               </span>
                             </button>
@@ -706,29 +700,29 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
 
                     {/* Add Tulle Toggle */}
                     <div className="form-group">
-                      <span className="form-label">إضافة طبقة تول خلف الستارة</span>
+                      <span className="form-label font-bold text-black mb-2 block">إضافة طبقة تول خلف الستارة</span>
                       {isBlindStyle(style) ? (
-                        <div className="option-card disabled">
-                          <span className="option-card-title">غير متاح للرول</span>
-                          <span className="option-card-subtitle">Not applicable for blinds</span>
+                        <div className="border border-gray-300 rounded-none p-3 bg-gray-100 text-[#111111]">
+                          <span className="font-bold text-sm block">غير متاح للرول</span>
+                          <span className="text-xs text-gray-500 mt-1">Not applicable for blinds</span>
                         </div>
                       ) : (
-                        <div className="option-grid">
+                        <div className="grid grid-cols-2 gap-3">
                           <button
                             type="button"
-                            className={`option-card ${!addTulle ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${!addTulle ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setAddTulle(false)}
                           >
-                            <span className="option-card-title">بدون تول</span>
-                            <span className="option-card-subtitle">No Sheer Tulle</span>
+                            <span className="font-bold text-sm">بدون تول</span>
+                            <span className={`text-xs mt-1 ${!addTulle ? 'text-gray-300' : 'text-gray-500'}`}>No Sheer Tulle</span>
                           </button>
                           <button
                             type="button"
-                            className={`option-card ${addTulle ? 'selected' : ''}`}
+                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${addTulle ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                             onClick={() => setAddTulle(true)}
                           >
-                            <span className="option-card-title">إضافة تول ✨</span>
-                            <span className="option-card-subtitle">Add Sheer Layer</span>
+                            <span className="font-bold text-sm">إضافة تول ✨</span>
+                            <span className={`text-xs mt-1 ${addTulle ? 'text-gray-300' : 'text-gray-500'}`}>Add Sheer Layer</span>
                           </button>
                         </div>
                       )}
@@ -738,16 +732,14 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
               </div>
 
               {/* Step 4: المعاينة والوضعية */}
-              <div className={`accordion-item ${activeStep === 4 ? 'active' : ''}`}>
+              <div className={`accordion-item ${activeStep === 4 ? 'active' : ''} border-b border-gray-300 bg-white`}>
                 <button 
                   type="button" 
                   className="accordion-header" 
                   onClick={() => toggleStep(4)}
                   aria-expanded={activeStep === 4}
                 >
-                  <span className="accordion-header-title">
-                    <span>٤. المعاينة والوضعية</span>
-                  </span>
+                  <span className="font-bold text-black">٤. المعاينة والوضعية</span>
                   <svg className="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
@@ -755,24 +747,24 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                 {activeStep === 4 && (
                   <div className="accordion-content">
                     {/* Curtain Position */}
-                    <div className="form-group">
-                      <span className="form-label">وضعية الستارة</span>
+                    <div className="form-group mb-4">
+                      <span className="form-label font-bold text-black mb-2 block">وضعية الستارة</span>
                       {isBlindStyle(style) ? (
-                        <div className="option-card disabled">
-                          <span className="option-card-title">تلقائي للموديل</span>
-                          <span className="option-card-subtitle">Auto position for blinds</span>
+                        <div className="border border-gray-300 rounded-none p-3 bg-gray-100 text-[#111111]">
+                          <span className="font-bold text-sm block">تلقائي للموديل</span>
+                          <span className="text-xs text-gray-500 mt-1">Auto position for blinds</span>
                         </div>
                       ) : (
-                        <div className="option-grid">
+                        <div className="grid grid-cols-2 gap-3">
                           {Object.keys(positionNames).map((key) => (
                             <button
                               key={key}
                               type="button"
-                              className={`option-card ${curtainPosition === key ? 'selected' : ''}`}
+                              className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${curtainPosition === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
                               onClick={() => setCurtainPosition(key)}
                             >
-                              <span className="option-card-title">{positionNames[key]}</span>
-                              <span className="option-card-subtitle">
+                              <span className="font-bold text-sm">{positionNames[key]}</span>
+                              <span className={`text-xs mt-1 ${curtainPosition === key ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {key === 'closed' ? 'Closed panels' : 'Half open panels'}
                               </span>
                             </button>
@@ -797,7 +789,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
             </div>
 
             {/* Sidebar Dock: Action Buttons & Selected Options Summary */}
-            <div className="sidebar-dock" style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+            <div className="sidebar-dock sticky bottom-0 z-10 w-full" style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', paddingBottom: '20px', backgroundColor: 'var(--bg)', marginTop: '20px' }}>
               {originalImageSrc && (
                 <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
                   <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
@@ -848,7 +840,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           </aside>
 
           {/* Column 2: Left/Center - Studio Stage */}
-          <section className="studio-stage" aria-label="معاينة الصورة والتوليد">
+          <section className="studio-stage w-full h-[45vh] relative lg:w-[70%] lg:h-full" aria-label="معاينة الصورة والتوليد">
             <div className="stage-header">
               <span className="stage-status" aria-live="polite">
                 <span className={`stage-status-dot ${originalImageSrc ? 'is-ready' : ''} ${generatedImageSrc ? 'is-done' : ''} ${loading ? 'is-busy' : ''}`} aria-hidden="true"></span>
@@ -918,12 +910,12 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
 
               {/* Source Image Display */}
               {originalImageSrc && !generatedImageSrc && (
-                <img src={originalImageSrc} className="editor-image" alt="النافذة المرفوعة" />
+                <img src={originalImageSrc} className="editor-image object-contain" alt="النافذة المرفوعة" style={{ width: '100%', height: '100%' }} />
               )}
 
               {/* Comparison Result View */}
               {originalImageSrc && generatedImageSrc && (
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <BeforeAfterSlider
                     beforeImage={originalImageSrc}
                     afterImage={generatedImageSrc}

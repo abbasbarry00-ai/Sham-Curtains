@@ -122,7 +122,7 @@ function StoreCard({ item }: { item: StoreItem }) {
             e.stopPropagation();
             setShowingWindow(!showingWindow);
           }}
-          style={{ background: 'rgba(234, 227, 210, 0.92)', color: 'var(--ink)', border: '1px solid var(--border)', fontWeight: 600 }}
+          style={{ background: 'rgba(253, 253, 253, 0.92)', color: 'var(--ink)', border: '1px solid var(--border)', fontWeight: 600 }}
         >
           {showingWindow ? "عرض الستارة" : "النافذة الأصلية"}
         </button>
