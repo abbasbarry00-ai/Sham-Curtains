@@ -2227,6 +2227,89 @@ h1, h2, h3, h4, .section-title, .logo, .footer-cta-title, .side-title {
   justify-content: space-between !important;
 }
 
+/* ==========================================================================
+   Desktop Studio Layout Optimization
+   ========================================================================== */
+@media (min-width: 1024px) {
+  /* Studio main container */
+  .studio:not(.magic-studio) {
+    display: grid !important;
+    grid-template-columns: 340px minmax(0, 1fr) !important; /* Right: 340px Sidebar, Left: remaining space Stage */
+    gap: 24px !important;
+    height: calc(100vh - 120px) !important; /* Fits screen exactly, no page scroll */
+    overflow: hidden !important;
+    padding-block: 16px 24px !important;
+    align-items: stretch !important;
+  }
+
+  /* Magic mode full screen */
+  .studio.magic-studio {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: calc(100vh - 120px) !important;
+    overflow: hidden !important;
+    padding-block: 16px 24px !important;
+  }
+
+  /* Right sidebar scroll internally */
+  .studio-sidebar {
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    position: relative !important;
+    top: 0 !important;
+  }
+
+  /* Left/center stage canvas preview wrapper */
+  .studio-stage {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: unset !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .stage-canvas {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    padding: 24px !important;
+    position: relative !important;
+  }
+
+  /* Enforce image scale constraints to prevent stretching page vertically */
+  .editor-image,
+  .comparison-container {
+    max-height: calc(100vh - 250px) !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Sticky Desktop Dock layout inside Sidebar */
+  .sidebar-dock {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 20 !important;
+    width: 100% !important;
+    background-color: #FFFFFF !important; /* Match sidebar background */
+    border-top: 1px solid #E5E7EB !important;
+    padding: 20px 16px !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.02) !important;
+  }
+}
+
 
 
 

@@ -441,7 +441,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
           </div>
         </div>
 
-        <div className="studio flex flex-col w-full min-h-screen lg:flex-row lg:h-screen lg:overflow-hidden" style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
+        <div className={`studio flex flex-col w-full min-h-screen lg:flex-row lg:h-screen lg:overflow-hidden ${isMagicMode ? 'magic-studio' : ''}`} style={{ '--stage-glow': '#ffffff' } as React.CSSProperties}>
           
           {/* Column 1: Right Sidebar - Consolidated Options panel */}
           {!isMagicMode && (
@@ -887,52 +887,9 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
               </div>
 
             </div>
-          </aside>
-          )}
 
-          {/* ── Fixed-bottom CTA bar (mobile) ── */}
-          {!isMagicMode && (
-            <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 px-4 py-3 lg:hidden">
-              {/* Selected options summary strip */}
-              {originalImageSrc && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '10px' }}>
-                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{styleNames[style]}</span>
-                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{fabricNames[fabric]}</span>}
-                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
-                    {colors.find(c => c.id === selectedColor)?.name}
-                  </span>
-                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{opacityNames[opacity]}</span>
-                </div>
-              )}
-              {originalImageSrc && generatedImageSrc ? (
-                <button className="btn btn-primary" id="btn-download-mobile" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
-                  تحميل التصميم
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="btn-generate"
-                    onClick={() => triggerGenerate()}
-                    disabled={!originalImageSrc || loading}
-                    style={{ width: '100%', padding: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                      <path d="M20 3v4"></path>
-                      <path d="M22 5h-4"></path>
-                    </svg>
-                    <span>{!originalImageSrc ? 'ارفع صورة أولاً' : 'ولّد التصميم'}</span>
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* ── Desktop Sidebar Dock ── */}
-          {!isMagicMode && (
-            <div className="sidebar-dock hidden lg:block lg:sticky lg:bottom-0 lg:z-10 lg:w-[30%]" style={{ borderTop: '1px solid var(--border)', padding: '20px 16px', backgroundColor: 'var(--bg)' }}>
+            {/* ── Desktop Sidebar Dock ── */}
+            <div className="sidebar-dock hidden lg:block lg:sticky lg:bottom-0 lg:z-10 w-full" style={{ borderTop: '1px solid var(--border)', padding: '20px 16px', backgroundColor: 'var(--surface)' }}>
               {originalImageSrc && (
                 <div className="dock-summary" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
                   <span className="dock-tag" style={{ fontSize: '11px', padding: '3px 8px' }}>{styleNames[style]}</span>
@@ -955,6 +912,13 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                   <button className="btn btn-primary" id="btn-download" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
                     تحميل التصميم
                   </button>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={resetWorkspace} 
+                    style={{ width: '100%', padding: '10px', fontWeight: 700, borderRadius: '0px', fontSize: '14px' }}
+                  >
+                    إعادة التصميم (رفع صورة جديدة)
+                  </button>
                 </div>
               ) : (
                 <>
@@ -975,6 +939,56 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                   {!originalImageSrc && (
                     <span className="dock-hint" style={{ display: 'block', textAlign: 'center', marginTop: '8px' }}>ارفع صورة نافذتك لتتمكن من التوليد.</span>
                   )}
+                </>
+              )}
+            </div>
+          </aside>
+          )}
+
+          {/* ── Fixed-bottom CTA bar (mobile) ── */}
+          {!isMagicMode && (
+            <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 px-4 py-3 lg:hidden">
+              {/* Selected options summary strip */}
+              {originalImageSrc && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '10px' }}>
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{styleNames[style]}</span>
+                  {!isBlindStyle(style) && <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{fabricNames[fabric]}</span>}
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <span className="dock-swatch" style={{ backgroundColor: colors.find(c => c.id === selectedColor)?.hex }} aria-hidden="true"></span>
+                    {colors.find(c => c.id === selectedColor)?.name}
+                  </span>
+                  <span className="dock-tag" style={{ fontSize: '10px', padding: '2px 7px' }}>{opacityNames[opacity]}</span>
+                </div>
+              )}
+              {originalImageSrc && generatedImageSrc ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                  <button className="btn btn-primary" id="btn-download-mobile" onClick={handleDownload} style={{ width: '100%', padding: '12px', fontWeight: 700 }}>
+                    تحميل التصميم
+                  </button>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={resetWorkspace} 
+                    style={{ width: '100%', padding: '10px', fontWeight: 700, borderRadius: '0px', fontSize: '13px' }}
+                  >
+                    إعادة تصميم جديدة
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn-generate"
+                    onClick={() => triggerGenerate()}
+                    disabled={!originalImageSrc || loading}
+                    style={{ width: '100%', padding: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                      <path d="M20 3v4"></path>
+                      <path d="M22 5h-4"></path>
+                    </svg>
+                    <span>{!originalImageSrc ? 'ارفع صورة أولاً' : 'ولّد التصميم'}</span>
+                  </button>
                 </>
               )}
             </div>
@@ -1102,7 +1116,9 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
         </div>
       </div>
 
-      <Footer />
+      <div className="lg:hidden">
+        <Footer />
+      </div>
     </>
   );
 }
