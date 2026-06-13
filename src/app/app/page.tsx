@@ -52,9 +52,10 @@ const colorPrompts: Record<string, string> = {
 };
 
 const barPrompts: Record<string, string> = {
-  wood_bar: "The curtains MUST hang from a highly visible, prominent decorative wooden curtain rod mounted on the wall above the window. The wooden rod has ornate wood finials on both ends and wooden brackets, with a rich warm wood grain finish. The rod and mounting brackets are clearly visible.",
-  metal_bar: "The curtains MUST hang from a highly visible, prominent decorative wrought iron curtain rod mounted on the wall above the window. The rod has elegant ornate metal finials on both ends and iron brackets, with a polished metallic black or brass finish. The rod and mounting brackets are clearly visible.",
-  modern_bar: "The curtains MUST hang from a highly visible, prominent sleek minimalist modern curtain rod mounted on the wall above the window. The modern rod has clean geometric finials and slim metal brackets in a brushed steel or matte black finish. The rod and brackets are clearly visible.",
+  wood_bar: "The curtains hang from a thick, highly visible decorative classic wooden curtain pole mounted above the window, featuring a warm natural wood grain finish (such as oak, walnut, or mahogany) with elegant carved wooden finials on both ends.",
+  wood_rail: "The curtains are mounted behind a highly visible decorative wooden valance pelmet box (wood cover frame or crown molding cornice box) running horizontally above the window. The wood box has a clean, premium painted finish (smooth matte white or natural wood grain veneer) that completely covers the top of the curtains and track, giving a neat, custom architectural look where the curtains drop gracefully from behind the wooden cover panel.",
+  metal_bar: "The curtains MUST hang from a prominent, highly visible luxury decorative metal double curtain rod mounted on the wall. The main rod has a refined metallic finish (antique brass, polished gold, or brushed bronze) with ornate, intricately carved hollow filigree grid ball finials or detailed scrollwork finials on the ends. The curtain panels are suspended from visible metal rings with small metal drapery clips holding the fabric gathered in crisp ripples.",
+  modern_bar: "The curtains hang from a highly visible modern white or metallic double track profile rail mounted on the wall or ceiling above the window. The tracks are sleek with flat geometric endpoints, and the curtain fabric hangs cleanly from small white gliders/hooks sliding smoothly inside the horizontal tracks.",
   hidden: "There must be NO visible curtain rod, NO pole, NO bar, NO finials, and NO brackets above the window. The curtains must hang from a completely hidden, invisible recessed track slot in the ceiling. The fabric emerges directly from a clean narrow gap in the ceiling without any visible hanging hardware."
 };
 
@@ -95,6 +96,7 @@ const fabricNames: Record<string, string> = {
 
 const barNames: Record<string, string> = {
   wood_bar: 'بار خشبي ديكور',
+  wood_rail: 'rail خشبي ديكور',
   metal_bar: 'بار حديد مزخرف',
   modern_bar: 'بار مودرن بسيط',
   hidden: 'سكة مخفية (بدون بار)'
@@ -325,11 +327,13 @@ export default function AppPage() {
         if (activeBar === 'hidden') {
           barInstruction = `The curtains must hang from a completely hidden, invisible ceiling track mount. The fabric emerges directly from a clean narrow gap in the ceiling. There must be no visible curtain rod, no metal pole, no rings, no finials, and no brackets above the window. The wall above the window is completely empty and clean, and the curtain is flush with the ceiling.`;
         } else if (activeBar === 'wood_bar') {
-          barInstruction = `Mount the curtains from a highly visible, prominent decorative wooden curtain rod installed on the wall above the window. The wooden rod has ornate wood finials on both ends and wooden brackets, with a rich warm wood grain finish. The rod and brackets are clearly visible.`;
+          barInstruction = `Mount the curtains from a highly visible, prominent decorative wooden curtain pole installed on the wall above the window. The wooden pole has ornate carved wood finials on both ends, with a rich warm wood grain finish. The pole and finials are clearly visible.`;
+        } else if (activeBar === 'wood_rail') {
+          barInstruction = `Mount the curtains behind a highly visible decorative wooden valance pelmet box (wood cover frame or crown molding cornice box) running horizontally above the window. The wood box has a clean, premium painted finish (smooth matte white or natural wood grain veneer) that completely covers the top of the curtains and track, giving a neat, custom architectural look where the curtains drop gracefully from behind the wooden cover panel.`;
         } else if (activeBar === 'metal_bar') {
-          barInstruction = `Mount the curtains from a highly visible, prominent decorative wrought iron curtain rod installed on the wall above the window. The rod has elegant ornate metal finials on both ends and iron brackets, with a polished metallic black or brass finish. The rod and brackets are clearly visible.`;
+          barInstruction = `Mount the curtains from a prominent, highly visible luxury decorative metal double curtain rod installed on the wall above the window. The main rod has a refined metallic finish (antique brass, polished gold, or brushed bronze) with ornate, intricately carved hollow filigree grid ball finials or detailed scrollwork finials on the ends. The curtain panels are suspended from visible metal rings with small metal drapery clips holding the fabric gathered in crisp ripples.`;
         } else if (activeBar === 'modern_bar') {
-          barInstruction = `Mount the curtains from a highly visible, prominent sleek minimalist modern curtain rod installed on the wall above the window. The modern rod has clean geometric finials and slim metal brackets in a brushed steel or matte black finish. The rod and brackets are clearly visible.`;
+          barInstruction = `Mount the curtains from a highly visible modern white or metallic double track profile rail installed on the wall or ceiling above the window. The tracks are sleek with flat geometric endpoints, and the curtain fabric hangs cleanly from small white gliders/hooks sliding smoothly inside the horizontal tracks.`;
         }
 
         const tulleLayerBehind = (activeAddTulle && activePosition === 'closed') 
@@ -786,7 +790,7 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                             >
                               <span className="font-bold text-sm">{barNames[key]}</span>
                               <span className={`text-xs mt-1 ${barStyle === key ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {key === 'wood_bar' ? 'Wood Bar' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
+                                {key === 'wood_bar' ? 'Wood Bar' : key === 'wood_rail' ? 'Wood Rail' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
                               </span>
                             </button>
                           ))}
