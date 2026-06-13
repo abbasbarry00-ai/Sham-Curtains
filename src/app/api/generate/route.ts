@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { image, prompt, style } = body;
+    const { image, prompt, negative_prompt, style } = body;
 
     if (!image) {
       return NextResponse.json(

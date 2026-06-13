@@ -267,7 +267,6 @@ export default function AppPage() {
 
     try {
       const getCohesivePrompt = () => {
-        // In magic mode, use default/auto parameters
         const activeStyle = isMagicMode ? 'wave' : style;
         const activeFabric = isMagicMode ? 'linen' : fabric;
         const activeColor = isMagicMode ? 'beige' : selectedColor;
@@ -276,79 +275,60 @@ export default function AppPage() {
         const activePosition = isMagicMode ? 'closed' : curtainPosition;
         const activeAddTulle = isMagicMode ? true : addTulle;
 
-        let colorDesc: string;
-        let colorHex: string;
-
+        // Colors & Prompts setup
+        let colorDesc = '';
+        let colorHex = '';
         if (!isMagicMode && selectedColor === 'custom') {
           colorHex = customColor;
-          const r = parseInt(colorHex.slice(1,3), 16);
-          const g = parseInt(colorHex.slice(3,5), 16);
-          const b = parseInt(colorHex.slice(5,7), 16);
-          colorDesc = `exact custom color with hex code ${colorHex}, RGB values (${r}, ${g}, ${b}) — use this precise color exactly as specified`;
+          colorDesc = `exact custom color with hex code ${colorHex}`;
         } else {
           const colorObj = colors.find(c => c.id === activeColor);
           colorHex = colorObj ? colorObj.hex : '#ffffff';
-          colorDesc = colorPrompts[activeColor] ?? 'pure solid white tone';
-        }
-        
-        let lightingInstruction = '';
-        if (activeOpacity === 'sheer') {
-          lightingInstruction = "The room's lighting must be bright and naturally lit by daylight filtering through the open or sheer window coverings. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
-        } else if (activeOpacity === 'semi') {
-          lightingInstruction = "The room's lighting must be softly diffused with gentle ambient light. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
-        } else {
-          lightingInstruction = "The room's interior lighting must match the blackout effect, showing less direct daylight and soft dimmed indoor ambient lighting. All other parts of the room, including the furniture, walls, and floor, must remain completely identical and unchanged.";
+          colorDesc = colorPrompts[activeColor] ?? 'pure solid color';
         }
 
-        const qualityDirectives = "This is a professional architectural photograph. Avoid any cartoonish, 3D render, digital illustration, flat vector, or artificial look. The materials must have realistic photographic textures, natural fabric folds, physical shadows, and ambient reflections matching a high-end interior design catalog photo.";
-
-        const universalNegative = "Avoid: floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling.";
-
-        if (isBlindStyle(activeStyle)) {
-          const blindStyleDesc = stylePrompts[activeStyle];
-          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[activeOpacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives} ${universalNegative}`;
-        }
-
-        // Curtains
         const fabricDesc = fabricPrompts[activeFabric];
         const styleDesc = stylePrompts[activeStyle];
         const opacityDesc = opacityPrompts[activeOpacity];
 
-        let positionInstruction = '';
-        if (activePosition === 'closed') {
-          positionInstruction = `In this photo, REPLACE the window view by completely covering the entire window with a CLOSED, SHUT, solid ${colorDesc.toUpperCase()} (${colorHex}) curtain. The curtain panels MUST be drawn completely closed and shut, meeting tightly in the center. The curtain fabric MUST cover the entire window from the left edge to the right edge. The window glass, window frame, and background view MUST be fully covered and hidden behind the solid continuous curtain fabric, with absolutely no center gap, no opening, and no window visible.`;
-        } else {
-          if (activeAddTulle) {
-            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window, and REPLACE the center window glass with a sheer white tulle layer. The main curtain panels are drawn open, gathered and bunched at the left and right edges of the window. In the center, fully covering the window glass, there is a sheer white tulle layer with fine mesh netting (sheer lace layer) that filters the daylight. The sheer tulle curtain covers the middle of the window glass, while the main curtains are on the sides.`;
-          } else {
-            positionInstruction = `In this photo, add a ${colorDesc.toUpperCase()} (${colorHex}) curtain on the sides of the window. The curtain panels are drawn open, gathered and bunched at the left and right edges of the window. The center of the window is fully open and exposed, showing the clear window glass with daylight streaming through, and no tulle or sheer layer.`;
-          }
-        }
-
+        // 1. Hardware First (Must be at the absolute top)
         let barInstruction = '';
-        if (activeBar === 'hidden') {
-          barInstruction = `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards. Seamless floor-to-ceiling drapes. Clean shadow gap at the ceiling junction, completely empty wall above the window.`;
-        } else if (activeBar === 'wood_bar') {
-          barInstruction = `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich, warm natural wood grain finish. Curtains suspended from matching wooden rings.`;
-        } else if (activeBar === 'wood_rail') {
-          barInstruction = `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains. Smooth matte white finish on the wooden valance, clean modern architectural framing above the window.`;
-        } else if (activeBar === 'metal_bar') {
-          barInstruction = `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials. Curtains hanging elegantly from visible metal rings with small drapery clips. Traditional high-end interior hardware.`;
-        } else if (activeBar === 'modern_bar') {
-          barInstruction = `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design. Curtains hanging directly from the clean white rail.`;
+        if (activeBar === 'hidden') barInstruction = `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards.`;
+        else if (activeBar === 'wood_bar') barInstruction = `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich natural wood grain finish.`;
+        else if (activeBar === 'wood_rail') barInstruction = `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains.`;
+        else if (activeBar === 'metal_bar') barInstruction = `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials.`;
+        else if (activeBar === 'modern_bar') barInstruction = `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design.`;
+
+        // 2. Strict Layering Logic (Separating Main Curtain from Tulle)
+        let positionInstruction = '';
+        let tulleInstruction = '';
+
+        if (activePosition === 'closed') {
+          positionInstruction = `The main solid curtain panels are fully CLOSED and shut, meeting tightly in the center, completely covering the entire window from edge to edge.`;
+          tulleInstruction = activeAddTulle ? `A secondary layer of sheer white tulle is installed hidden behind the closed main curtain.` : ``;
+        } else {
+          positionInstruction = `The main solid curtain panels are drawn OPEN, gathered and neatly bunched at the left and right edges of the window frame.`;
+          tulleInstruction = activeAddTulle ? `DOUBLE-LAYERED TREATMENT: Behind the main side drapes, the center window glass is completely covered by a separate, delicate sheer white tulle layer.` : `The center window glass is clear and exposed with no tulle layer.`;
         }
 
-        const tulleLayerBehind = (activeAddTulle && activePosition === 'closed') 
-          ? ' A secondary layer of sheer white tulle is installed behind the closed main curtain, close to the window glass (mostly hidden by the closed main curtain).'
-          : '';
+        // 3. Constructing the final Positive Prompt
+        const positivePrompt = `${barInstruction}
+A photorealistic architectural interior photograph. 
+MAIN CURTAINS: ${positionInstruction} These main curtains are a custom-fit ${colorDesc.toUpperCase()} (${colorHex}) made of ${fabricDesc} in a ${styleDesc} style. The main curtain fabric is strictly a ${opacityDesc} (NOT sheer lace).
+SECONDARY LAYER: ${tulleInstruction}
+Lighting is natural and matches the high-end interior.`;
 
-        return `${positionInstruction}
-The curtain must be a custom-fit ${colorDesc.toUpperCase()} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain fabric is ${opacityDesc}.${tulleLayerBehind}
-${barInstruction}
-${lightingInstruction} High-resolution architectural photography, photorealistic interior design. ${universalNegative}`;
+        // 4. Strict Negative Prompt (Separated)
+        const negativePrompt = "floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling, sheer main curtains when solid expected, transparent main drapes.";
+
+        // Return as an object so the API call can use both correctly
+        return {
+          prompt: positivePrompt,
+          negative_prompt: negativePrompt
+        };
       };
 
-      const prompt = getCohesivePrompt();
+      const promptObj = getCohesivePrompt();
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -357,7 +337,8 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
         },
         body: JSON.stringify({
           image: imageToUse,
-          prompt: prompt,
+          prompt: promptObj.prompt,
+          negative_prompt: promptObj.negative_prompt,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
