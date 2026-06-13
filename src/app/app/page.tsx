@@ -316,11 +316,11 @@ export default function AppPage() {
         const positivePrompt = `${barInstruction}
 This is a professional photorealistic architectural interior.
 VIEW CONSTRAINT: ${positionInstruction} 
-FABRIC TEXTURE: The custom-fit curtains are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
+COLOR AND FABRIC: The custom-fit curtains are STRICTLY ${colorDesc.toUpperCase()} in color. They are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
 SECONDARY LAYERING: ${tulleInstruction}
 Lighting matches interior design.`;
 
-        const negativePrompt = "floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics.";
+        const negativePrompt = "floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics, wrong colors, multiple colors.";
 
         // Return as an object so the API call can use both correctly
         return {
