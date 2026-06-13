@@ -296,8 +296,8 @@ export default function AppPage() {
         let tulleInstruction = '';
 
         if (activePosition === 'closed') {
-          positionInstruction = `Draw the ${colorDesc} main curtains COMPLETELY CLOSED across the entire window. The two fabric panels MUST meet perfectly in the exact center. The thick curtains must completely cover and hide the entire window frame, the window glass, and the outside view.`;
-          tulleInstruction = `Do not show any sheer tulle, only the closed thick drapes.`;
+          positionInstruction = `CRITICAL OVERRIDE: Completely erase the window, the glass, and the outside landscape. Replace the entire center window area with a continuous, unbroken, solid wall of thick ${colorDesc} curtain fabric. The fabric MUST cover the center completely with no gap. NO daylight should be visible.`;
+          tulleInstruction = `Do not generate any sheer tulle or transparent fabrics.`;
         } else {
           positionInstruction = `Draw the ${colorDesc} main curtains OPEN to the sides, sweeping them to the left and right edges of the window.`;
           tulleInstruction = activeAddTulle 
