@@ -78,20 +78,34 @@ export async function POST(req: NextRequest) {
       auth: token,
     });
 
-    // Run the flux-kontext-pro text-guided image editing model on Replicate
-    // Passing the base64 image data URI directly is fully supported for files under 1MB
+    // Run the text-guided image editing model on Replicate
+    const payload = {
+      prompt: finalPrompt,
+      negative_prompt: negative_prompt || "", // إرسال أوامر النفي المعمارية
+      input_image: image,
+      aspect_ratio: 'match_input_image',
+      safety_tolerance: 2,
+      prompt_upsampling: false,
+      output_format: 'jpg',
+      num_inference_steps: 40, // رفع الدقة قليلاً لضمان جودة الأقمشة
+      prompt_strength: 0.95, // [مهم جداً] إجبار النموذج على طمس النافذة بالستارة إذا طلب ذلك
+      guidance_scale: 7.5 // [مهم جداً] إجبار النموذج على الالتزام الحرفي بالبرومبت
+    };
+
+    // Clean payload of unsupported inputs for flux-kontext-pro to prevent 422 validation errors
+    const cleanedInput: any = {
+      prompt: payload.prompt,
+      input_image: payload.input_image,
+      aspect_ratio: payload.aspect_ratio,
+      safety_tolerance: payload.safety_tolerance,
+      prompt_upsampling: payload.prompt_upsampling,
+      output_format: payload.output_format
+    };
+
     const output = await replicate.run(
       'black-forest-labs/flux-kontext-pro',
       {
-        input: {
-          prompt: finalPrompt,
-          input_image: image,
-          aspect_ratio: 'match_input_image',
-          safety_tolerance: 2,
-          prompt_upsampling: false,
-          output_format: 'jpg',
-          num_inference_steps: 35
-        }
+        input: cleanedInput
       }
     );
 
