@@ -277,7 +277,6 @@ export default function AppPage() {
         const activePosition = isMagicMode ? 'closed' : curtainPosition === 'half_open' ? 'open_sides' : curtainPosition; 
         const activeAddTulle = isMagicMode ? true : addTulle;
 
-        // Colors & Prompts setup
         let colorDesc = '';
         let colorHex = '';
         if (!isMagicMode && selectedColor === 'custom') {
@@ -289,44 +288,36 @@ export default function AppPage() {
           colorDesc = colorPrompts[activeColor] ?? 'pure solid color';
         }
 
-        // 1. Hardware First (Must be at the absolute top for focus)
         let barInstruction = getHardwarePrompt(activeBar);
-
-        // 2. Opacity vs Tulle Conflict Resolution
-        // Rule: If blackout is active, Tulle should NOT override drapes on the main window view.
         const isOpaque = activeOpacity === 'semi' || activeOpacity === 'blackout';
 
-        // 3. Layering & Position Logic
+        // 1. Layering & Position Logic with HEAVY WEIGHTS
         let positionInstruction = '';
         let tulleInstruction = '';
         let dynamicNegative = '';
 
         if (activePosition === 'closed') {
-          // إجبار النموذج على رسم قماش متصل
-          positionInstruction = `The curtains are COMPLETELY CLOSED and drawn shut. A continuous, solid wall of folded fabric covers the entire window area. The two panels meet perfectly in the exact center with ZERO gap.`;
+          positionInstruction = `(COMPLETELY CLOSED CURTAINS:1.9), (PULLED SHUT IN THE CENTER WITH ZERO GAP:1.9), (WINDOW GLASS ENTIRELY HIDDEN BEHIND FABRIC:1.9). A continuous, solid wall of folded fabric covers the entire window area.`;
           tulleInstruction = '';
-          // نفي قاطع لأي تفاصيل خارجية أو فتحات في الستارة
-          dynamicNegative = `open curtains, split curtains, gap in middle, visible window glass, outside view, landscape, trees, sky, daylight through window, tied back curtains, `;
+          dynamicNegative = `(open curtains:1.9), (split drapes:1.9), (visible window glass:1.9), (outside view:1.9), (landscape:1.8), (trees:1.8), (sky:1.8), tied back curtains, `;
         } else {
-          // OPEN sides
-          positionInstruction = `The main drapes are smoothly drawn OPEN to the outer sides, exposing the center window.`;
+          positionInstruction = `(Main drapes drawn OPEN to the outer sides:1.5), exposing the center window.`;
           tulleInstruction = (activeAddTulle) 
-            ? `DOUBLE-LAYERED TREATMENT: Behind the open side drapes, the center window glass is covered by a sheer white tulle layer.`
-            : `The center window glass is completely clear and exposed.`;
+            ? `(Center window covered by a sheer white tulle layer:1.5).`
+            : `(Center window glass is completely clear and exposed:1.5).`;
           dynamicNegative = ``;
         }
 
-        // 4. Constructing the prompt with priorities
+        // 2. Constructing the prompt with exact priorities
         const positivePrompt = `${barInstruction}
-This is a professional photorealistic architectural interior.
+(Photorealistic architectural interior:1.2).
 VIEW CONSTRAINT: ${positionInstruction} 
-COLOR AND FABRIC: The custom-fit curtains are STRICTLY ${colorDesc.toUpperCase()} in color. They are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
+COLOR AND FABRIC: The custom-fit curtains are (STRICTLY ${colorDesc.toUpperCase()}:1.6). Made of (${fabricPrompts[activeFabric]}:1.4). They MUST BE IN EXACTLY (${stylePrompts[activeStyle]}:1.7) style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
 SECONDARY LAYERING: ${tulleInstruction}
 Lighting matches interior design.`;
 
-        const negativePrompt = `${dynamicNegative}floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics, wrong colors.`;
+        const negativePrompt = `${dynamicNegative}(floating rods:1.6), (multiple poles:1.5), architectural errors, missing window frame, (solid wall instead of window:1.6), sheer main curtains, missing fabrics, wrong colors.`;
 
-        // Return as an object so the API call can use both correctly
         return {
           prompt: positivePrompt,
           negative_prompt: negativePrompt
