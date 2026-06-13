@@ -15,19 +15,20 @@ const colors = [
 ];
 
 const stylePrompts: Record<string, string> = {
-  wave: "modern wave fold ripple fold curtain, elegant continuous uniform s-curve vertical folds, sleek architectural draping",
-  pleated: "tailored pleated curtain, crisp structured vertical fabric folds, neat tailoring",
-  gathered: "tightly gathered rod pocket curtain, bunched fabric firmly gathered at the top header, soft dense continuous ruffles",
-  pinch: "classic American pinch pleat custom curtain, rigid tailored 3-finger pinch folds firmly sewn at the top header, elegant traditional drape",
-  sunscreen: "sleek architectural sunscreen roller blind, ONE single completely flat continuous vertical translucent fabric sheet, smooth surface, NO folds, NO wrinkles",
-  blackout: "premium heavy suede chamois blackout curtain, 100% opaque thick matte texture, heavy vertical drop, straight hem",
-  dk: "modern day and night double roller blind system, flat clean architectural window covering, flat vertical surface",
-  classic_rod: "classic eyelet grommet curtain, large metal rings cleanly threaded through a thick visible horizontal metal pipe rod, deep wavy folds",
-  zebra: "modern zebra blind, flat alternating horizontal translucent and solid opaque fabric stripes, straight flat surface, NO folds",
-  wood_venetian: "luxurious wooden horizontal Venetian blinds, distinct thick natural wood horizontal slats, architectural window treatment",
-  metal_venetian: "sleek architectural aluminum mini Venetian blinds, thin sharp horizontal metal slats, modern minimalist style",
-  side_pull: "elegant drapery smoothly swept to the outer sides and tightly secured with decorative fabric tie-backs, sweeping curved drape opening clearly in the center",
-  stage: "grand theatrical drape, heavy luxurious dramatic curtains with extremely deep rich vertical pleats, opulent thick hanging, extreme fabric fullness"
+  wave: "modern ripple fold curtain, uniform s-curve vertical pleats, continuous neat drape",
+  pleated: "tailored tailored curtain, crisp structured vertical fabric folds, neat tailoring",
+  gathered: "rod pocket curtain, tightly bunched dense fabric gathered firmly at the top header",
+  pinch: "classic American 3-finger pinch pleat drapes, rigid traditional sewn tailored folds",
+  sunscreen: "sleek architectural sunscreen roller blind, one single flat translucent fabric sheet, NO folds, NO wrinkles",
+  blackout: "premium heavy suede chamois blackout curtain, thick matte texture, extreme fabric fullness, heavy vertical drop",
+  dk: "day and night double roller blind system, flat horizontal stripe surface covering window",
+  classic_rod: "classic eyelet grommet curtain, deep wavy folds from large rings on a thick pipe rod",
+  zebra: "modern zebra blind, flat alternating horizontal translucent and solid opaque fabric stripes",
+  wood_venetian: "luxurious wooden horizontal Venetian blinds, natural wood thick horizontal slats",
+  metal_venetian: "sleek architectural aluminum mini Venetian blinds, thin sharp horizontal metal slats",
+  side_pull: "drapery smoothly swept to the outer edges and tightly secured with matching fabric tie-backs, sweeping curved drape opening",
+  open_sides: "drapery smoothly swept to the outer edges and tightly secured with matching fabric tie-backs, sweeping curved drape opening",
+  stage: "grand theatrical drape, opulent luxurious dramatic curtains with extremely deep rich vertical pleats"
 };
 
 const blindStyles = ['sunscreen', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
@@ -51,12 +52,13 @@ const colorPrompts: Record<string, string> = {
   rose: "dusty rose pink tone"
 };
 
-const barPrompts: Record<string, string> = {
-  wood_bar: "The curtains hang from a thick, highly visible decorative classic wooden curtain pole mounted above the window, featuring a warm natural wood grain finish (such as oak, walnut, or mahogany) with elegant carved wooden finials on both ends.",
-  wood_rail: "The curtains are mounted behind a highly visible decorative wooden valance pelmet box (wood cover frame or crown molding cornice box) running horizontally above the window. The wood box has a clean, premium painted finish (smooth matte white or natural wood grain veneer) that completely covers the top of the curtains and track, giving a neat, custom architectural look where the curtains drop gracefully from behind the wooden cover panel.",
-  metal_bar: "The curtains MUST hang from a prominent, highly visible luxury decorative metal double curtain rod mounted on the wall. The main rod has a refined metallic finish (antique brass, polished gold, or brushed bronze) with ornate, intricately carved hollow filigree grid ball finials or detailed scrollwork finials on the ends. The curtain panels are suspended from visible metal rings with small metal drapery clips holding the fabric gathered in crisp ripples.",
-  modern_bar: "The curtains hang from a highly visible modern white or metallic double track profile rail mounted on the wall or ceiling above the window. The tracks are sleek with flat geometric endpoints, and the curtain fabric hangs cleanly from small white gliders/hooks sliding smoothly inside the horizontal tracks.",
-  hidden: "There must be NO visible curtain rod, NO pole, NO bar, NO finials, and NO brackets above the window. The curtains must hang from a completely hidden, invisible recessed track slot in the ceiling. The fabric emerges directly from a clean narrow gap in the ceiling without any visible hanging hardware."
+const getHardwarePrompt = (activeBar: string) => {
+  if (activeBar === 'hidden') return `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards.`;
+  if (activeBar === 'wood_bar') return `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich natural wood grain finish.`;
+  if (activeBar === 'wood_rail') return `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains.`;
+  if (activeBar === 'metal_bar') return `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials.`;
+  if (activeBar === 'modern_bar') return `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design.`;
+  return '';
 };
 
 const curtainPositionPrompts: Record<string, string> = {
@@ -104,7 +106,7 @@ const barNames: Record<string, string> = {
 
 const positionNames: Record<string, string> = {
   closed: 'مغلقة بالكامل',
-  half_open: 'مفتوحة عالنص'
+  open_sides: 'مسحوبة للجانبين'
 };
 
 const opacityNames: Record<string, string> = {
@@ -272,7 +274,7 @@ export default function AppPage() {
         const activeColor = isMagicMode ? 'beige' : selectedColor;
         const activeBar = isMagicMode ? 'hidden' : barStyle;
         const activeOpacity = isMagicMode ? 'semi' : opacity;
-        const activePosition = isMagicMode ? 'closed' : curtainPosition;
+        const activePosition = isMagicMode ? 'closed' : curtainPosition === 'half_open' ? 'open_sides' : curtainPosition; 
         const activeAddTulle = isMagicMode ? true : addTulle;
 
         // Colors & Prompts setup
@@ -287,39 +289,40 @@ export default function AppPage() {
           colorDesc = colorPrompts[activeColor] ?? 'pure solid color';
         }
 
-        const fabricDesc = fabricPrompts[activeFabric];
-        const styleDesc = stylePrompts[activeStyle];
-        const opacityDesc = opacityPrompts[activeOpacity];
+        // 1. Hardware First (Must be at the absolute top for focus)
+        let barInstruction = getHardwarePrompt(activeBar);
 
-        // 1. Hardware First (Must be at the absolute top)
-        let barInstruction = '';
-        if (activeBar === 'hidden') barInstruction = `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards.`;
-        else if (activeBar === 'wood_bar') barInstruction = `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich natural wood grain finish.`;
-        else if (activeBar === 'wood_rail') barInstruction = `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains.`;
-        else if (activeBar === 'metal_bar') barInstruction = `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials.`;
-        else if (activeBar === 'modern_bar') barInstruction = `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design.`;
+        // 2. Opacity vs Tulle Conflict Resolution
+        // Rule: If blackout is active, Tulle should NOT override drapes on the main window view.
+        const isOpaque = activeOpacity === 'semi' || activeOpacity === 'blackout';
 
-        // 2. Strict Layering Logic (Separating Main Curtain from Tulle)
+        // 3. Layering & Position Logic
         let positionInstruction = '';
         let tulleInstruction = '';
 
         if (activePosition === 'closed') {
-          positionInstruction = `The main solid curtain panels are fully CLOSED and shut, meeting tightly in the center, completely covering the entire window from edge to edge.`;
-          tulleInstruction = activeAddTulle ? `A secondary layer of sheer white tulle is installed hidden behind the closed main curtain.` : ``;
+          // FORCE COMPLETE COVERAGE. REMOVE THE WINDOW VIEW.
+          positionInstruction = `A photo showing a continuous, uninterrupted flat curtain wall. The window and exterior view are COMPLETELY REPLACED, covered, and hidden. absolutely NO window, NO opening, NO window glass visible. THE VIEW IS GONE. The curtains meet in the center with NO GAP.`;
+          
+          // Tulle is added only if drapes are partially open, OR ignored in blackout.
+          tulleInstruction = '';
         } else {
-          positionInstruction = `The main solid curtain panels are drawn OPEN, gathered and neatly bunched at the left and right edges of the window frame.`;
-          tulleInstruction = activeAddTulle ? `DOUBLE-LAYERED TREATMENT: Behind the main side drapes, the center window glass is completely covered by a separate, delicate sheer white tulle layer.` : `The center window glass is clear and exposed with no tulle layer.`;
+          // OPENsides (curtain panels to the sides)
+          positionInstruction = `The main drapes are smoothly drawn to the outer sides and gathered at the edges.`;
+          tulleInstruction = (activeAddTulle && activeOpacity === 'sheer') 
+            ? `DOUBLE-LAYERED TREATMENT: Behind the main side drapes, the center window glass is covered by a separate, delicate sheer white tulle layer.`
+            : `The center window glass is clear and exposed.`;
         }
 
-        // 3. Constructing the final Positive Prompt
+        // 4. Constructing the prompt with priorities
         const positivePrompt = `${barInstruction}
-A photorealistic architectural interior photograph. 
-MAIN CURTAINS: ${positionInstruction} These main curtains are a custom-fit ${colorDesc.toUpperCase()} (${colorHex}) made of ${fabricDesc} in a ${styleDesc} style. The main curtain fabric is strictly a ${opacityDesc} (NOT sheer lace).
-SECONDARY LAYER: ${tulleInstruction}
-Lighting is natural and matches the high-end interior.`;
+This is a professional photorealistic architectural interior.
+VIEW CONSTRAINT: ${positionInstruction} 
+DRAMATIC MATTE FABRIC TEXTURE: The custom-fit curtains are made of thick ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
+SECONDARY LAYERING: ${tulleInstruction}
+Lighting matches interior design.`;
 
-        // 4. Strict Negative Prompt (Separated)
-        const negativePrompt = "floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling, sheer main curtains when solid expected, transparent main drapes.";
+        const negativePrompt = "floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling, sheer main curtains when solid expected, transparent main drapes, (sheer when opaque requested:1.5), (window visible when closed requested:1.8), (view of outside when closed requested)";
 
         // Return as an object so the API call can use both correctly
         return {
@@ -848,7 +851,7 @@ Lighting is natural and matches the high-end interior.`;
                             >
                               <span className="font-bold text-sm">{positionNames[key]}</span>
                               <span className={`text-xs mt-1 ${curtainPosition === key ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {key === 'closed' ? 'Closed panels' : 'Half open panels'}
+                                {key === 'closed' ? 'Closed panels' : 'Open sides'}
                               </span>
                             </button>
                           ))}
@@ -862,7 +865,7 @@ Lighting is natural and matches the high-end interior.`;
                       <ul className="tips-list">
                         <li>صوّر النافذة كاملة بإضاءة نهارية واضحة.</li>
                         <li>تجنّب الصور المائلة جداً أو شديدة الظلام.</li>
-                        <li>لإظهار التول، اختر "مفتوحة عالنص" مع تفعيل التول.</li>
+                        <li>لإظهار التول، اختر "مسحوبة للجانبين" مع تفعيل التول.</li>
                       </ul>
                     </div>
                   </div>
