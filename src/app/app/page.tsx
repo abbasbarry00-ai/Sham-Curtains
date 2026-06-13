@@ -302,9 +302,11 @@ export default function AppPage() {
 
         const qualityDirectives = "This is a professional architectural photograph. Avoid any cartoonish, 3D render, digital illustration, flat vector, or artificial look. The materials must have realistic photographic textures, natural fabric folds, physical shadows, and ambient reflections matching a high-end interior design catalog photo.";
 
+        const universalNegative = "Avoid: floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling.";
+
         if (isBlindStyle(activeStyle)) {
           const blindStyleDesc = stylePrompts[activeStyle];
-          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[activeOpacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives}`;
+          return `Edit this photo of the room to add a new custom-fit ${colorDesc.toUpperCase()} (${colorHex}) ${blindStyleDesc} inside the window frame. The blinds must be neatly installed, precisely fitted to the window's exact size, looking clean and realistic. The blinds fabric is ${opacityPrompts[activeOpacity]}. The slats, shadows, and light filtering must match the room's window size. ${lightingInstruction} ${qualityDirectives} ${universalNegative}`;
         }
 
         // Curtains
@@ -325,15 +327,15 @@ export default function AppPage() {
 
         let barInstruction = '';
         if (activeBar === 'hidden') {
-          barInstruction = `The curtains must hang from a completely hidden, invisible ceiling track mount. The fabric emerges directly from a clean narrow gap in the ceiling. There must be no visible curtain rod, no metal pole, no rings, no finials, and no brackets above the window. The wall above the window is completely empty and clean, and the curtain is flush with the ceiling.`;
+          barInstruction = `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards. Seamless floor-to-ceiling drapes. Clean shadow gap at the ceiling junction, completely empty wall above the window.`;
         } else if (activeBar === 'wood_bar') {
-          barInstruction = `Mount the curtains from a highly visible, prominent decorative wooden curtain pole installed on the wall above the window. The wooden pole has ornate carved wood finials on both ends, with a rich warm wood grain finish. The pole and finials are clearly visible.`;
+          barInstruction = `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich, warm natural wood grain finish. Curtains suspended from matching wooden rings.`;
         } else if (activeBar === 'wood_rail') {
-          barInstruction = `Mount the curtains behind a highly visible decorative wooden valance pelmet box (wood cover frame or crown molding cornice box) running horizontally above the window. The wood box has a clean, premium painted finish (smooth matte white or natural wood grain veneer) that completely covers the top of the curtains and track, giving a neat, custom architectural look where the curtains drop gracefully from behind the wooden cover panel.`;
+          barInstruction = `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains. Smooth matte white finish on the wooden valance, clean modern architectural framing above the window.`;
         } else if (activeBar === 'metal_bar') {
-          barInstruction = `Mount the curtains from a prominent, highly visible luxury decorative metal double curtain rod installed on the wall above the window. The main rod has a refined metallic finish (antique brass, polished gold, or brushed bronze) with ornate, intricately carved hollow filigree grid ball finials or detailed scrollwork finials on the ends. The curtain panels are suspended from visible metal rings with small metal drapery clips holding the fabric gathered in crisp ripples.`;
+          barInstruction = `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials. Curtains hanging elegantly from visible metal rings with small drapery clips. Traditional high-end interior hardware.`;
         } else if (activeBar === 'modern_bar') {
-          barInstruction = `Mount the curtains from a highly visible modern white or metallic double track profile rail installed on the wall or ceiling above the window. The tracks are sleek with flat geometric endpoints, and the curtain fabric hangs cleanly from small white gliders/hooks sliding smoothly inside the horizontal tracks.`;
+          barInstruction = `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design. Curtains hanging directly from the clean white rail.`;
         }
 
         const tulleLayerBehind = (activeAddTulle && activePosition === 'closed') 
@@ -343,7 +345,7 @@ export default function AppPage() {
         return `${positionInstruction}
 The curtain must be a custom-fit ${colorDesc.toUpperCase()} curtain made of ${fabricDesc} in a ${styleDesc} style. The curtain fabric is ${opacityDesc}.${tulleLayerBehind}
 ${barInstruction}
-${lightingInstruction} High-resolution architectural photography, photorealistic interior design.`;
+${lightingInstruction} High-resolution architectural photography, photorealistic interior design. ${universalNegative}`;
       };
 
       const prompt = getCohesivePrompt();
