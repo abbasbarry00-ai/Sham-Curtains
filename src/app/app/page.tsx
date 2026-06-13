@@ -301,28 +301,26 @@ export default function AppPage() {
         let tulleInstruction = '';
 
         if (activePosition === 'closed') {
-          // FORCE COMPLETE COVERAGE. REMOVE THE WINDOW VIEW.
-          positionInstruction = `A photo showing a continuous, uninterrupted flat curtain wall. The window and exterior view are COMPLETELY REPLACED, covered, and hidden. absolutely NO window, NO opening, NO window glass visible. THE VIEW IS GONE. The curtains meet in the center with NO GAP.`;
-          
-          // Tulle is added only if drapes are partially open, OR ignored in blackout.
-          tulleInstruction = '';
+          // نركز على سحب القماش للمنتصف لتغطية الزجاج بدلاً من مسح النافذة
+          positionInstruction = `The main curtain panels are fully DRAWN SHUT and pulled all the way to the center of the rod. The fabric meets perfectly in the exact middle with NO GAP. The thick curtain fabric completely covers the entire window glass from the left edge to the right edge.`;
+          tulleInstruction = ''; // لا يظهر التول إذا كانت الستارة مغلقة
         } else {
-          // OPENsides (curtain panels to the sides)
-          positionInstruction = `The main drapes are smoothly drawn to the outer sides and gathered at the edges.`;
-          tulleInstruction = (activeAddTulle && activeOpacity === 'sheer') 
-            ? `DOUBLE-LAYERED TREATMENT: Behind the main side drapes, the center window glass is covered by a separate, delicate sheer white tulle layer.`
-            : `The center window glass is clear and exposed.`;
+          // OPEN sides
+          positionInstruction = `The main drapes are smoothly drawn OPEN to the outer sides, exposing the center.`;
+          tulleInstruction = (activeAddTulle) 
+            ? `DOUBLE-LAYERED TREATMENT: Behind the open side drapes, the center window glass is covered by a sheer white tulle layer.`
+            : `The center window glass is completely clear and exposed.`;
         }
 
         // 4. Constructing the prompt with priorities
         const positivePrompt = `${barInstruction}
 This is a professional photorealistic architectural interior.
 VIEW CONSTRAINT: ${positionInstruction} 
-DRAMATIC MATTE FABRIC TEXTURE: The custom-fit curtains are made of thick ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
+FABRIC TEXTURE: The custom-fit curtains are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
 SECONDARY LAYERING: ${tulleInstruction}
 Lighting matches interior design.`;
 
-        const negativePrompt = "floating rods, multiple poles, double rods, floating finials, crooked rods, disconnected brackets, messy rings, overlapping tracks, curtain rod passing through fabric, architectural errors, impossible physics, broken hardware, empty hooks, wires, cables, 3d render plastic look, cartoon, text, watermarks, messy ceiling, sheer main curtains when solid expected, transparent main drapes, (sheer when opaque requested:1.5), (window visible when closed requested:1.8), (view of outside when closed requested)";
+        const negativePrompt = "floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics.";
 
         // Return as an object so the API call can use both correctly
         return {
