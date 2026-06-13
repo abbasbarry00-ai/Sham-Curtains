@@ -278,44 +278,48 @@ export default function AppPage() {
         const activeAddTulle = isMagicMode ? true : addTulle;
 
         let colorDesc = '';
-        let colorHex = '';
         if (!isMagicMode && selectedColor === 'custom') {
-          colorHex = customColor;
-          colorDesc = `custom color with hex code ${colorHex}`;
+          colorDesc = `exact custom color hex ${customColor}`;
         } else {
           const colorObj = colors.find(c => c.id === activeColor);
-          colorHex = colorObj ? colorObj.hex : '#ffffff';
-          colorDesc = colorPrompts[activeColor] ?? 'pure solid color';
+          colorDesc = colorObj ? colorPrompts[activeColor] : 'solid color';
         }
 
-        let barInstruction = getHardwarePrompt(activeBar);
+        let barInstruction = '';
+        if (activeBar === 'hidden') barInstruction = `Install a hidden recessed ceiling track.`;
+        else if (activeBar === 'wood_bar') barInstruction = `Install a thick oak wood curtain rod with carved finials above the window.`;
+        else if (activeBar === 'wood_rail') barInstruction = `Install a painted wooden pelmet box above the window to hide the hardware.`;
+        else if (activeBar === 'metal_bar') barInstruction = `Install an antique brass metal curtain rod with decorative finials above the window.`;
+        else if (activeBar === 'modern_bar') barInstruction = `Install a sleek modern white aluminum ceiling track.`;
 
-        // 1. Layering & Position Logic (Clean Natural Language)
         let positionInstruction = '';
         let tulleInstruction = '';
 
         if (activePosition === 'closed') {
-          positionInstruction = `The curtains are completely closed and drawn shut. A continuous, solid wall of folded fabric covers the entire window area. The two panels meet perfectly in the center, leaving zero gaps, ensuring the glass behind is 100% hidden.`;
-          tulleInstruction = '';
+          positionInstruction = `Draw the ${colorDesc} main curtains COMPLETELY CLOSED across the entire window. The two fabric panels MUST meet perfectly in the exact center. The thick curtains must completely cover and hide the entire window frame, the window glass, and the outside view.`;
+          tulleInstruction = `Do not show any sheer tulle, only the closed thick drapes.`;
         } else {
-          positionInstruction = `The main curtain panels are drawn open to the outer sides of the window rod, framing the window.`;
-          tulleInstruction = (activeAddTulle) 
-            ? `The center of the window is covered by a sheer white tulle layer, allowing soft filtered light to pass through.`
-            : `The center window glass is completely clear and exposed, revealing the glass pane with no inner curtain.`;
+          positionInstruction = `Draw the ${colorDesc} main curtains OPEN to the sides, sweeping them to the left and right edges of the window.`;
+          tulleInstruction = activeAddTulle 
+            ? `Cover the exposed center window glass with a delicate sheer white tulle curtain layer.`
+            : `Leave the center window glass completely clear and exposed to show the outside view.`;
         }
 
-        // 2. Constructing the prompt with exact priorities
-        const prompt = `${barInstruction}
-This is a professional photorealistic architectural interior.
-VIEW CONSTRAINT: ${positionInstruction} 
-COLOR AND FABRIC: The custom-fit curtains are strictly ${colorDesc.toUpperCase()} in color. They are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
-SECONDARY LAYERING: ${tulleInstruction}
-Lighting is natural, matching the room's original interior design.`;
+        const prompt = `Edit this photo of a room.
+Action 1: ${barInstruction}
+Action 2: Hang custom curtains made of ${colorDesc} ${fabricPrompts[activeFabric]}.
+Action 3: The curtains must be styled as: ${stylePrompts[activeStyle]}.
+Action 4: ${positionInstruction}
+Action 5: ${tulleInstruction}
+CRITICAL: Maintain the exact original composition, wall colors, furniture, and room lighting. Only modify the window treatments.`;
 
-        return prompt;
+        return {
+          prompt: prompt,
+          negative_prompt: "" 
+        };
       };
 
-      const finalPrompt = getCohesivePrompt();
+      const promptObj = getCohesivePrompt();
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -324,7 +328,7 @@ Lighting is natural, matching the room's original interior design.`;
         },
         body: JSON.stringify({
           image: imageToUse,
-          prompt: finalPrompt,
+          prompt: promptObj.prompt,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
