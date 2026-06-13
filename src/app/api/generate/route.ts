@@ -29,11 +29,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { image, prompt, style } = body;
+    const { image, mask, prompt, style } = body;
 
     if (!image) {
       return NextResponse.json(
         { detail: 'Image is a required parameter.' },
+        { status: 400 }
+      );
+    }
+
+    if (!mask) {
+      return NextResponse.json(
+        { detail: 'Mask is a required parameter for inpainting.' },
         { status: 400 }
       );
     }
@@ -78,17 +85,18 @@ export async function POST(req: NextRequest) {
       auth: token,
     });
 
-    // Run the flux-kontext-pro text-guided image editing model on Replicate
+    // Run the SDXL Inpainting model on Replicate
     const output = await replicate.run(
-      'black-forest-labs/flux-kontext-pro',
+      'lucataco/sdxl-inpainting:a5b13068cc81a89a4fbeefeccc774869fcb34df4dbc92c1555e0f2771d49dde7',
       {
         input: {
           prompt: finalPrompt,
-          input_image: image,
-          aspect_ratio: 'match_input_image',
-          safety_tolerance: 2,
-          output_format: 'jpg',
-          num_inference_steps: 35
+          image: image,
+          mask: mask,
+          strength: 0.8,
+          steps: 30,
+          guidance_scale: 7.5,
+          num_outputs: 1
         }
       }
     );

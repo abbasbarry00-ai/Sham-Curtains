@@ -141,6 +141,168 @@ export default function AppPage() {
   const [styleCategory, setStyleCategory] = useState<'fabric' | 'roller'>('fabric');
   const [isMagicMode, setIsMagicMode] = useState(false);
 
+  // Canvas Masking States
+  const [lines, setLines] = useState<{ points: { x: number; y: number }[]; relativeBrushSize: number }[]>([]);
+  const [currentLine, setCurrentLine] = useState<{ x: number; y: number }[] | null>(null);
+  const [brushSize, setBrushSize] = useState(40);
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [isDrawing, setIsDrawing] = useState(false);
+  
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const updateCanvasSize = () => {
+    if (imageRef.current) {
+      const img = imageRef.current;
+      setCanvasSize({
+        width: img.clientWidth,
+        height: img.clientHeight
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    window.addEventListener('resize', updateCanvasSize);
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+    };
+  }, []);
+
+  // Redraw canvas lines on change
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw all lines
+    lines.forEach((line) => {
+      if (line.points.length === 0) return;
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(235, 94, 85, 0.45)'; // Semi-transparent red
+      ctx.lineWidth = line.relativeBrushSize * canvas.width;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.moveTo(line.points[0].x * canvas.width, line.points[0].y * canvas.height);
+      for (let i = 1; i < line.points.length; i++) {
+        ctx.lineTo(line.points[i].x * canvas.width, line.points[i].y * canvas.height);
+      }
+      ctx.stroke();
+    });
+
+    // Draw current line
+    if (currentLine && currentLine.length > 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(235, 94, 85, 0.45)';
+      ctx.lineWidth = brushSize; // brushSize is screen pixels, directly matches canvas
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.moveTo(currentLine[0].x * canvas.width, currentLine[0].y * canvas.height);
+      for (let i = 1; i < currentLine.length; i++) {
+        ctx.lineTo(currentLine[i].x * canvas.width, currentLine[i].y * canvas.height);
+      }
+      ctx.stroke();
+    }
+  }, [lines, currentLine, canvasSize, brushSize]);
+
+  const getCoordinates = (clientX: number, clientY: number): { x: number, y: number } | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    return {
+      x: x / canvas.width,
+      y: y / canvas.height
+    };
+  };
+
+  const startDrawing = (clientX: number, clientY: number) => {
+    const coords = getCoordinates(clientX, clientY);
+    if (!coords) return;
+    setIsDrawing(true);
+    setCurrentLine([coords]);
+  };
+
+  const draw = (clientX: number, clientY: number) => {
+    if (!isDrawing || !currentLine) return;
+    const coords = getCoordinates(clientX, clientY);
+    if (!coords) return;
+    setCurrentLine([...currentLine, coords]);
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    if (currentLine && currentLine.length > 0) {
+      const relativeBrushSize = brushSize / canvasSize.width;
+      setLines([...lines, { points: currentLine, relativeBrushSize }]);
+    }
+    setCurrentLine(null);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      startDrawing(touch.clientX, touch.clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      draw(touch.clientX, touch.clientY);
+    }
+  };
+
+  // Generate black and white mask at original image size
+  const generateMaskBase64 = (): string => {
+    if (!imageRef.current) return '';
+    const img = imageRef.current;
+    const origWidth = img.naturalWidth;
+    const origHeight = img.naturalHeight;
+
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = origWidth;
+    maskCanvas.height = origHeight;
+    const ctx = maskCanvas.getContext('2d');
+    if (!ctx) return '';
+
+    // Fill background with black
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, origWidth, origHeight);
+
+    // If no mask is drawn, draw a full white mask so it does standard image-to-image
+    if (lines.length === 0) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, origWidth, origHeight);
+      return maskCanvas.toDataURL('image/png');
+    }
+
+    // Draw lines in white
+    lines.forEach((line) => {
+      if (line.points.length === 0) return;
+      ctx.beginPath();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = line.relativeBrushSize * origWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.moveTo(line.points[0].x * origWidth, line.points[0].y * origHeight);
+      for (let i = 1; i < line.points.length; i++) {
+        ctx.lineTo(line.points[i].x * origWidth, line.points[i].y * origHeight);
+      }
+      ctx.stroke();
+    });
+
+    return maskCanvas.toDataURL('image/png');
+  };
+
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -217,6 +379,8 @@ export default function AppPage() {
       alert('الرجاء رفع ملف صورة صالح.');
       return;
     }
+    setLines([]);
+    setCanvasSize({ width: 0, height: 0 });
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -320,6 +484,7 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
       };
 
       const promptObj = getCohesivePrompt();
+      const maskDataUrl = generateMaskBase64();
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -328,6 +493,7 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
         },
         body: JSON.stringify({
           image: imageToUse,
+          mask: maskDataUrl,
           prompt: promptObj.prompt,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
@@ -351,6 +517,8 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
   const resetWorkspace = () => {
     setOriginalImageSrc(null);
     setGeneratedImageSrc(null);
+    setLines([]);
+    setCanvasSize({ width: 0, height: 0 });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -362,6 +530,8 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
   };
 
   const loadReadyImage = async () => {
+    setLines([]);
+    setCanvasSize({ width: 0, height: 0 });
     setLoading(true);
     setLoadingMessage('جاري تحميل الصورة الجاهزة...');
     try {
@@ -1052,9 +1222,144 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
                 </div>
               )}
 
-              {/* Source Image Display */}
+              {/* Source Image Display with Canvas Masking Tool */}
               {originalImageSrc && !generatedImageSrc && (
-                <img src={originalImageSrc} className="editor-image object-contain" alt="النافذة المرفوعة" style={{ width: '100%', height: '100%' }} />
+                <div 
+                  ref={containerRef} 
+                  style={{ 
+                    position: 'relative', 
+                    width: '100%', 
+                    height: '100%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}
+                >
+                  <img 
+                    ref={imageRef}
+                    src={originalImageSrc} 
+                    className="editor-image object-contain" 
+                    alt="النافذة المرفوعة" 
+                    style={{ 
+                      width: 'auto', 
+                      height: 'auto', 
+                      maxWidth: '100%', 
+                      maxHeight: 'calc(100vh - 250px)', 
+                      display: 'block' 
+                    }} 
+                    onLoad={updateCanvasSize}
+                  />
+                  
+                  {canvasSize.width > 0 && canvasSize.height > 0 && (
+                    <canvas
+                      ref={canvasRef}
+                      width={canvasSize.width}
+                      height={canvasSize.height}
+                      style={{
+                        position: 'absolute',
+                        top: imageRef.current ? imageRef.current.offsetTop : 0,
+                        left: imageRef.current ? imageRef.current.offsetLeft : 0,
+                        width: canvasSize.width,
+                        height: canvasSize.height,
+                        zIndex: 10,
+                        cursor: 'crosshair',
+                        touchAction: 'none'
+                      }}
+                      onMouseDown={(e) => startDrawing(e.clientX, e.clientY)}
+                      onMouseMove={(e) => draw(e.clientX, e.clientY)}
+                      onMouseUp={stopDrawing}
+                      onMouseLeave={stopDrawing}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={stopDrawing}
+                    />
+                  )}
+
+                  {/* Brush and Undo controls */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    insetInlineStart: '16px',
+                    zIndex: 30,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    backgroundColor: 'rgba(17, 17, 17, 0.85)',
+                    color: '#FFFFFF',
+                    padding: '8px 16px',
+                    borderRadius: '980px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    direction: 'rtl'
+                  }}>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold' }}>حجم الفرشاة:</span>
+                    <input 
+                      type="range" 
+                      min="15" 
+                      max="100" 
+                      value={brushSize} 
+                      onChange={(e) => setBrushSize(parseInt(e.target.value))} 
+                      style={{ width: '80px', accentColor: '#AD8B4A', cursor: 'pointer' }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setLines(prev => prev.slice(0, -1))} 
+                      disabled={lines.length === 0}
+                      className="btn"
+                      style={{
+                        padding: '4px 12px',
+                        fontSize: '11px',
+                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '980px',
+                        cursor: lines.length === 0 ? 'not-allowed' : 'pointer',
+                        opacity: lines.length === 0 ? 0.4 : 1
+                      }}
+                    >
+                      تراجع
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setLines([])} 
+                      disabled={lines.length === 0}
+                      className="btn"
+                      style={{
+                        padding: '4px 12px',
+                        fontSize: '11px',
+                        backgroundColor: 'rgba(215, 0, 21, 0.8)',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '980px',
+                        cursor: lines.length === 0 ? 'not-allowed' : 'pointer',
+                        opacity: lines.length === 0 ? 0.4 : 1
+                      }}
+                    >
+                      مسح التظليل
+                    </button>
+                  </div>
+
+                  {/* Canvas Instructions */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 30,
+                    backgroundColor: 'rgba(17, 17, 17, 0.85)',
+                    color: '#FFFFFF',
+                    padding: '8px 20px',
+                    borderRadius: '980px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    width: 'max-content',
+                    maxWidth: '90%'
+                  }}>
+                    🎨 قم بتظليل مساحة النافذة بالكامل لتحديد مكان الستارة
+                  </div>
+                </div>
               )}
 
               {/* Comparison Result View */}
