@@ -281,7 +281,7 @@ export default function AppPage() {
         let colorHex = '';
         if (!isMagicMode && selectedColor === 'custom') {
           colorHex = customColor;
-          colorDesc = `exact custom color with hex code ${colorHex}`;
+          colorDesc = `custom color with hex code ${colorHex}`;
         } else {
           const colorObj = colors.find(c => c.id === activeColor);
           colorHex = colorObj ? colorObj.hex : '#ffffff';
@@ -289,42 +289,33 @@ export default function AppPage() {
         }
 
         let barInstruction = getHardwarePrompt(activeBar);
-        const isOpaque = activeOpacity === 'semi' || activeOpacity === 'blackout';
 
-        // 1. Layering & Position Logic with HEAVY WEIGHTS
+        // 1. Layering & Position Logic (Clean Natural Language)
         let positionInstruction = '';
         let tulleInstruction = '';
-        let dynamicNegative = '';
 
         if (activePosition === 'closed') {
-          positionInstruction = `(COMPLETELY CLOSED CURTAINS:1.9), (PULLED SHUT IN THE CENTER WITH ZERO GAP:1.9), (WINDOW GLASS ENTIRELY HIDDEN BEHIND FABRIC:1.9). A continuous, solid wall of folded fabric covers the entire window area.`;
+          positionInstruction = `The curtains are completely closed and drawn shut. A continuous, solid wall of folded fabric covers the entire window area. The two panels meet perfectly in the center, leaving zero gaps, ensuring the glass behind is 100% hidden.`;
           tulleInstruction = '';
-          dynamicNegative = `(open curtains:1.9), (split drapes:1.9), (visible window glass:1.9), (outside view:1.9), (landscape:1.8), (trees:1.8), (sky:1.8), tied back curtains, `;
         } else {
-          positionInstruction = `(Main drapes drawn OPEN to the outer sides:1.5), exposing the center window.`;
+          positionInstruction = `The main curtain panels are drawn open to the outer sides of the window rod, framing the window.`;
           tulleInstruction = (activeAddTulle) 
-            ? `(Center window covered by a sheer white tulle layer:1.5).`
-            : `(Center window glass is completely clear and exposed:1.5).`;
-          dynamicNegative = ``;
+            ? `The center of the window is covered by a sheer white tulle layer, allowing soft filtered light to pass through.`
+            : `The center window glass is completely clear and exposed, revealing the glass pane with no inner curtain.`;
         }
 
         // 2. Constructing the prompt with exact priorities
-        const positivePrompt = `${barInstruction}
-(Photorealistic architectural interior:1.2).
+        const prompt = `${barInstruction}
+This is a professional photorealistic architectural interior.
 VIEW CONSTRAINT: ${positionInstruction} 
-COLOR AND FABRIC: The custom-fit curtains are (STRICTLY ${colorDesc.toUpperCase()}:1.6). Made of (${fabricPrompts[activeFabric]}:1.4). They MUST BE IN EXACTLY (${stylePrompts[activeStyle]}:1.7) style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
+COLOR AND FABRIC: The custom-fit curtains are strictly ${colorDesc.toUpperCase()} in color. They are made of ${fabricPrompts[activeFabric]} in ${stylePrompts[activeStyle]} style. The main drapes have a rich ${opacityPrompts[activeOpacity]} opacity.
 SECONDARY LAYERING: ${tulleInstruction}
-Lighting matches interior design.`;
+Lighting is natural, matching the room's original interior design.`;
 
-        const negativePrompt = `${dynamicNegative}(floating rods:1.6), (multiple poles:1.5), architectural errors, missing window frame, (solid wall instead of window:1.6), sheer main curtains, missing fabrics, wrong colors.`;
-
-        return {
-          prompt: positivePrompt,
-          negative_prompt: negativePrompt
-        };
+        return prompt;
       };
 
-      const promptObj = getCohesivePrompt();
+      const finalPrompt = getCohesivePrompt();
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -333,8 +324,7 @@ Lighting matches interior design.`;
         },
         body: JSON.stringify({
           image: imageToUse,
-          prompt: promptObj.prompt,
-          negative_prompt: promptObj.negative_prompt,
+          prompt: finalPrompt,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
