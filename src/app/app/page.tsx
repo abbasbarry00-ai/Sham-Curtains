@@ -299,17 +299,21 @@ export default function AppPage() {
         // 3. Layering & Position Logic
         let positionInstruction = '';
         let tulleInstruction = '';
+        let dynamicNegative = '';
 
         if (activePosition === 'closed') {
-          // نركز على سحب القماش للمنتصف لتغطية الزجاج بدلاً من مسح النافذة
-          positionInstruction = `The main curtain panels are fully DRAWN SHUT and pulled all the way to the center of the rod. The fabric meets perfectly in the exact middle with NO GAP. The thick curtain fabric completely covers the entire window glass from the left edge to the right edge.`;
-          tulleInstruction = ''; // لا يظهر التول إذا كانت الستارة مغلقة
+          // إجبار النموذج على رسم قماش متصل
+          positionInstruction = `The curtains are COMPLETELY CLOSED and drawn shut. A continuous, solid wall of folded fabric covers the entire window area. The two panels meet perfectly in the exact center with ZERO gap.`;
+          tulleInstruction = '';
+          // نفي قاطع لأي تفاصيل خارجية أو فتحات في الستارة
+          dynamicNegative = `open curtains, split curtains, gap in middle, visible window glass, outside view, landscape, trees, sky, daylight through window, tied back curtains, `;
         } else {
           // OPEN sides
-          positionInstruction = `The main drapes are smoothly drawn OPEN to the outer sides, exposing the center.`;
+          positionInstruction = `The main drapes are smoothly drawn OPEN to the outer sides, exposing the center window.`;
           tulleInstruction = (activeAddTulle) 
             ? `DOUBLE-LAYERED TREATMENT: Behind the open side drapes, the center window glass is covered by a sheer white tulle layer.`
             : `The center window glass is completely clear and exposed.`;
+          dynamicNegative = ``;
         }
 
         // 4. Constructing the prompt with priorities
@@ -320,7 +324,7 @@ COLOR AND FABRIC: The custom-fit curtains are STRICTLY ${colorDesc.toUpperCase()
 SECONDARY LAYERING: ${tulleInstruction}
 Lighting matches interior design.`;
 
-        const negativePrompt = "floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics, wrong colors, multiple colors.";
+        const negativePrompt = `${dynamicNegative}floating rods, multiple poles, architectural errors, missing window frame, solid wall instead of window, sheer main curtains, missing fabrics, wrong colors.`;
 
         // Return as an object so the API call can use both correctly
         return {
