@@ -405,30 +405,9 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!generatedImageSrc) return;
-    
-    try {
-      const btn = document.getElementById('btn-download');
-      if (btn) btn.textContent = 'جاري التحميل...';
-      
-      const response = await fetch(generatedImageSrc);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `setara-ai-design-${Date.now()}.webp`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-      
-      if (btn) btn.textContent = 'تحميل التصميم';
-    } catch (e) {
-      console.error(e);
-      window.open(generatedImageSrc, '_blank');
-    }
+    window.location.href = `/api/download?url=${encodeURIComponent(generatedImageSrc)}`;
   };
 
   return (
@@ -1016,6 +995,15 @@ ${lightingInstruction} High-resolution architectural photography, photorealistic
                 {originalImageSrc && generatedImageSrc && isMagicMode && (
                   <button className="btn btn-primary" onClick={handleDownload} style={{ padding: '6px 16px', fontSize: '13px', fontWeight: 700 }}>
                     تحميل التصميم
+                  </button>
+                )}
+                {originalImageSrc && isMagicMode && (
+                  <button 
+                    className="stage-reset" 
+                    onClick={() => setIsMagicMode(false)}
+                    style={{ backgroundColor: '#f3f4f6', color: '#111111', borderColor: '#d1d5db' }}
+                  >
+                    تعديل التصميم يدوياً
                   </button>
                 )}
                 {originalImageSrc && (
