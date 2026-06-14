@@ -15,20 +15,17 @@ const colors = [
 ];
 
 const stylePrompts: Record<string, string> = {
-  wave: "modern ripple fold curtain, uniform s-curve vertical pleats, continuous neat drape",
-  pleated: "tailored tailored curtain, crisp structured vertical fabric folds, neat tailoring",
-  gathered: "rod pocket curtain, tightly bunched dense fabric gathered firmly at the top header",
-  pinch: "classic American 3-finger pinch pleat drapes, rigid traditional sewn tailored folds",
-  sunscreen: "sleek architectural sunscreen roller blind, one single flat translucent fabric sheet, NO folds, NO wrinkles",
-  blackout: "premium heavy suede chamois blackout curtain, thick matte texture, extreme fabric fullness, heavy vertical drop",
-  dk: "day and night double roller blind system, flat horizontal stripe surface covering window",
-  classic_rod: "classic eyelet grommet curtain, deep wavy folds from large rings on a thick pipe rod",
-  zebra: "modern zebra blind, flat alternating horizontal translucent and solid opaque fabric stripes",
-  wood_venetian: "luxurious wooden horizontal Venetian blinds, natural wood thick horizontal slats",
-  metal_venetian: "sleek architectural aluminum mini Venetian blinds, thin sharp horizontal metal slats",
-  side_pull: "drapery smoothly swept to the outer edges and tightly secured with matching fabric tie-backs, sweeping curved drape opening",
-  open_sides: "drapery smoothly swept to the outer edges and tightly secured with matching fabric tie-backs, sweeping curved drape opening",
-  stage: "grand theatrical drape, opulent luxurious dramatic curtains with extremely deep rich vertical pleats"
+  wave: "ripplefold wave curtain heading on track carriers: identical soft S-shaped waves from top to bottom, evenly spaced sinusoidal folds, no sewn pinch pleat groups, no rod pocket bunching, no eyelet rings",
+  pleated: "pencil pleat tape curtain: many slim close-set vertical pencil folds gathered by heading tape across the top, small regular pleats, not triple pinch pleats, not wave folds, not eyelet rings",
+  gathered: "rod pocket gathered curtain: fabric sleeve pocket at the top gathered densely around a round rod, soft irregular bunching along the header, no grommet rings, no pinch pleat stitching, no wave track carriers",
+  pinch: "American triple pinch pleat curtain: stitched three-finger pleat groups sewn at fixed intervals along the header, each pleat pinched at the top and fanning into tailored vertical folds below, formal structured drapery",
+  sunscreen: "sunscreen roller blind: one single flat solar-screen mesh fabric sheet rolling from a top tube with a straight weighted bottom bar, subtly translucent woven mesh, no folds, no pleats, no curtain fabric panels",
+  dk: "day and night double roller blind system: two separate roller fabrics in one headrail, one sheer day screen and one opaque night blackout layer, dual-roll/cassette mechanism, not zebra stripes, not fabric curtains",
+  classic_rod: "eyelet grommet curtain on visible round rod: large metal grommet rings punched through the top header and threaded on a visible round pole, creating broad even waves below each ring, no hidden track, no rod pocket, no pinch pleats",
+  zebra: "zebra roller blind: one continuous looped banded shade with alternating horizontal opaque and sheer stripes across the same flat panel, stripes align to control privacy, single cassette/roller, no pleats or curtain folds",
+  wood_venetian: "wood Venetian blind: rigid horizontal natural wood slats stacked evenly with ladder tapes/cords and a top headrail, slats can tilt, visible wood grain, no fabric sheet, no pleats, no drapery folds",
+  metal_venetian: "aluminum mini Venetian blind: thin narrow horizontal metallic slats with crisp reflective edges, ladder cords and compact headrail, slats can tilt, no fabric sheet, no pleats, no curtain panels",
+  stage: "theatrical stage drape: very heavy opulent fabric with oversized deep vertical folds, extreme fullness, dramatic floor-length drop, rich performance-hall look, not simple residential pencil pleats"
 };
 
 const blindStyles = ['sunscreen', 'dk', 'zebra', 'wood_venetian', 'metal_venetian'];
@@ -40,7 +37,8 @@ const fabricPrompts: Record<string, string> = {
   linen: "textured natural organic linen fabric with a visible weave and rustic elegance",
   silk: "shiny smooth premium mulberry silk fabric with elegant flowing draping and soft highlights",
   cotton: "soft high-quality organic cotton fabric with a clean smooth matte finish",
-  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture"
+  lace: "delicately patterned sheer lace fabric with detailed embroidery and openwork texture",
+  blackout_chamois: "thick chamois suede blackout fabric, dense opaque backing, soft matte nap texture, heavy room-darkening drape"
 };
 
 const colorPrompts: Record<string, string> = {
@@ -58,13 +56,11 @@ const styleNames: Record<string, string> = {
   gathered: 'زم',
   pinch: 'تكسير امريكي',
   sunscreen: 'رول سنسكرين',
-  blackout: 'بلاك آوت شامواه',
   dk: 'دي كي (DK)',
   classic_rod: 'كلاسيك بوري',
   zebra: 'رول زيبرا',
   wood_venetian: 'جالوزي خشبي',
   metal_venetian: 'جالوزي معدني',
-  side_pull: 'رفعات جانبية',
   stage: 'مسرحي كسرات'
 };
 
@@ -73,7 +69,17 @@ const fabricNames: Record<string, string> = {
   linen: 'كتان طبيعي',
   silk: 'حرير ناعم',
   cotton: 'قطن ناعم',
-  lace: 'دانتيل منقوش'
+  lace: 'دانتيل منقوش',
+  blackout_chamois: 'بلاك آوت شامواه'
+};
+
+const fabricEnglishNames: Record<string, string> = {
+  velvet: 'Velvet',
+  linen: 'Linen',
+  silk: 'Silk',
+  cotton: 'Cotton',
+  lace: 'Lace',
+  blackout_chamois: 'Chamois Blackout'
 };
 
 const barNames: Record<string, string> = {
@@ -86,7 +92,14 @@ const barNames: Record<string, string> = {
 
 const positionNames: Record<string, string> = {
   closed: 'مغلقة بالكامل',
-  open_sides: 'مسحوبة للجانبين'
+  open_sides: 'مسحوبة للجانبين',
+  side_pull: 'رفعات جانبية'
+};
+
+const positionEnglishNames: Record<string, string> = {
+  closed: 'Closed panels',
+  open_sides: 'Open sides',
+  side_pull: 'Side tiebacks'
 };
 
 const opacityNames: Record<string, string> = {
@@ -180,14 +193,25 @@ export default function AppPage() {
 
   const handleStyleSelect = (styleId: string) => {
     setStyle(styleId);
-    if (styleId === 'side_pull') {
-      setCurtainPosition('open_sides');
+    if (styleId === 'classic_rod' && !['wood_bar', 'metal_bar'].includes(barStyle)) {
+      setBarStyle('metal_bar');
     }
   };
 
   const handleCurtainPositionSelect = (positionId: string) => {
     setCurtainPosition(positionId);
-    if (positionId === 'closed' && style === 'side_pull') {
+  };
+
+  const handleFabricSelect = (fabricId: string) => {
+    setFabric(fabricId);
+    if (fabricId === 'blackout_chamois') {
+      setOpacity('blackout');
+    }
+  };
+
+  const handleBarStyleSelect = (barId: string) => {
+    setBarStyle(barId);
+    if (style === 'classic_rod' && !['wood_bar', 'metal_bar'].includes(barId)) {
       setStyle('wave');
     }
   };
@@ -434,6 +458,7 @@ export default function AppPage() {
         const activePosition = isMagicMode ? 'closed' : curtainPosition === 'half_open' ? 'open_sides' : curtainPosition; 
         const activeAddTulle = isMagicMode ? true : addTulle;
         const isClosedPosition = activePosition === 'closed';
+        const isSideTiebackPosition = activePosition === 'side_pull';
 
         let colorDesc = '';
         if (!isMagicMode && selectedColor === 'custom') {
@@ -455,8 +480,6 @@ export default function AppPage() {
         if (isClosedPosition) {
           if (isBlindStyle(activeStyle)) {
             constructionInstruction = `${stylePrompts[activeStyle]}, fully lowered across the complete window opening as one continuous closed window covering`;
-          } else if (activeStyle === 'side_pull' || activeStyle === 'open_sides') {
-            constructionInstruction = `closed full-width drapery with any tie-backs removed, continuous vertical folds, fabric spanning the whole window opening`;
           } else {
             constructionInstruction = `${stylePrompts[activeStyle]}, arranged as closed full-width curtain panels with folds continuing through the center seam`;
           }
@@ -464,12 +487,18 @@ export default function AppPage() {
           positionInstruction = `Required final position: CLOSED. The selected main curtain or blind must cover the entire window opening from left edge to right edge. For fabric curtains, fill the center with the same continuous fabric folds; the center seam is only a narrow vertical meeting line, not a gap. Do not leave panels parked on the left and right sides. Do not show exposed glass, window frame, clear daylight, or outside scenery in the middle.`;
           tulleInstruction = `Do not add a separate visible tulle layer in front of the closed main curtain.`;
           negativePrompt = `${negativePrompt}, exposed center opening, open curtains, side-stacked curtains, visible window glass, visible window frame, outside view, daylight in the center, separate tulle panel over an open window`;
+        } else if (isSideTiebackPosition) {
+          positionInstruction = `Required final position: SIDE TIEBACKS. Pull the main curtain panels outward to the left and right sides and secure each panel with visible fabric tiebacks or holdbacks around the middle height. The drapery should curve gracefully toward the side tiebacks, leaving the center window intentionally exposed.`;
+          tulleInstruction = activeAddTulle 
+            ? `Add one delicate sheer white tulle layer across the exposed center window glass behind the tied-back side panels.`
+            : `Do not add tulle. Leave the exposed center window glass clear behind the tied-back side panels.`;
+          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, plain open panels without tiebacks`;
         } else {
-          positionInstruction = `Required final position: OPEN SIDES. Move the main curtain fabric to the left and right sides of the window. The center window area remains visible, and the side fabric must look intentionally gathered or tied back, not closed.`;
+          positionInstruction = `Required final position: OPEN SIDES. Move the main curtain fabric to the left and right sides of the window. The center window area remains visible, and the side fabric should stack naturally at the outer edges without tiebacks.`;
           tulleInstruction = activeAddTulle 
             ? `Add one delicate sheer white tulle layer across the exposed center window glass.`
             : `Do not add tulle. Leave the exposed center window glass clear.`;
-          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window`;
+          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, tiebacks, holdbacks`;
         }
 
         const prompt = `Edit this room photo as a strict product visualization. The selected specifications override the original photo and must not be substituted.
@@ -649,7 +678,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'wave' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('wave')}
+                            onClick={() => handleStyleSelect('wave')}
                           >
                             <span className="font-bold text-sm">ويفي</span>
                             <span className={`text-xs mt-1 ${style === 'wave' ? 'text-gray-300' : 'text-gray-500'}`}>Ripple Fold</span>
@@ -657,7 +686,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'pleated' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('pleated')}
+                            onClick={() => handleStyleSelect('pleated')}
                           >
                             <span className="font-bold text-sm">كسرات</span>
                             <span className={`text-xs mt-1 ${style === 'pleated' ? 'text-gray-300' : 'text-gray-500'}`}>Pleated</span>
@@ -665,7 +694,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'gathered' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('gathered')}
+                            onClick={() => handleStyleSelect('gathered')}
                           >
                             <span className="font-bold text-sm">زم</span>
                             <span className={`text-xs mt-1 ${style === 'gathered' ? 'text-gray-300' : 'text-gray-500'}`}>Rod Pocket</span>
@@ -673,7 +702,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'pinch' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('pinch')}
+                            onClick={() => handleStyleSelect('pinch')}
                           >
                             <span className="font-bold text-sm">تكسير أمريكي</span>
                             <span className={`text-xs mt-1 ${style === 'pinch' ? 'text-gray-300' : 'text-gray-500'}`}>Pinch Pleat</span>
@@ -681,34 +710,18 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'classic_rod' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('classic_rod')}
+                            onClick={() => handleStyleSelect('classic_rod')}
                           >
                             <span className="font-bold text-sm">كلاسيك بوري</span>
                             <span className={`text-xs mt-1 ${style === 'classic_rod' ? 'text-gray-300' : 'text-gray-500'}`}>Eyelet Grommet</span>
                           </button>
                           <button
                             type="button"
-                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'side_pull' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => handleStyleSelect('side_pull')}
-                          >
-                            <span className="font-bold text-sm">رفعات جانبية</span>
-                            <span className={`text-xs mt-1 ${style === 'side_pull' ? 'text-gray-300' : 'text-gray-500'}`}>Sweep Pull</span>
-                          </button>
-                          <button
-                            type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'stage' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('stage')}
+                            onClick={() => handleStyleSelect('stage')}
                           >
                             <span className="font-bold text-sm">مسرحي كسرات</span>
                             <span className={`text-xs mt-1 ${style === 'stage' ? 'text-gray-300' : 'text-gray-500'}`}>Theatrical</span>
-                          </button>
-                          <button
-                            type="button"
-                            className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'blackout' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('blackout')}
-                          >
-                            <span className="font-bold text-sm">بلاك آوت شامواه</span>
-                            <span className={`text-xs mt-1 ${style === 'blackout' ? 'text-gray-300' : 'text-gray-500'}`}>Suede Blackout</span>
                           </button>
                         </>
                       ) : (
@@ -716,7 +729,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'sunscreen' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('sunscreen')}
+                            onClick={() => handleStyleSelect('sunscreen')}
                           >
                             <span className="font-bold text-sm">رول سنسكرين</span>
                             <span className={`text-xs mt-1 ${style === 'sunscreen' ? 'text-gray-300' : 'text-gray-500'}`}>Sunscreen</span>
@@ -724,7 +737,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'dk' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('dk')}
+                            onClick={() => handleStyleSelect('dk')}
                           >
                             <span className="font-bold text-sm">دي كي (DK)</span>
                             <span className={`text-xs mt-1 ${style === 'dk' ? 'text-gray-300' : 'text-gray-500'}`}>Double Roller</span>
@@ -732,7 +745,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'zebra' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('zebra')}
+                            onClick={() => handleStyleSelect('zebra')}
                           >
                             <span className="font-bold text-sm">رول زيبرا</span>
                             <span className={`text-xs mt-1 ${style === 'zebra' ? 'text-gray-300' : 'text-gray-500'}`}>Zebra Roller</span>
@@ -740,7 +753,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'wood_venetian' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('wood_venetian')}
+                            onClick={() => handleStyleSelect('wood_venetian')}
                           >
                             <span className="font-bold text-sm">جالوزي خشبي</span>
                             <span className={`text-xs mt-1 ${style === 'wood_venetian' ? 'text-gray-300' : 'text-gray-500'}`}>Wood Venetian</span>
@@ -748,7 +761,7 @@ Final compliance check: the generated result must match every selected specifica
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'metal_venetian' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('metal_venetian')}
+                            onClick={() => handleStyleSelect('metal_venetian')}
                           >
                             <span className="font-bold text-sm">جالوزي معدني</span>
                             <span className={`text-xs mt-1 ${style === 'metal_venetian' ? 'text-gray-300' : 'text-gray-500'}`}>Alum Venetian</span>
@@ -790,11 +803,11 @@ Final compliance check: the generated result must match every selected specifica
                               key={key}
                               type="button"
                               className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${fabric === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                              onClick={() => setFabric(key)}
+                              onClick={() => handleFabricSelect(key)}
                             >
                               <span className="font-bold text-sm">{fabricNames[key]}</span>
                               <span className={`text-xs mt-1 ${fabric === key ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {key === 'velvet' ? 'Velvet' : key === 'linen' ? 'Linen' : key === 'silk' ? 'Silk' : key === 'cotton' ? 'Cotton' : 'Lace'}
+                                {fabricEnglishNames[key]}
                               </span>
                             </button>
                           ))}
@@ -947,7 +960,7 @@ Final compliance check: the generated result must match every selected specifica
                               key={key}
                               type="button"
                               className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${barStyle === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                              onClick={() => setBarStyle(key)}
+                              onClick={() => handleBarStyleSelect(key)}
                             >
                               <span className="font-bold text-sm">{barNames[key]}</span>
                               <span className={`text-xs mt-1 ${barStyle === key ? 'text-gray-300' : 'text-gray-500'}`}>
@@ -1026,7 +1039,7 @@ Final compliance check: the generated result must match every selected specifica
                             >
                               <span className="font-bold text-sm">{positionNames[key]}</span>
                               <span className={`text-xs mt-1 ${curtainPosition === key ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {key === 'closed' ? 'Closed panels' : 'Open sides'}
+                                {positionEnglishNames[key]}
                               </span>
                             </button>
                           ))}
