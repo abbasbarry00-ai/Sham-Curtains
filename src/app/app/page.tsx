@@ -235,6 +235,140 @@ export default function AppPage() {
     });
   };
 
+  const getSelectedColorHex = () => {
+    if (!isMagicMode && selectedColor === 'custom') return customColor;
+    const activeColor = isMagicMode ? 'beige' : selectedColor;
+    return colors.find((c) => c.id === activeColor)?.hex || '#c8b28f';
+  };
+
+  const hexToRgb = (hex: string) => {
+    const normalized = hex.replace('#', '');
+    const value = normalized.length === 3
+      ? normalized.split('').map((char) => char + char).join('')
+      : normalized;
+    const parsed = parseInt(value, 16);
+    return {
+      r: (parsed >> 16) & 255,
+      g: (parsed >> 8) & 255,
+      b: parsed & 255
+    };
+  };
+
+  const createClosedCurtainGuideImageBase64 = (src: string, colorHex: string, styleId: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(src);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const scan = ctx.getImageData(0, 0, width, height).data;
+        const scanMinX = Math.floor(width * 0.16);
+        const scanMaxX = Math.floor(width * 0.84);
+        const scanMinY = Math.floor(height * 0.06);
+        const scanMaxY = Math.floor(height * 0.78);
+        let minX = scanMaxX;
+        let maxX = scanMinX;
+        let minY = scanMaxY;
+        let maxY = scanMinY;
+        let count = 0;
+
+        for (let y = scanMinY; y < scanMaxY; y += 3) {
+          for (let x = scanMinX; x < scanMaxX; x += 3) {
+            const index = (y * width + x) * 4;
+            const r = scan[index];
+            const g = scan[index + 1];
+            const b = scan[index + 2];
+            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            const colorSpread = Math.max(r, g, b) - Math.min(r, g, b);
+            if (luma > 148 && (luma > 182 || colorSpread > 28)) {
+              minX = Math.min(minX, x);
+              maxX = Math.max(maxX, x);
+              minY = Math.min(minY, y);
+              maxY = Math.max(maxY, y);
+              count++;
+            }
+          }
+        }
+
+        const minUsefulPixels = ((scanMaxX - scanMinX) * (scanMaxY - scanMinY)) / 9 * 0.025;
+        if (count < minUsefulPixels || minX >= maxX || minY >= maxY) {
+          minX = Math.floor(width * 0.26);
+          maxX = Math.floor(width * 0.74);
+          minY = Math.floor(height * 0.13);
+          maxY = Math.floor(height * 0.80);
+        } else {
+          minX = Math.max(0, minX - Math.floor(width * 0.045));
+          maxX = Math.min(width, maxX + Math.floor(width * 0.045));
+          minY = Math.max(0, minY - Math.floor(height * 0.045));
+          maxY = Math.min(height, maxY + Math.floor(height * 0.10));
+        }
+
+        const guideWidth = maxX - minX;
+        const guideHeight = maxY - minY;
+        const rgb = hexToRgb(colorHex);
+        const isBlindGuide = isBlindStyle(styleId);
+
+        ctx.save();
+        ctx.globalAlpha = 0.96;
+        ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        ctx.fillRect(minX, minY, guideWidth, guideHeight);
+
+        if (isBlindGuide) {
+          ctx.globalAlpha = 0.22;
+          ctx.strokeStyle = rgb.r + rgb.g + rgb.b > 620 ? 'rgba(70, 60, 45, 0.5)' : 'rgba(255, 255, 255, 0.45)';
+          ctx.lineWidth = Math.max(1, height * 0.003);
+          const stripeStep = Math.max(10, guideHeight / 18);
+          for (let y = minY + stripeStep; y < maxY; y += stripeStep) {
+            ctx.beginPath();
+            ctx.moveTo(minX, y);
+            ctx.lineTo(maxX, y);
+            ctx.stroke();
+          }
+        } else {
+          const foldCount = 18;
+          const foldWidth = guideWidth / foldCount;
+          for (let i = 0; i < foldCount; i++) {
+            const x = minX + i * foldWidth;
+            const shade = i % 2 === 0 ? 'rgba(0, 0, 0, 0.16)' : 'rgba(255, 255, 255, 0.18)';
+            const gradient = ctx.createLinearGradient(x, minY, x + foldWidth, minY);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(0.45, shade);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.globalAlpha = 0.95;
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, minY, foldWidth, guideHeight);
+          }
+          ctx.globalAlpha = 0.35;
+          ctx.strokeStyle = 'rgba(40, 30, 20, 0.55)';
+          ctx.lineWidth = Math.max(1, width * 0.002);
+          ctx.beginPath();
+          ctx.moveTo(minX + guideWidth / 2, minY);
+          ctx.lineTo(minX + guideWidth / 2, maxY);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = 'rgba(30, 20, 10, 0.45)';
+        ctx.fillRect(minX, minY, guideWidth, Math.max(4, height * 0.01));
+        ctx.restore();
+
+        resolve(canvas.toDataURL('image/jpeg', 0.86));
+      };
+      img.onerror = () => resolve(src);
+      img.src = src;
+    });
+  };
+
   const handleImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('الرجاء رفع ملف صورة صالح.');
@@ -355,8 +489,9 @@ Forbidden changes:
 
 Execution:
 Action 1: Replace only the existing window treatment area with the selected specifications above.
-Action 2: Preserve the room and architecture outside the window treatment area.
-Action 3: Make the final image photorealistic and internally consistent.
+Action 2: ${isClosedPosition ? 'Use the rough closed-curtain color guide in the input image only as spatial guidance, and refine it into realistic fabric that fully covers the window.' : 'Use the original image as the room reference.'}
+Action 3: Preserve the room and architecture outside the window treatment area.
+Action 4: Make the final image photorealistic and internally consistent.
 Final compliance check: the generated result must match every selected specification: style, color, opacity, hardware, tulle setting, and ${isClosedPosition ? 'fully closed position with no open center gap.' : 'open-side position with the center window intentionally exposed.'}`;
 
         return {
@@ -367,6 +502,10 @@ Final compliance check: the generated result must match every selected specifica
       };
 
       const promptObj = getCohesivePrompt();
+      const guideStyle = isMagicMode ? 'wave' : style;
+      const imageForGeneration = promptObj.curtain_position === 'closed'
+        ? await createClosedCurtainGuideImageBase64(imageToUse, getSelectedColorHex(), guideStyle)
+        : imageToUse;
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -374,7 +513,7 @@ Final compliance check: the generated result must match every selected specifica
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image: imageToUse,
+          image: imageForGeneration,
           prompt: promptObj.prompt,
           negative_prompt: promptObj.negative_prompt,
           curtain_position: promptObj.curtain_position,
