@@ -169,6 +169,20 @@ export default function AppPage() {
     }
   };
 
+  const handleStyleSelect = (styleId: string) => {
+    setStyle(styleId);
+    if (styleId === 'side_pull') {
+      setCurtainPosition('open_sides');
+    }
+  };
+
+  const handleCurtainPositionSelect = (positionId: string) => {
+    setCurtainPosition(positionId);
+    if (positionId === 'closed' && style === 'side_pull') {
+      setStyle('wave');
+    }
+  };
+
   // Measure and set original image aspect ratio dynamically
   React.useEffect(() => {
     if (!originalImageSrc) return;
@@ -276,6 +290,7 @@ export default function AppPage() {
         const activeOpacity = isMagicMode ? 'semi' : opacity;
         const activePosition = isMagicMode ? 'closed' : curtainPosition === 'half_open' ? 'open_sides' : curtainPosition; 
         const activeAddTulle = isMagicMode ? true : addTulle;
+        const isClosedPosition = activePosition === 'closed';
 
         let colorDesc = '';
         if (!isMagicMode && selectedColor === 'custom') {
@@ -294,13 +309,22 @@ export default function AppPage() {
 
         let positionInstruction = '';
         let tulleInstruction = '';
+        let constructionInstruction = stylePrompts[activeStyle];
 
         let negativePrompt = "blank wall, painted wall, drywall, plaster patch, changed wall color, changed furniture, changed floor, changed ceiling, distorted room layout";
 
-        if (activePosition === 'closed') {
-          positionInstruction = `Close the curtain panels fully. Extend the same ${colorDesc} curtain fabric continuously from the left window edge to the right window edge. The left and right panels meet tightly at a narrow vertical center seam. The fabric hangs naturally from the selected hardware down to the floor with continuous vertical folds across the full width. No bright center opening, exposed glass, outside view, or visible window frame should remain.`;
+        if (isClosedPosition) {
+          if (isBlindStyle(activeStyle)) {
+            constructionInstruction = `${stylePrompts[activeStyle]}, fully lowered across the complete window opening as one continuous closed window covering`;
+          } else if (activeStyle === 'side_pull' || activeStyle === 'open_sides') {
+            constructionInstruction = `closed full-width drapery with any tie-backs removed, continuous vertical folds, fabric spanning the whole window opening`;
+          } else {
+            constructionInstruction = `${stylePrompts[activeStyle]}, arranged as closed full-width curtain panels with folds continuing through the center seam`;
+          }
+
+          positionInstruction = `Make the final curtain position CLOSED. Cover the entire bright window rectangle with the same ${colorDesc} fabric from the hardware at the top down to the floor or sill. Fill the center area with continuous fabric folds; the center seam is only a narrow vertical meeting line, not an opening. Do not leave curtain panels parked on the left and right sides. Do not show exposed glass, window frame, daylight, or outside scenery in the middle.`;
           tulleInstruction = `Keep the curtain fully opaque in the center and do not add sheer tulle or transparent layers.`;
-          negativePrompt = `${negativePrompt}, exposed center opening, open curtains, visible window glass, visible window frame, outside view`;
+          negativePrompt = `${negativePrompt}, exposed center opening, open curtains, side-stacked curtains, visible window glass, visible window frame, outside view, daylight in the center`;
         } else {
           positionInstruction = `Open the ${colorDesc} main curtain panels to the sides. Sweep the fabric to the left and right edges of the window while keeping the center opening visible.`;
           tulleInstruction = activeAddTulle 
@@ -310,16 +334,19 @@ export default function AppPage() {
 
         const prompt = `Edit this photo of a room.
 Action 1: Preserve the original room composition, camera angle, wall colors, furniture, floor, ceiling, and lighting.
-Action 2: ${barInstruction}
-Action 3: Install custom curtain fabric in ${colorDesc}, using ${fabricPrompts[activeFabric]}.
-Action 4: Shape the curtain with this construction style: ${stylePrompts[activeStyle]}.
-Action 5: ${positionInstruction}
-Action 6: ${tulleInstruction}
-Action 7: Blend the new curtain treatment photorealistically into the original photo. Only modify the window treatment area.`;
+Action 2: Treat the existing window opening as the only area that receives a new window treatment.
+Action 3: ${barInstruction}
+Action 4: Install custom curtain fabric in ${colorDesc}, using ${fabricPrompts[activeFabric]}.
+Action 5: Shape the curtain with this construction style: ${constructionInstruction}.
+Action 6: ${positionInstruction}
+Action 7: ${tulleInstruction}
+Action 8: Blend the new curtain treatment photorealistically into the original photo. Only modify the window treatment area.
+Final check: ${isClosedPosition ? 'the generated image must show a closed curtain covering the whole window, with no open center gap.' : 'the generated image should keep the selected open-side curtain position.'}`;
 
         return {
           prompt: prompt,
-          negative_prompt: negativePrompt 
+          negative_prompt: negativePrompt,
+          curtain_position: activePosition
         };
       };
 
@@ -334,6 +361,7 @@ Action 7: Blend the new curtain treatment photorealistically into the original p
           image: imageToUse,
           prompt: promptObj.prompt,
           negative_prompt: promptObj.negative_prompt,
+          curtain_position: promptObj.curtain_position,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
@@ -506,7 +534,7 @@ Action 7: Blend the new curtain treatment photorealistically into the original p
                           <button
                             type="button"
                             className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${style === 'side_pull' ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                            onClick={() => setStyle('side_pull')}
+                            onClick={() => handleStyleSelect('side_pull')}
                           >
                             <span className="font-bold text-sm">رفعات جانبية</span>
                             <span className={`text-xs mt-1 ${style === 'side_pull' ? 'text-gray-300' : 'text-gray-500'}`}>Sweep Pull</span>
@@ -839,7 +867,7 @@ Action 7: Blend the new curtain treatment photorealistically into the original p
                               key={key}
                               type="button"
                               className={`border border-gray-300 rounded-none p-3 flex flex-col items-center justify-center cursor-pointer transition-colors ${curtainPosition === key ? 'bg-[#111111] text-white' : 'bg-white text-[#111111]'}`}
-                              onClick={() => setCurtainPosition(key)}
+                              onClick={() => handleCurtainPositionSelect(key)}
                             >
                               <span className="font-bold text-sm">{positionNames[key]}</span>
                               <span className={`text-xs mt-1 ${curtainPosition === key ? 'text-gray-300' : 'text-gray-500'}`}>

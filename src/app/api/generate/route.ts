@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { image, prompt, negative_prompt } = body;
+    const { image, prompt, negative_prompt, curtain_position } = body;
 
     if (!image) {
       return NextResponse.json(
@@ -41,12 +41,16 @@ export async function POST(req: NextRequest) {
       'Preservation constraint: keep the original walls, wall paint color, furniture, floor, ceiling, camera perspective, and room lighting unchanged. Only edit the window treatment area.'
     ].join('\n');
 
+    const closedCurtainInstruction = curtain_position === 'closed'
+      ? '\nClosed-curtain requirement: the final image must show the curtain fully closed across the entire window opening. Do not leave a center gap, side-stacked open panels, visible glass, visible frame, daylight, or outdoor scenery in the middle.'
+      : '';
+
     const negativeInstruction = typeof negative_prompt === 'string' && negative_prompt.trim()
       ? `\nAvoid: ${negative_prompt.trim()}.`
       : '';
 
     const input: Record<string, unknown> = {
-      prompt: `${preservationInstruction}${negativeInstruction}`,
+      prompt: `${preservationInstruction}${closedCurtainInstruction}${negativeInstruction}`,
       input_image: image,
       output_format: 'jpg'
     };
