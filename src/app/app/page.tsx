@@ -52,26 +52,6 @@ const colorPrompts: Record<string, string> = {
   rose: "dusty rose pink tone"
 };
 
-const getHardwarePrompt = (activeBar: string) => {
-  if (activeBar === 'hidden') return `Curtains dropping seamlessly from a recessed architectural ceiling slit. Minimalist interior design. The curtain fabric flows directly from the pristine, flat ceiling downwards.`;
-  if (activeBar === 'wood_bar') return `Classic thick oak wood curtain rod mounted on the wall above the window. The wooden pole features intricately carved traditional wood finials on both ends. Rich natural wood grain finish.`;
-  if (activeBar === 'wood_rail') return `Curtains falling elegantly from behind a minimalist painted wooden pelmet box. Architectural window cornice board covering the top header of the curtains.`;
-  if (activeBar === 'metal_bar') return `Luxury antique brass metal curtain rod mounted above the window. The rod features ornate, intricately carved hollow filigree ball finials.`;
-  if (activeBar === 'modern_bar') return `Sleek modern white aluminum curtain track rail mounted on the ceiling. Minimalist low-profile track system, flat geometric design.`;
-  return '';
-};
-
-const curtainPositionPrompts: Record<string, string> = {
-  closed: "The curtain panels are drawn completely shut, meeting tightly in the center. The fabric covers the entire window from the left edge to the right edge. The window glass and window frame are fully covered and hidden behind the solid continuous curtain fabric, with no center gap or opening.",
-  half_open: "The curtain panels are half-open, drawn apart to the left and right sides. The curtain fabric is gathered and bunched at the left and right window edges, leaving the center of the window fully open and exposed, with natural daylight streaming through the window glass in the middle."
-};
-
-const opacityPrompts: Record<string, string> = {
-  sheer: "sheer translucent fabric that lets natural sunlight pass through, creating a bright airy ambiance with soft light filtering",
-  semi: "semi-opaque light-filtering fabric that dims the light and offers privacy while maintaining a warm ambient glow",
-  blackout: "100% thick blackout fabric that completely blocks out all incoming daylight, providing full room darkening and absolute privacy"
-};
-
 const styleNames: Record<string, string> = {
   wave: 'ويفي',
   pleated: 'كسرات',
@@ -113,6 +93,35 @@ const opacityNames: Record<string, string> = {
   sheer: 'شفاف يمرر الضوء',
   semi: 'شبه تعتيم',
   blackout: 'تعتيم كامل'
+};
+
+const hardwareRequirements: Record<string, { required: string; forbidden: string }> = {
+  hidden: {
+    required: 'Use a concealed recessed ceiling track. The fabric must start from a narrow hidden slot or shadow line at the ceiling/top reveal.',
+    forbidden: 'Do not show any visible curtain rod, metal pole, wooden pole, finials, rings, brackets, grommets, or black horizontal bar.'
+  },
+  wood_bar: {
+    required: 'Use one visible thick natural oak wooden curtain rod mounted above the window, with carved wooden finials on both ends.',
+    forbidden: 'Do not use a black metal rod, brass rod, ceiling track, hidden track, pelmet-only installation, or aluminum rail.'
+  },
+  wood_rail: {
+    required: 'Use a painted wooden pelmet/cornice box that hides the rail. The curtain fabric must emerge from under the pelmet.',
+    forbidden: 'Do not show a round rod, finials, rings, black metal pole, brass pole, or exposed ceiling track.'
+  },
+  metal_bar: {
+    required: 'Use one visible decorative dark iron curtain rod above the window, with matching decorative metal finials.',
+    forbidden: 'Do not use a wooden rod, hidden track, ceiling slit, white aluminum rail, or wooden pelmet.'
+  },
+  modern_bar: {
+    required: 'Use a slim modern white aluminum ceiling-mounted curtain track, clean and minimal.',
+    forbidden: 'Do not use a round rod, finials, rings, black metal pole, wooden pole, or carved decorative hardware.'
+  }
+};
+
+const opacityRequirements: Record<string, string> = {
+  sheer: 'Use sheer light-filtering fabric. It may glow with daylight, but the selected curtain shape must remain physically continuous and clear.',
+  semi: 'Use semi-opaque light-filtering fabric that softens daylight and blocks a clear outside view.',
+  blackout: 'Use fully opaque blackout fabric that blocks daylight and hides the outside view.'
 };
 
 export default function AppPage() {
@@ -300,18 +309,14 @@ export default function AppPage() {
           colorDesc = colorObj ? colorPrompts[activeColor] : 'solid color';
         }
 
-        let barInstruction = '';
-        if (activeBar === 'hidden') barInstruction = `Install a hidden recessed ceiling track.`;
-        else if (activeBar === 'wood_bar') barInstruction = `Install a thick oak wood curtain rod with carved finials above the window.`;
-        else if (activeBar === 'wood_rail') barInstruction = `Install a painted wooden pelmet box above the window to hide the hardware.`;
-        else if (activeBar === 'metal_bar') barInstruction = `Install an antique brass metal curtain rod with decorative finials above the window.`;
-        else if (activeBar === 'modern_bar') barInstruction = `Install a sleek modern white aluminum ceiling track.`;
+        const hardwareSpec = hardwareRequirements[activeBar] || hardwareRequirements.hidden;
+        const opacitySpec = opacityRequirements[activeOpacity] || opacityRequirements.semi;
 
         let positionInstruction = '';
         let tulleInstruction = '';
         let constructionInstruction = stylePrompts[activeStyle];
 
-        let negativePrompt = "blank wall, painted wall, drywall, plaster patch, changed wall color, changed furniture, changed floor, changed ceiling, distorted room layout";
+        let negativePrompt = `wrong curtain style, wrong hardware, ${hardwareSpec.forbidden}, blank wall, painted wall, drywall, plaster patch, changed wall color, changed furniture, changed floor, changed ceiling, distorted room layout`;
 
         if (isClosedPosition) {
           if (isBlindStyle(activeStyle)) {
@@ -322,26 +327,37 @@ export default function AppPage() {
             constructionInstruction = `${stylePrompts[activeStyle]}, arranged as closed full-width curtain panels with folds continuing through the center seam`;
           }
 
-          positionInstruction = `Make the final curtain position CLOSED. Cover the entire bright window rectangle with the same ${colorDesc} fabric from the hardware at the top down to the floor or sill. Fill the center area with continuous fabric folds; the center seam is only a narrow vertical meeting line, not an opening. Do not leave curtain panels parked on the left and right sides. Do not show exposed glass, window frame, daylight, or outside scenery in the middle.`;
-          tulleInstruction = `Keep the curtain fully opaque in the center and do not add sheer tulle or transparent layers.`;
-          negativePrompt = `${negativePrompt}, exposed center opening, open curtains, side-stacked curtains, visible window glass, visible window frame, outside view, daylight in the center`;
+          positionInstruction = `Required final position: CLOSED. The selected main curtain or blind must cover the entire window opening from left edge to right edge. For fabric curtains, fill the center with the same continuous fabric folds; the center seam is only a narrow vertical meeting line, not a gap. Do not leave panels parked on the left and right sides. Do not show exposed glass, window frame, clear daylight, or outside scenery in the middle.`;
+          tulleInstruction = `Do not add a separate visible tulle layer in front of the closed main curtain.`;
+          negativePrompt = `${negativePrompt}, exposed center opening, open curtains, side-stacked curtains, visible window glass, visible window frame, outside view, daylight in the center, separate tulle panel over an open window`;
         } else {
-          positionInstruction = `Open the ${colorDesc} main curtain panels to the sides. Sweep the fabric to the left and right edges of the window while keeping the center opening visible.`;
+          positionInstruction = `Required final position: OPEN SIDES. Move the main curtain fabric to the left and right sides of the window. The center window area remains visible, and the side fabric must look intentionally gathered or tied back, not closed.`;
           tulleInstruction = activeAddTulle 
-            ? `Cover the exposed center window glass with a delicate sheer white tulle curtain layer.`
-            : `Leave the center window glass completely clear and exposed to show the outside view.`;
+            ? `Add one delicate sheer white tulle layer across the exposed center window glass.`
+            : `Do not add tulle. Leave the exposed center window glass clear.`;
+          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window`;
         }
 
-        const prompt = `Edit this photo of a room.
-Action 1: Preserve the original room composition, camera angle, wall colors, furniture, floor, ceiling, and lighting.
-Action 2: Treat the existing window opening as the only area that receives a new window treatment.
-Action 3: ${barInstruction}
-Action 4: Install custom curtain fabric in ${colorDesc}, using ${fabricPrompts[activeFabric]}.
-Action 5: Shape the curtain with this construction style: ${constructionInstruction}.
-Action 6: ${positionInstruction}
-Action 7: ${tulleInstruction}
-Action 8: Blend the new curtain treatment photorealistically into the original photo. Only modify the window treatment area.
-Final check: ${isClosedPosition ? 'the generated image must show a closed curtain covering the whole window, with no open center gap.' : 'the generated image should keep the selected open-side curtain position.'}`;
+        const prompt = `Edit this room photo as a strict product visualization. The selected specifications override the original photo and must not be substituted.
+
+Required selected specifications:
+- Curtain/blind style: ${constructionInstruction}.
+- Fabric/material/color: ${colorDesc}; ${isBlindStyle(activeStyle) ? 'use the selected blind material surface' : fabricPrompts[activeFabric]}.
+- Opacity: ${opacitySpec}
+- Hardware: ${hardwareSpec.required}
+- Position: ${positionInstruction}
+- Tulle: ${tulleInstruction}
+
+Forbidden changes:
+- ${hardwareSpec.forbidden}
+- Do not change wall color, furniture, floor, ceiling, camera angle, room layout, or general lighting.
+- Do not invent a different curtain type, different pleat construction, different bar, or different position.
+
+Execution:
+Action 1: Replace only the existing window treatment area with the selected specifications above.
+Action 2: Preserve the room and architecture outside the window treatment area.
+Action 3: Make the final image photorealistic and internally consistent.
+Final compliance check: the generated result must match every selected specification: style, color, opacity, hardware, tulle setting, and ${isClosedPosition ? 'fully closed position with no open center gap.' : 'open-side position with the center window intentionally exposed.'}`;
 
         return {
           prompt: prompt,
