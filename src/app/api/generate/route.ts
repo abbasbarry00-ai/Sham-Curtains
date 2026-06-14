@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { image, mask, prompt, negative_prompt } = body;
+    const { image, prompt, negative_prompt } = body;
 
     if (!image) {
       return NextResponse.json(
@@ -50,12 +50,6 @@ export async function POST(req: NextRequest) {
       input_image: image,
       output_format: 'jpg'
     };
-
-    // FLUX.1 Kontext Pro is instruction-based image editing. It does not use SDXL
-    // inpainting controls, and an all-white mask would invite full-image edits.
-    if (typeof mask === 'string' && mask.trim()) {
-      console.warn('Mask received but not sent: flux-kontext-pro does not accept SDXL-style mask input.');
-    }
 
     const output = await replicate.run(FLUX_KONTEXT_MODEL, { input });
 
