@@ -277,11 +277,9 @@ export default function AppPage() {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, origWidth, origHeight);
 
-    // If no mask is drawn, draw a full white mask so it does standard image-to-image
+    // If no mask is drawn, let the backend omit mask input entirely.
     if (lines.length === 0) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, origWidth, origHeight);
-      return maskCanvas.toDataURL('image/png');
+      return '';
     }
 
     // Draw lines in white
@@ -459,27 +457,31 @@ export default function AppPage() {
         let positionInstruction = '';
         let tulleInstruction = '';
 
+        let negativePrompt = "blank wall, painted wall, drywall, plaster patch, changed wall color, changed furniture, changed floor, changed ceiling, distorted room layout";
+
         if (activePosition === 'closed') {
-          positionInstruction = `CRITICAL OVERRIDE: Completely erase the window, the glass, and the outside landscape. Replace the entire center window area with a continuous, unbroken, solid wall of thick ${colorDesc} curtain fabric. The fabric MUST cover the center completely with no gap. NO daylight should be visible.`;
-          tulleInstruction = `Do not generate any sheer tulle or transparent fabrics.`;
+          positionInstruction = `Close the curtain panels fully. Extend the same ${colorDesc} curtain fabric continuously from the left window edge to the right window edge. The left and right panels meet tightly at a narrow vertical center seam. The fabric hangs naturally from the selected hardware down to the floor with continuous vertical folds across the full width. No bright center opening, exposed glass, outside view, or visible window frame should remain.`;
+          tulleInstruction = `Keep the curtain fully opaque in the center and do not add sheer tulle or transparent layers.`;
+          negativePrompt = `${negativePrompt}, exposed center opening, open curtains, visible window glass, visible window frame, outside view`;
         } else {
-          positionInstruction = `Draw the ${colorDesc} main curtains OPEN to the sides, sweeping them to the left and right edges of the window.`;
+          positionInstruction = `Open the ${colorDesc} main curtain panels to the sides. Sweep the fabric to the left and right edges of the window while keeping the center opening visible.`;
           tulleInstruction = activeAddTulle 
             ? `Cover the exposed center window glass with a delicate sheer white tulle curtain layer.`
             : `Leave the center window glass completely clear and exposed to show the outside view.`;
         }
 
         const prompt = `Edit this photo of a room.
-Action 1: ${barInstruction}
-Action 2: Hang custom curtains made of ${colorDesc} ${fabricPrompts[activeFabric]}.
-Action 3: The curtains must be styled as: ${stylePrompts[activeStyle]}.
-Action 4: ${positionInstruction}
-Action 5: ${tulleInstruction}
-CRITICAL: Maintain the exact original composition, wall colors, furniture, and room lighting. Only modify the window treatments.`;
+Action 1: Preserve the original room composition, camera angle, wall colors, furniture, floor, ceiling, and lighting.
+Action 2: ${barInstruction}
+Action 3: Install custom curtain fabric in ${colorDesc}, using ${fabricPrompts[activeFabric]}.
+Action 4: Shape the curtain with this construction style: ${stylePrompts[activeStyle]}.
+Action 5: ${positionInstruction}
+Action 6: ${tulleInstruction}
+Action 7: Blend the new curtain treatment photorealistically into the original photo. Only modify the window treatment area.`;
 
         return {
           prompt: prompt,
-          negative_prompt: "" 
+          negative_prompt: negativePrompt 
         };
       };
 
@@ -493,8 +495,9 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
         },
         body: JSON.stringify({
           image: imageToUse,
-          mask: maskDataUrl,
+          mask: maskDataUrl || undefined,
           prompt: promptObj.prompt,
+          negative_prompt: promptObj.negative_prompt,
           style: isMagicMode ? 'ستارة ويفي كتان بيج' : styleNames[style],
         }),
       });
@@ -1400,4 +1403,3 @@ CRITICAL: Maintain the exact original composition, wall colors, furniture, and r
     </>
   );
 }
-
