@@ -84,10 +84,18 @@ const fabricEnglishNames: Record<string, string> = {
 
 const barNames: Record<string, string> = {
   wood_bar: 'بار خشبي ديكور',
-  wood_rail: 'rail خشبي ديكور',
+  wood_rail: 'سكة خشبية ديكور',
   metal_bar: 'بار حديد مزخرف',
-  modern_bar: 'بار مودرن بسيط',
+  modern_bar: 'سكة ألمنيوم مودرن',
   hidden: 'سكة مخفية (بدون بار)'
+};
+
+const barEnglishNames: Record<string, string> = {
+  wood_bar: 'Wood Rod',
+  wood_rail: 'Wood Pelmet Track',
+  metal_bar: 'Iron Rod',
+  modern_bar: 'Aluminum Track',
+  hidden: 'Hidden Track'
 };
 
 const positionNames: Record<string, string> = {
@@ -108,26 +116,31 @@ const opacityNames: Record<string, string> = {
   blackout: 'تعتيم كامل'
 };
 
-const hardwareRequirements: Record<string, { required: string; forbidden: string }> = {
+const hardwareRequirements: Record<string, { type: string; required: string; forbidden: string }> = {
   hidden: {
-    required: 'Use a concealed recessed ceiling track. The fabric must start from a narrow hidden slot or shadow line at the ceiling/top reveal.',
-    forbidden: 'Do not show any visible curtain rod, metal pole, wooden pole, finials, rings, brackets, grommets, or black horizontal bar.'
+    type: 'concealed track only, no visible hardware',
+    required: 'Use a fully concealed recessed ceiling track hidden inside the ceiling pocket. The curtain fabric must appear to drop directly from a narrow ceiling slot or shadow gap, with no visible hardware at all.',
+    forbidden: 'Do not show any visible curtain rod, pole, rail, track, pelmet box, brackets, finials, rings, grommets, black horizontal bar, wooden bar, or metal bar.'
   },
   wood_bar: {
-    required: 'Use one visible thick natural oak wooden curtain rod mounted above the window, with carved wooden finials on both ends.',
-    forbidden: 'Do not use a black metal rod, brass rod, ceiling track, hidden track, pelmet-only installation, or aluminum rail.'
+    type: 'visible round wooden rod/pole',
+    required: 'Use one visible round natural oak wooden curtain rod mounted on wall brackets above the window, with carved wooden finials on both ends. This is a rod/pole, not a rail.',
+    forbidden: 'Do not use a metal rod, black rod, brass rod, ceiling track, hidden track, pelmet box, square rail, aluminum track, or recessed slot.'
   },
   wood_rail: {
-    required: 'Use a painted wooden pelmet/cornice box that hides the rail. The curtain fabric must emerge from under the pelmet.',
-    forbidden: 'Do not show a round rod, finials, rings, black metal pole, brass pole, or exposed ceiling track.'
+    type: 'wooden pelmet with hidden internal rail, no visible rod',
+    required: 'Use a straight wooden pelmet/cornice box above the window that conceals an internal curtain rail/track. The curtain fabric must emerge from underneath the wooden box. The rail is hidden inside the pelmet, so no round pole is visible.',
+    forbidden: 'Do not show any round rod, pole, finials, rings, grommets, black metal bar, brass pole, exposed aluminum track, or ceiling slot.'
   },
   metal_bar: {
-    required: 'Use one visible decorative dark iron curtain rod above the window, with matching decorative metal finials.',
-    forbidden: 'Do not use a wooden rod, hidden track, ceiling slit, white aluminum rail, or wooden pelmet.'
+    type: 'visible round decorative iron rod/pole',
+    required: 'Use one visible round decorative dark iron curtain rod mounted on wall brackets above the window, with matching decorative metal finials. This is a rod/pole, not a rail.',
+    forbidden: 'Do not use a wooden rod, hidden track, ceiling slit, white aluminum track, wooden pelmet, square rail, or recessed ceiling slot.'
   },
   modern_bar: {
-    required: 'Use a slim modern white aluminum ceiling-mounted curtain track, clean and minimal.',
-    forbidden: 'Do not use a round rod, finials, rings, black metal pole, wooden pole, or carved decorative hardware.'
+    type: 'visible slim aluminum track/rail, not a rod',
+    required: 'Use a slim straight white aluminum curtain track/rail mounted close to the ceiling. It should look like a low-profile linear rail, not a round pole, with no finials.',
+    forbidden: 'Do not use any round rod, pole, finials, rings, grommets, black metal bar, wooden bar, carved decorative hardware, or wooden pelmet box.'
   }
 };
 
@@ -135,6 +148,34 @@ const opacityRequirements: Record<string, string> = {
   sheer: 'Use sheer light-filtering fabric. It may glow with daylight, but the selected curtain shape must remain physically continuous and clear.',
   semi: 'Use semi-opaque light-filtering fabric that softens daylight and blocks a clear outside view.',
   blackout: 'Use fully opaque blackout fabric that blocks daylight and hides the outside view.'
+};
+
+const getHardwareSpec = (styleId: string, barId: string) => {
+  if (styleId === 'sunscreen' || styleId === 'zebra') {
+    return {
+      type: 'roller blind cassette/headrail only',
+      required: 'Use only the compact roller blind cassette or top tube that belongs to the selected roller blind. No curtain rod or decorative curtain bar is used.',
+      forbidden: 'Do not show curtain rods, poles, finials, curtain rings, grommets, pelmet boxes, decorative bars, or drapery hardware.'
+    };
+  }
+
+  if (styleId === 'dk') {
+    return {
+      type: 'double roller cassette/headrail only',
+      required: 'Use a compact double-roller headrail/cassette containing two separate roller fabrics. No curtain rod or decorative curtain bar is used.',
+      forbidden: 'Do not show curtain rods, poles, finials, curtain rings, grommets, pelmet boxes, decorative bars, or drapery hardware.'
+    };
+  }
+
+  if (styleId === 'wood_venetian' || styleId === 'metal_venetian') {
+    return {
+      type: 'Venetian blind headrail only',
+      required: 'Use only a compact rectangular Venetian blind headrail at the top of the slats. No curtain rod or decorative curtain bar is used.',
+      forbidden: 'Do not show curtain rods, poles, finials, curtain rings, grommets, pelmet boxes, decorative bars, curtain tracks, or drapery hardware.'
+    };
+  }
+
+  return hardwareRequirements[barId] || hardwareRequirements.hidden;
 };
 
 export default function AppPage() {
@@ -393,6 +434,164 @@ export default function AppPage() {
     });
   };
 
+  const detectWindowBounds = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    const scan = ctx.getImageData(0, 0, width, height).data;
+    const scanMinX = Math.floor(width * 0.16);
+    const scanMaxX = Math.floor(width * 0.84);
+    const scanMinY = Math.floor(height * 0.06);
+    const scanMaxY = Math.floor(height * 0.78);
+    let minX = scanMaxX;
+    let maxX = scanMinX;
+    let minY = scanMaxY;
+    let maxY = scanMinY;
+    let count = 0;
+
+    for (let y = scanMinY; y < scanMaxY; y += 3) {
+      for (let x = scanMinX; x < scanMaxX; x += 3) {
+        const index = (y * width + x) * 4;
+        const r = scan[index];
+        const g = scan[index + 1];
+        const b = scan[index + 2];
+        const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        const colorSpread = Math.max(r, g, b) - Math.min(r, g, b);
+        if (luma > 148 && (luma > 182 || colorSpread > 28)) {
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+          count++;
+        }
+      }
+    }
+
+    const minUsefulPixels = ((scanMaxX - scanMinX) * (scanMaxY - scanMinY)) / 9 * 0.025;
+    if (count < minUsefulPixels || minX >= maxX || minY >= maxY) {
+      return {
+        minX: Math.floor(width * 0.26),
+        maxX: Math.floor(width * 0.74),
+        minY: Math.floor(height * 0.13),
+        maxY: Math.floor(height * 0.80)
+      };
+    }
+
+    return {
+      minX: Math.max(0, minX - Math.floor(width * 0.045)),
+      maxX: Math.min(width, maxX + Math.floor(width * 0.045)),
+      minY: Math.max(0, minY - Math.floor(height * 0.045)),
+      maxY: Math.min(height, maxY + Math.floor(height * 0.10))
+    };
+  };
+
+  const sampleWallColor = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    bounds: { minX: number; maxX: number; minY: number; maxY: number }
+  ) => {
+    const sampleY = Math.max(0, Math.floor(bounds.minY - height * 0.08));
+    const sampleXs = [
+      Math.max(0, Math.floor(bounds.minX - width * 0.08)),
+      Math.min(width - 1, Math.floor(bounds.maxX + width * 0.08)),
+      Math.floor(width * 0.5)
+    ];
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    sampleXs.forEach((x) => {
+      const pixel = ctx.getImageData(x, sampleY, 1, 1).data;
+      r += pixel[0];
+      g += pixel[1];
+      b += pixel[2];
+    });
+    return {
+      r: Math.round(r / sampleXs.length),
+      g: Math.round(g / sampleXs.length),
+      b: Math.round(b / sampleXs.length)
+    };
+  };
+
+  const createHardwareGuideImageBase64 = (src: string, barId: string, styleId: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(src);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const bounds = detectWindowBounds(ctx, width, height);
+        const guideMinX = Math.max(0, bounds.minX - Math.floor(width * 0.06));
+        const guideMaxX = Math.min(width, bounds.maxX + Math.floor(width * 0.06));
+        const guideWidth = guideMaxX - guideMinX;
+        const topY = Math.max(0, bounds.minY - Math.floor(height * 0.075));
+        const wall = sampleWallColor(ctx, width, height, bounds);
+        const isBlind = isBlindStyle(styleId);
+
+        ctx.save();
+
+        if (isBlind) {
+          ctx.fillStyle = 'rgba(245, 245, 242, 0.94)';
+          ctx.fillRect(guideMinX, Math.max(0, bounds.minY - height * 0.035), guideWidth, Math.max(5, height * 0.018));
+          ctx.restore();
+          resolve(canvas.toDataURL('image/jpeg', 0.86));
+          return;
+        }
+
+        if (barId === 'hidden') {
+          ctx.fillStyle = `rgba(${wall.r}, ${wall.g}, ${wall.b}, 0.96)`;
+          ctx.fillRect(guideMinX, topY, guideWidth, Math.max(10, height * 0.085));
+          ctx.fillStyle = 'rgba(25, 22, 20, 0.32)';
+          ctx.fillRect(guideMinX + width * 0.015, bounds.minY - height * 0.012, guideWidth - width * 0.03, Math.max(2, height * 0.004));
+        } else if (barId === 'wood_rail') {
+          const boxY = Math.max(0, bounds.minY - height * 0.085);
+          const boxHeight = Math.max(14, height * 0.055);
+          const gradient = ctx.createLinearGradient(guideMinX, boxY, guideMaxX, boxY + boxHeight);
+          gradient.addColorStop(0, '#9a7447');
+          gradient.addColorStop(0.5, '#c59a62');
+          gradient.addColorStop(1, '#8c6338');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(guideMinX, boxY, guideWidth, boxHeight);
+          ctx.fillStyle = 'rgba(60, 35, 15, 0.22)';
+          ctx.fillRect(guideMinX, boxY + boxHeight - Math.max(3, height * 0.006), guideWidth, Math.max(3, height * 0.006));
+        } else if (barId === 'modern_bar') {
+          const railY = Math.max(0, bounds.minY - height * 0.045);
+          ctx.fillStyle = 'rgba(248, 248, 246, 0.96)';
+          ctx.fillRect(guideMinX, railY, guideWidth, Math.max(4, height * 0.009));
+          ctx.fillStyle = 'rgba(180, 180, 175, 0.55)';
+          ctx.fillRect(guideMinX, railY + Math.max(4, height * 0.009), guideWidth, Math.max(1, height * 0.003));
+        } else {
+          const rodY = Math.max(0, bounds.minY - height * 0.045);
+          const isWood = barId === 'wood_bar';
+          ctx.strokeStyle = isWood ? '#7a4d25' : '#171717';
+          ctx.lineWidth = Math.max(4, height * 0.012);
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(guideMinX, rodY);
+          ctx.lineTo(guideMaxX, rodY);
+          ctx.stroke();
+          ctx.fillStyle = isWood ? '#7a4d25' : '#171717';
+          const finialRadius = Math.max(7, height * 0.022);
+          ctx.beginPath();
+          ctx.arc(guideMinX, rodY, finialRadius, 0, Math.PI * 2);
+          ctx.arc(guideMaxX, rodY, finialRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+        resolve(canvas.toDataURL('image/jpeg', 0.86));
+      };
+      img.onerror = () => resolve(src);
+      img.src = src;
+    });
+  };
+
   const handleImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('الرجاء رفع ملف صورة صالح.');
@@ -456,7 +655,7 @@ export default function AppPage() {
         const activeBar = isMagicMode ? 'hidden' : barStyle;
         const activeOpacity = isMagicMode ? 'semi' : opacity;
         const activePosition = isMagicMode ? 'closed' : curtainPosition === 'half_open' ? 'open_sides' : curtainPosition; 
-        const activeAddTulle = isMagicMode ? true : addTulle;
+        const activeAddTulle = isMagicMode ? false : addTulle;
         const isClosedPosition = activePosition === 'closed';
         const isSideTiebackPosition = activePosition === 'side_pull';
 
@@ -468,7 +667,7 @@ export default function AppPage() {
           colorDesc = colorObj ? colorPrompts[activeColor] : 'solid color';
         }
 
-        const hardwareSpec = hardwareRequirements[activeBar] || hardwareRequirements.hidden;
+        const hardwareSpec = getHardwareSpec(activeStyle, activeBar);
         const opacitySpec = opacityRequirements[activeOpacity] || opacityRequirements.semi;
 
         let positionInstruction = '';
@@ -490,15 +689,15 @@ export default function AppPage() {
         } else if (isSideTiebackPosition) {
           positionInstruction = `Required final position: SIDE TIEBACKS. Pull the main curtain panels outward to the left and right sides and secure each panel with visible fabric tiebacks or holdbacks around the middle height. The drapery should curve gracefully toward the side tiebacks, leaving the center window intentionally exposed.`;
           tulleInstruction = activeAddTulle 
-            ? `Add one delicate sheer white tulle layer across the exposed center window glass behind the tied-back side panels.`
-            : `Do not add tulle. Leave the exposed center window glass clear behind the tied-back side panels.`;
-          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, plain open panels without tiebacks`;
+            ? `Add a separate hanging sheer white tulle curtain behind the tied-back side panels. It must be a fabric curtain with soft folds, not a coating, tint, film, or wrap on the glass.`
+            : `Do not add tulle. Keep the original window glass transparent and uncovered behind the tied-back side panels.`;
+          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, plain open panels without tiebacks, frosted glass, tinted window film, privacy film, vinyl wrap, plastic cover on glass, milky glass`;
         } else {
           positionInstruction = `Required final position: OPEN SIDES. Move the main curtain fabric to the left and right sides of the window. The center window area remains visible, and the side fabric should stack naturally at the outer edges without tiebacks.`;
           tulleInstruction = activeAddTulle 
-            ? `Add one delicate sheer white tulle layer across the exposed center window glass.`
-            : `Do not add tulle. Leave the exposed center window glass clear.`;
-          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, tiebacks, holdbacks`;
+            ? `Add a separate hanging sheer white tulle curtain behind the open side panels. It must have visible soft fabric folds and must not look like frosted glass, tinted film, vinyl, or a flat coating on the window.`
+            : `Do not add tulle. Keep the original window glass transparent, uncovered, untinted, and free of any film or wrap.`;
+          negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, tiebacks, holdbacks, frosted glass, tinted window film, privacy film, vinyl wrap, plastic cover on glass, milky glass`;
         }
 
         const prompt = `Edit this room photo as a strict product visualization. The selected specifications override the original photo and must not be substituted.
@@ -507,9 +706,11 @@ Required selected specifications:
 - Curtain/blind style: ${constructionInstruction}.
 - Fabric/material/color: ${colorDesc}; ${isBlindStyle(activeStyle) ? 'use the selected blind material surface' : fabricPrompts[activeFabric]}.
 - Opacity: ${opacitySpec}
-- Hardware: ${hardwareSpec.required}
+- Hardware type: ${hardwareSpec.type}
+- Hardware requirement: ${hardwareSpec.required}
 - Position: ${positionInstruction}
 - Tulle: ${tulleInstruction}
+- Window glass: ${isClosedPosition ? 'glass may be hidden only by the closed main curtain fabric.' : 'keep the original glass transparent and readable; never turn the glass into frosted film, tint, vinyl wrap, plastic cover, or a flat milky overlay.'}
 
 Forbidden changes:
 - ${hardwareSpec.forbidden}
@@ -526,15 +727,17 @@ Final compliance check: the generated result must match every selected specifica
         return {
           prompt: prompt,
           negative_prompt: negativePrompt,
-          curtain_position: activePosition
+          curtain_position: activePosition,
+          hardware_id: activeBar
         };
       };
 
       const promptObj = getCohesivePrompt();
       const guideStyle = isMagicMode ? 'wave' : style;
+      const hardwareGuideImage = await createHardwareGuideImageBase64(imageToUse, promptObj.hardware_id, guideStyle);
       const imageForGeneration = promptObj.curtain_position === 'closed'
-        ? await createClosedCurtainGuideImageBase64(imageToUse, getSelectedColorHex(), guideStyle)
-        : imageToUse;
+        ? await createClosedCurtainGuideImageBase64(hardwareGuideImage, getSelectedColorHex(), guideStyle)
+        : hardwareGuideImage;
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -964,7 +1167,7 @@ Final compliance check: the generated result must match every selected specifica
                             >
                               <span className="font-bold text-sm">{barNames[key]}</span>
                               <span className={`text-xs mt-1 ${barStyle === key ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {key === 'wood_bar' ? 'Wood Bar' : key === 'wood_rail' ? 'Wood Rail' : key === 'metal_bar' ? 'Iron Bar' : key === 'modern_bar' ? 'Modern Bar' : 'Hidden Track'}
+                                {barEnglishNames[key]}
                               </span>
                             </button>
                           ))}
