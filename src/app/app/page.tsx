@@ -84,7 +84,7 @@ const fabricEnglishNames: Record<string, string> = {
 
 const barNames: Record<string, string> = {
   wood_bar: 'بار خشبي ديكور',
-  wood_rail: 'سكة خشبية ديكور',
+  wood_rail: 'بلمت خشبي (سكة مخفية)',
   metal_bar: 'بار حديد مزخرف',
   modern_bar: 'سكة ألمنيوم مودرن',
   hidden: 'سكة مخفية (بدون بار)'
@@ -128,9 +128,9 @@ const hardwareRequirements: Record<string, { type: string; required: string; for
     forbidden: 'Do not use a metal rod, black rod, brass rod, ceiling track, hidden track, pelmet box, square rail, aluminum track, or recessed slot.'
   },
   wood_rail: {
-    type: 'wooden pelmet with hidden internal rail, no visible rod',
-    required: 'Use a straight wooden pelmet/cornice box above the window that conceals an internal curtain rail/track. The curtain fabric must emerge from underneath the wooden box. The rail is hidden inside the pelmet, so no round pole is visible.',
-    forbidden: 'Do not show any round rod, pole, finials, rings, grommets, black metal bar, brass pole, exposed aluminum track, or ceiling slot.'
+    type: 'flat wooden pelmet/cornice with hidden internal track, no visible rod',
+    required: 'Use a straight flat rectangular wooden pelmet/cornice box above the window that conceals an internal curtain track. The curtain fabric must emerge from underneath the wooden box. The visible hardware is a wooden box only, never a round pole.',
+    forbidden: 'Do not show any round rod, cylindrical pole, finials, rings, grommets, brackets, black metal bar, brass pole, exposed aluminum track, or ceiling slot.'
   },
   metal_bar: {
     type: 'visible round decorative iron rod/pole',
@@ -139,8 +139,8 @@ const hardwareRequirements: Record<string, { type: string; required: string; for
   },
   modern_bar: {
     type: 'visible slim aluminum track/rail, not a rod',
-    required: 'Use a slim straight white aluminum curtain track/rail mounted close to the ceiling. It should look like a low-profile linear rail, not a round pole, with no finials.',
-    forbidden: 'Do not use any round rod, pole, finials, rings, grommets, black metal bar, wooden bar, carved decorative hardware, or wooden pelmet box.'
+    required: 'Use a slim straight white aluminum curtain track/rail mounted close to the ceiling. It must look like a flat low-profile linear track, not a cylindrical rod, with no finials or rings.',
+    forbidden: 'Do not use any round rod, cylindrical pole, finials, rings, grommets, black metal bar, wooden bar, carved decorative hardware, or wooden pelmet box.'
   }
 };
 
@@ -177,6 +177,8 @@ const getHardwareSpec = (styleId: string, barId: string) => {
 
   return hardwareRequirements[barId] || hardwareRequirements.hidden;
 };
+
+const isVisibleRodHardware = (barId: string) => barId === 'wood_bar' || barId === 'metal_bar';
 
 export default function AppPage() {
   const [style, setStyle] = useState('wave');
@@ -527,10 +529,14 @@ export default function AppPage() {
 
         ctx.drawImage(img, 0, 0, width, height);
         const bounds = detectWindowBounds(ctx, width, height);
-        const guideMinX = Math.max(0, bounds.minX - Math.floor(width * 0.06));
-        const guideMaxX = Math.min(width, bounds.maxX + Math.floor(width * 0.06));
+        const rodHardware = isVisibleRodHardware(barId);
+        const guideMinX = rodHardware
+          ? Math.max(0, bounds.minX - Math.floor(width * 0.08))
+          : Math.max(0, Math.min(bounds.minX - Math.floor(width * 0.12), Math.floor(width * 0.08)));
+        const guideMaxX = rodHardware
+          ? Math.min(width, bounds.maxX + Math.floor(width * 0.08))
+          : Math.min(width, Math.max(bounds.maxX + Math.floor(width * 0.12), Math.floor(width * 0.92)));
         const guideWidth = guideMaxX - guideMinX;
-        const topY = Math.max(0, bounds.minY - Math.floor(height * 0.075));
         const wall = sampleWallColor(ctx, width, height, bounds);
         const isBlind = isBlindStyle(styleId);
 
@@ -545,27 +551,41 @@ export default function AppPage() {
         }
 
         if (barId === 'hidden') {
+          const clearY = Math.max(0, bounds.minY - Math.floor(height * 0.12));
+          const clearHeight = Math.max(22, Math.floor(height * 0.105));
           ctx.fillStyle = `rgba(${wall.r}, ${wall.g}, ${wall.b}, 0.96)`;
-          ctx.fillRect(guideMinX, topY, guideWidth, Math.max(10, height * 0.085));
+          ctx.fillRect(guideMinX, clearY, guideWidth, clearHeight);
           ctx.fillStyle = 'rgba(25, 22, 20, 0.32)';
           ctx.fillRect(guideMinX + width * 0.015, bounds.minY - height * 0.012, guideWidth - width * 0.03, Math.max(2, height * 0.004));
         } else if (barId === 'wood_rail') {
-          const boxY = Math.max(0, bounds.minY - height * 0.085);
-          const boxHeight = Math.max(14, height * 0.055);
+          const clearY = Math.max(0, bounds.minY - Math.floor(height * 0.12));
+          const clearHeight = Math.max(22, Math.floor(height * 0.105));
+          ctx.fillStyle = `rgba(${wall.r}, ${wall.g}, ${wall.b}, 0.90)`;
+          ctx.fillRect(guideMinX, clearY, guideWidth, clearHeight);
+
+          const boxY = Math.max(0, bounds.minY - height * 0.105);
+          const boxHeight = Math.max(18, height * 0.072);
           const gradient = ctx.createLinearGradient(guideMinX, boxY, guideMaxX, boxY + boxHeight);
-          gradient.addColorStop(0, '#9a7447');
-          gradient.addColorStop(0.5, '#c59a62');
-          gradient.addColorStop(1, '#8c6338');
+          gradient.addColorStop(0, '#8f6538');
+          gradient.addColorStop(0.5, '#c09358');
+          gradient.addColorStop(1, '#7d552d');
           ctx.fillStyle = gradient;
           ctx.fillRect(guideMinX, boxY, guideWidth, boxHeight);
+          ctx.fillStyle = 'rgba(255, 235, 195, 0.20)';
+          ctx.fillRect(guideMinX, boxY + Math.max(2, height * 0.006), guideWidth, Math.max(2, height * 0.004));
           ctx.fillStyle = 'rgba(60, 35, 15, 0.22)';
           ctx.fillRect(guideMinX, boxY + boxHeight - Math.max(3, height * 0.006), guideWidth, Math.max(3, height * 0.006));
         } else if (barId === 'modern_bar') {
-          const railY = Math.max(0, bounds.minY - height * 0.045);
+          const clearY = Math.max(0, bounds.minY - Math.floor(height * 0.085));
+          const clearHeight = Math.max(15, Math.floor(height * 0.06));
+          ctx.fillStyle = `rgba(${wall.r}, ${wall.g}, ${wall.b}, 0.88)`;
+          ctx.fillRect(guideMinX, clearY, guideWidth, clearHeight);
+
+          const railY = Math.max(0, bounds.minY - height * 0.052);
           ctx.fillStyle = 'rgba(248, 248, 246, 0.96)';
-          ctx.fillRect(guideMinX, railY, guideWidth, Math.max(4, height * 0.009));
+          ctx.fillRect(guideMinX, railY, guideWidth, Math.max(5, height * 0.012));
           ctx.fillStyle = 'rgba(180, 180, 175, 0.55)';
-          ctx.fillRect(guideMinX, railY + Math.max(4, height * 0.009), guideWidth, Math.max(1, height * 0.003));
+          ctx.fillRect(guideMinX, railY + Math.max(5, height * 0.012), guideWidth, Math.max(1, height * 0.003));
         } else {
           const rodY = Math.max(0, bounds.minY - height * 0.045);
           const isWood = barId === 'wood_bar';
@@ -669,6 +689,11 @@ export default function AppPage() {
 
         const hardwareSpec = getHardwareSpec(activeStyle, activeBar);
         const opacitySpec = opacityRequirements[activeOpacity] || opacityRequirements.semi;
+        const hardwareGuideInstruction = isBlindStyle(activeStyle)
+          ? 'The top guide in the input image indicates the selected blind headrail/cassette. Preserve it as blind hardware and do not convert it into a curtain rod.'
+          : isVisibleRodHardware(activeBar)
+            ? 'The top guide in the input image indicates the selected visible round rod. Keep it as the chosen rod hardware.'
+            : 'The top guide in the input image indicates the selected track/rail/pelmet. Preserve that flat non-rod hardware exactly and never replace it with a round rod, pole, rings, brackets, or finials.';
 
         let positionInstruction = '';
         let tulleInstruction = '';
@@ -689,13 +714,13 @@ export default function AppPage() {
         } else if (isSideTiebackPosition) {
           positionInstruction = `Required final position: SIDE TIEBACKS. Pull the main curtain panels outward to the left and right sides and secure each panel with visible fabric tiebacks or holdbacks around the middle height. The drapery should curve gracefully toward the side tiebacks, leaving the center window intentionally exposed.`;
           tulleInstruction = activeAddTulle 
-            ? `Add a separate hanging sheer white tulle curtain behind the tied-back side panels. It must be a fabric curtain with soft folds, not a coating, tint, film, or wrap on the glass.`
+            ? `Add a separate hanging sheer white tulle curtain behind the tied-back side panels. It must be suspended from the curtain hardware with visible soft vertical fabric folds and a small air gap from the glass. It must not be a coating, tint, film, plastic sheet, sticker, or wrap on the glass.`
             : `Do not add tulle. Keep the original window glass transparent and uncovered behind the tied-back side panels.`;
           negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, plain open panels without tiebacks, frosted glass, tinted window film, privacy film, vinyl wrap, plastic cover on glass, milky glass`;
         } else {
           positionInstruction = `Required final position: OPEN SIDES. Move the main curtain fabric to the left and right sides of the window. The center window area remains visible, and the side fabric should stack naturally at the outer edges without tiebacks.`;
           tulleInstruction = activeAddTulle 
-            ? `Add a separate hanging sheer white tulle curtain behind the open side panels. It must have visible soft fabric folds and must not look like frosted glass, tinted film, vinyl, or a flat coating on the window.`
+            ? `Add a separate hanging sheer white tulle curtain behind the open side panels. It must be suspended from the curtain hardware with visible soft vertical fabric folds and a small air gap from the glass. It must not look like frosted glass, tinted film, vinyl, plastic sheet, sticker, or a flat coating on the window.`
             : `Do not add tulle. Keep the original window glass transparent, uncovered, untinted, and free of any film or wrap.`;
           negativePrompt = `${negativePrompt}, closed full-width curtain, covered center window, tiebacks, holdbacks, frosted glass, tinted window film, privacy film, vinyl wrap, plastic cover on glass, milky glass`;
         }
@@ -706,8 +731,10 @@ Required selected specifications:
 - Curtain/blind style: ${constructionInstruction}.
 - Fabric/material/color: ${colorDesc}; ${isBlindStyle(activeStyle) ? 'use the selected blind material surface' : fabricPrompts[activeFabric]}.
 - Opacity: ${opacitySpec}
+- Selected hardware option: ${barEnglishNames[activeBar] || activeBar}
 - Hardware type: ${hardwareSpec.type}
 - Hardware requirement: ${hardwareSpec.required}
+- Hardware guide: ${hardwareGuideInstruction}
 - Position: ${positionInstruction}
 - Tulle: ${tulleInstruction}
 - Window glass: ${isClosedPosition ? 'glass may be hidden only by the closed main curtain fabric.' : 'keep the original glass transparent and readable; never turn the glass into frosted film, tint, vinyl wrap, plastic cover, or a flat milky overlay.'}
@@ -719,10 +746,11 @@ Forbidden changes:
 
 Execution:
 Action 1: Replace only the existing window treatment area with the selected specifications above.
-Action 2: ${isClosedPosition ? 'Use the rough closed-curtain color guide in the input image only as spatial guidance, and refine it into realistic fabric that fully covers the window.' : 'Use the original image as the room reference.'}
-Action 3: Preserve the room and architecture outside the window treatment area.
-Action 4: Make the final image photorealistic and internally consistent.
-Final compliance check: the generated result must match every selected specification: style, color, opacity, hardware, tulle setting, and ${isClosedPosition ? 'fully closed position with no open center gap.' : 'open-side position with the center window intentionally exposed.'}`;
+Action 2: Follow the top hardware guide in the input image as the exact hardware category and silhouette.
+Action 3: ${isClosedPosition ? 'Use the rough closed-curtain color guide in the input image only as spatial guidance, and refine it into realistic fabric that fully covers the window.' : 'Use the original image as the room reference.'}
+Action 4: Preserve the room and architecture outside the window treatment area.
+Action 5: Make the final image photorealistic and internally consistent.
+Final compliance check: the generated result must match every selected specification: style, color, opacity, hardware, tulle setting, and ${isClosedPosition ? 'fully closed position with no open center gap.' : `${positionEnglishNames[activePosition] || activePosition} position.`}`;
 
         return {
           prompt: prompt,
@@ -734,10 +762,10 @@ Final compliance check: the generated result must match every selected specifica
 
       const promptObj = getCohesivePrompt();
       const guideStyle = isMagicMode ? 'wave' : style;
-      const hardwareGuideImage = await createHardwareGuideImageBase64(imageToUse, promptObj.hardware_id, guideStyle);
-      const imageForGeneration = promptObj.curtain_position === 'closed'
-        ? await createClosedCurtainGuideImageBase64(hardwareGuideImage, getSelectedColorHex(), guideStyle)
-        : hardwareGuideImage;
+      const positionGuideImage = promptObj.curtain_position === 'closed'
+        ? await createClosedCurtainGuideImageBase64(imageToUse, getSelectedColorHex(), guideStyle)
+        : imageToUse;
+      const imageForGeneration = await createHardwareGuideImageBase64(positionGuideImage, promptObj.hardware_id, guideStyle);
 
       const response = await fetch('/api/generate', {
         method: 'POST',
